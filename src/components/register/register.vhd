@@ -4,7 +4,7 @@ use IEEE.numeric_std.all;
 
 entity reg is
     generic (
-        XLEN :      integer := 32
+        XLEN :      integer := 32                                       -- Number of bits stored by the register. 
     );
     port (
         -- IO ports
