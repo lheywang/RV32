@@ -12,6 +12,7 @@ LEN = 1ms
 VHDLSRC = 	components/alu/alu.vhd
 VHDLSRC += 	components/decoder/decoder.vhd
 VHDLSRC += 	components/register/register.vhd
+VHDLSRC += 	components/register/register_tb.vhd
 VHDLSRC += 	rv32.vhd
 
 VHDLTOP = 	rv32 # Set here the top name. Not the file name !
