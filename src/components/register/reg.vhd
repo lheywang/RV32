@@ -16,7 +16,7 @@ entity reg is
 
         -- Control signals
         nRST :      in      std_logic;                                  -- Reset. Force a 0'b00--000 value
-        WREN :      in      std_logic;                                  -- Enable the output of the register.
+        WREN :      in      std_logic;                                  -- Enable the output of the register. (adync operation)
         INPU :      in      std_logic                                   -- Enable the input of the register. Data will be copied on the next rising edge.         
     );
 end entity;
