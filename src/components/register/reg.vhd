@@ -9,7 +9,7 @@ entity reg is
     port (
         -- IO ports
         datain :    in      std_logic_vector((XLEN - 1) downto 0);      -- Input on the internal bus
-        dataout :   out     std_logic_vector((XLEN -1) downto 0);       -- Output on the internal bud
+        dataout :   out     std_logic_vector((XLEN -1) downto 0);       -- Output on the internal bus
 
         -- Clocks
         clock :     in      std_logic;                                  -- Main clock

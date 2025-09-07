@@ -1,3 +1,5 @@
+-- recommended sim lenght : 200 ns
+
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
@@ -7,26 +9,26 @@ end entity;
 
 architecture behavioral of reg_tb is
 
-    signal datain_t : std_logic_vector(31 downto 0)         := X"deadbeef";
-    signal dataout_t : std_logic_vector(31 downto 0)        := (others => '0');
-    signal clock_t : std_logic                              := '0';
-    signal nRST_t : std_logic                               := '0';
-    signal WREN_t : std_logic                               := '0';
-    signal INPU_t : std_logic                               := '0';
+    signal datain_t :       std_logic_vector(31 downto 0)           := X"deadbeef";
+    signal dataout_t :      std_logic_vector(31 downto 0)           := (others => '0');
+    signal clock_t :        std_logic                               := '0';
+    signal nRST_t :         std_logic                               := '0';
+    signal WREN_t :         std_logic                               := '0';
+    signal INPU_t :         std_logic                               := '0';
 
     begin
 
         U1 : entity work.reg(behavioral)
             generic map (
-                XLEN => 32
+                XLEN    =>  32
             )
             port map (
-                datain => datain_t,
-                dataout => dataout_t,
-                clock => clock_t,
-                nRST => nRST_t,
-                WREN => WREN_t,
-                INPU => INPU_t
+                datain  =>  datain_t,
+                dataout =>  dataout_t,
+                clock   =>  clock_t,
+                nRST    =>  nRST_t,
+                WREN    =>  WREN_t,
+                INPU    =>  INPU_t
             );
 
         P1 : process
