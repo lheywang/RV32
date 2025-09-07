@@ -155,7 +155,7 @@ GHDL_SIMULATE = (
     + f" --wave={WAVEFILE} "
     + f"--stop-time={LEN}"
 )
-GTKWAVE_SHOW = GTKWAVE_CMD + f"-a {PRESENTATION}" + f" {WAVEFILE}" + " --saveonexit"
+GTKWAVE_SHOW = GTKWAVE_CMD + f"-a {PRESENTATION}" + f" {WAVEFILE}"
 
 # Store the different elements into a common list :
 commands = [
@@ -174,6 +174,7 @@ print(
 print("=" * 100)
 
 index = 0
+# result = None
 while True:
     try:
         print(f"Running {commands[index % 4]}")
@@ -187,6 +188,8 @@ while True:
         # CHeck if prints are needed :
         if result.stdout:
             print(result.stdout)
+        if result.stderr:
+            print(result.stderr)
 
         # Incrementing counter
         index += 1
@@ -202,6 +205,20 @@ while True:
         print("Exiting code ghdl handler !")
         print("=" * 100)
         exit(0)
+
+    except subprocess.CalledProcessError as e:
+        # The 'e' object is a CalledProcessError and has stdout/stderr attributes.
+        # Show here the erro from the CLI
+        print(f"\n--- ERROR ---")
+        print(f"Command failed: {' '.join(e.cmd)}")
+        print(f"Return code: {e.returncode}")
+        print(f"Stdout:\n{e.stdout}")
+        print(f"Stderr:\n{e.stderr}")
+        print("----------------\n")
+        input("Press any key to continue...")
+
+        # Set index to 0, to force a recompile
+        index = 0
 
     except Exception as e:
         print()
