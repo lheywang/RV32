@@ -14,14 +14,13 @@ entity decoder is
 
         -- outputs
         -- buses
-        rs1 :           out     std_logic_vector(REG_NB downto 0);          -- One more register here, for the selection of immediate value.
-        rs2 :           out     std_logic_vector((REG_NB - 1) downto 0);
+        rs1 :           out     std_logic_vector((REG_NB + 1) downto 0);    -- Two more register here, for the selection of immediate value and PC respectively.
+        rs2 :           out     std_logic_vector((REG_NB - 1) downto 0);    
         rd :            out     std_logic_vector((REG_NB - 1) downto 0);
         imm :           out     std_logic_vector((XLEN - 1) downto 0);
         opcode :        out     std_logic_vector(16 downto 0);              -- ISA use an up to 17 bit opcode.
         -- signals
         nILLEGAL :      out     std_logic;
-        counter_en :    out     std_logic;
 
         -- Clocks
         clock :         in      std_logic;
@@ -31,19 +30,82 @@ end entity;
 
 architecture behavioral of decoder is
 
-        -- signal
+        -- Defining the different decoders
+        type decoders is (U, I, R, B, S, J, default);
+
+        -- signals
+        signal nILLEGAL_internal :      std_logic           := '0';
+        signal decoder :                decoders            := default;
 
     begin
 
+        -- Basic checks
         P1 : process(clock, nRST) 
             begin
 
                 if (nRST = '0') then
+                    nILLEGAL_internal <= '1';
+                    rs1 <= (others => '0');
+                    rs2 <= (others => '0');
+                    imm <= (others => '0');
+                    rd <= (others => '0');
+                    opcode <= (others => '0');
+
+                    decoder <= default;
 
                 elsif rising_edge(clock) then
 
+                    case instruction(6 downto 0) is
+
+                        when "0110111" => 
+                            decoder <= U;
+                            nILLEGAL_internal <= '1';
+                        when "0010111" =>
+                            decoder <= U;
+                            nILLEGAL_internal <= '1';
+
+                        when "0010011" =>
+                            decoder <= I;
+                            nILLEGAL_internal <= '1';
+                        when "0001111" =>
+                            decoder <= I;
+                            nILLEGAL_internal <= '1';
+                        when "1100111" =>
+                            decoder <= I;
+                            nILLEGAL_internal <= '1';
+                        when "1110011" =>
+                            decoder <= I;
+                            nILLEGAL_internal <= '1';
+
+                        when "0110011" => 
+                            decoder <= R;
+                            nILLEGAL_internal <= '1';
+                        
+                        when "1100011" =>
+                            decoder <= B;
+                            nILLEGAL_internal <= '1';
+                        
+                        when "0100011" =>
+                            decoder <= S;
+                            nILLEGAL_internal <= '1';
+                        when "0000011" =>
+                            decoder <= S;
+                            nILLEGAL_internal <= '1';
+
+                        when "1101111" =>
+                            decoder <= J;
+                            nILLEGAL_internal <= '1';
+
+                        when others =>
+                            decoder <= default;
+                            nILLEGAL_internal <= '0';
+
+                    end case;
                 end if;
                 
             end process;
+
+        -- Always bounded
+        nILLEGAL <= nILLEGAL_internal;
 
     end architecture;

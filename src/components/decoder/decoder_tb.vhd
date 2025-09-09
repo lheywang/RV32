@@ -1,3 +1,4 @@
+-- recommended simulation duration : 2us
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
@@ -8,13 +9,12 @@ end entity;
 architecture behavioral of decoder_tb is
 
         signal instruction_t :  std_logic_vector(31 downto 0)       := X"00000000";
-        signal rs1_t :          std_logic_vector(32 downto 0);
+        signal rs1_t :          std_logic_vector(33 downto 0);
         signal rs2_t :          std_logic_vector(31 downto 0);
         signal rd_t :           std_logic_vector(31 downto 0);
         signal imm_t :          std_logic_vector(31 downto 0);
         signal opcode_t :       std_logic_vector(16 downto 0);
         signal nILLEGAL_t :     std_logic;
-        signal counter_en_t :   std_logic;
         signal clock_t :        std_logic                           := '0';
         signal nRST_t :         std_logic                           := '0';
 
@@ -33,7 +33,6 @@ architecture behavioral of decoder_tb is
                 imm         => imm_t,
                 opcode      => opcode_t,
                 nILLEGAL    => nILLEGAL_t,
-                counter_en  => counter_en_t,
                 clock       => clock_t,
                 nRST        => nRST_t
             );
@@ -59,6 +58,10 @@ architecture behavioral of decoder_tb is
                     --==================================================
                     -- RV32I
                     --==================================================
+
+                    -- Invalid instruction
+                    instruction_t <= B"01110100101001101010011110111101"; 
+                    wait for 40 ns;
 
                     ----------------------------------------------------
                     -- Load immediates
@@ -184,11 +187,6 @@ architecture behavioral of decoder_tb is
                     -- FENCE 0000 1001 1001 00000 000 00000 00011 11
                     -- I type
                     instruction_t <= B"00001001100100000000000000001111"; 
-                    wait for 40 ns;
-
-                    -- FENCE.I 00000 00 00000 00000 001 00000 00011 11
-                    -- I Type
-                    instruction_t <= B"00000000000000000001000000001111"; 
                     wait for 40 ns;
 
                     ----------------------------------------------------
@@ -352,62 +350,61 @@ architecture behavioral of decoder_tb is
 
 -- Instructions lists
 
--- Type	    Opcode	    Funct3	Funct7	        Instruction	    Description
+-- Type	    Opcode	    Funct3	Funct7	        Instruction	    Description                             Cycles Numbers  Remarks
 
--- U-Type	0110111	    N/A	    N/A	            LUI	            Load Upper Immediate
--- U-Type	0010111	    N/A	    N/A	            AUIPC	        Add Upper Immediate to PC
+-- U-Type	0110111	    N/A	    N/A	            LUI	            Load Upper Immediate                    1               N/A
+-- U-Type	0010111	    N/A	    N/A	            AUIPC	        Add Upper Immediate to PC               1               N/A
 
--- I-Type	0010011	    000	    N/A	            ADDI	        Add Immediate
--- I-Type	0010011	    010	    N/A	            SLTI	        Set if Less Than Immediate
--- I-Type	0010011	    011	    N/A	            SLTIU	        Set if < Immediate (Unsigned)
--- I-Type	0010011	    100	    N/A	            XORI	        XOR Immediate
--- I-Type	0010011	    110	    N/A	            ORI	            OR Immediate
--- I-Type	0010011	    111	    N/A	            ANDI	        AND Immediate
--- I-Type	0010011	    001	    0000000	        SLLI	        Shift Left Logical Immediate
--- I-Type	0010011	    101	    0000000	        SRLI	        Shift Right Logical Immediate
--- I-Type	0010011	    101	    0100000	        SRAI	        Shift Right Arithmetic Immediate
+-- I-Type	0010011	    000	    N/A	            ADDI	        Add Immediate                           1               N/A
+-- I-Type	0010011	    010	    N/A	            SLTI	        Set if Less Than Immediate              1               N/A       
+-- I-Type	0010011	    011	    N/A	            SLTIU	        Set if < Immediate (Unsigned)           1               N/A
+-- I-Type	0010011	    100	    N/A	            XORI	        XOR Immediate                           1               N/A
+-- I-Type	0010011	    110	    N/A	            ORI	            OR Immediate                            1               N/A
+-- I-Type	0010011	    111	    N/A	            ANDI	        AND Immediate                           1               N/A
+-- I-Type	0010011	    001	    0000000	        SLLI	        Shift Left Logical Immediate            1               N/A
+-- I-Type	0010011	    101	    0000000	        SRLI	        Shift Right Logical Immediate           1               N/A
+-- I-Type	0010011	    101	    0100000	        SRAI	        Shift Right Arithmetic Immediate        1               N/A
 
--- R-Type	0110011	    000	    0000000	        ADD	            Add
--- R-Type	0110011	    000	    0100000	        SUB	            Subtract
--- R-Type	0110011	    001	    0000000	        SLL	            Shift Left Logical
--- R-Type	0110011	    010	    0000000	        SLT	            Set if Less Than
--- R-Type	0110011	    011	    0000000	        SLTU	        Set if < (Unsigned)
--- R-Type	0110011	    100	    0000000	        XOR	            XOR
--- R-Type	0110011	    101	    0000000	        SRL	            Shift Right Logical
--- R-Type	0110011	    101	    0100000	        SRA	            Shift Right Arithmetic
--- R-Type	0110011	    110	    0000000	        OR	            OR
--- R-Type	0110011	    111	    0000000	        AND	            AND
+-- R-Type	0110011	    000	    0000000	        ADD	            Add                                     1               N/A
+-- R-Type	0110011	    000	    0100000	        SUB	            Subtract                                1               N/A
+-- R-Type	0110011	    001	    0000000	        SLL	            Shift Left Logical                      1               N/A
+-- R-Type	0110011	    010	    0000000	        SLT	            Set if Less Than                        1               N/A
+-- R-Type	0110011	    011	    0000000	        SLTU	        Set if < (Unsigned)                     1               N/A
+-- R-Type	0110011	    100	    0000000	        XOR	            XOR                                     1               N/A
+-- R-Type	0110011	    101	    0000000	        SRL	            Shift Right Logical                     1               N/A
+-- R-Type	0110011	    101	    0100000	        SRA	            Shift Right Arithmetic                  1               N/A
+-- R-Type	0110011	    110	    0000000	        OR	            OR                                      1               N/A
+-- R-Type	0110011	    111	    0000000	        AND	            AND                                     
 
--- I-Type	0001111	    000	    N/A	            FENCE	        Fence
--- ??????   ???????     ???     ???             FENCE.i         Fence
+-- I-Type	0001111	    000	    N/A	            FENCE	        Fence                                   ?               Block any unterminated IO operation
 
--- B-Type	1100011	    000	    N/A	            BEQ	            Branch if Equal
--- B-Type	1100011	    001	    N/A	            BNE	            Branch if Not Equal
--- B-Type	1100011	    100	    N/A	            BLT	            Branch if Less Than
--- B-Type	1100011	    101	    N/A	            BGE	            Branch if Greater Than or Equal
--- B-Type	1100011	    110	    N/A	            BLTU	        Branch if Less Than (Unsigned)
--- B-Type	1100011	    111	    N/A	            BGEU	        Branch if >= (Unsigned)
+-- B-Type	1100011	    000	    N/A	            BEQ	            Branch if Equal                         ?               N/A
+-- B-Type	1100011	    001	    N/A	            BNE	            Branch if Not Equal                     ?               N/A
+-- B-Type	1100011	    100	    N/A	            BLT	            Branch if Less Than                     ?               N/A
+-- B-Type	1100011	    101	    N/A	            BGE	            Branch if Greater Than or Equal         ?               N/A
+-- B-Type	1100011	    110	    N/A	            BLTU	        Branch if Less Than (Unsigned)          ?               N/A
+-- B-Type	1100011	    111	    N/A	            BGEU	        Branch if >= (Unsigned)                 ?               N/A
 
--- S-Type	0100011	    000	    N/A	            SB	            Store Byte
--- S-Type	0100011	    001	    N/A	            SH	            Store Halfword
--- S-Type	0100011	    010	    N/A	            SW	            Store Word
--- I-Type	0000011	    000	    N/A	            LB	            Load Byte
--- I-Type	0000011	    001	    N/A	            LH	            Load Halfword
--- I-Type	0000011	    010	    N/A	            LW	            Load Word
--- I-Type	0000011	    100	    N/A	            LBU	            Load Byte (Unsigned)
--- I-Type	0000011	    101	    N/A	            LHU	            Load Halfword (Unsigned)
+-- S-Type	0100011	    000	    N/A	            SB	            Store Byte                              ?               May take time (how much ?). Does not block by default, FENCE op if needed.
+-- S-Type	0100011	    001	    N/A	            SH	            Store Halfword                          ?               May take time (how much ?). Does not block by default, FENCE op if needed.
+-- S-Type	0100011	    010	    N/A	            SW	            Store Word                              ?               May take time (how much ?). Does not block by default, FENCE op if needed.
+-- I-Type	0000011	    000	    N/A	            LB	            Load Byte                               ?               May take time (how much ?). Does not block by default, FENCE op if needed.
+-- I-Type	0000011	    001	    N/A	            LH	            Load Halfword                           ?               May take time (how much ?). Does not block by default, FENCE op if needed.
+-- I-Type	0000011	    010	    N/A	            LW	            Load Word                               ?               May take time (how much ?). Does not block by default, FENCE op if needed.
+-- I-Type	0000011	    100	    N/A	            LBU	            Load Byte (Unsigned)                    ?               May take time (how much ?). Does not block by default, FENCE op if needed.
+-- I-Type	0000011	    101	    N/A	            LHU	            Load Halfword (Unsigned)                ?               May take time (how much ?). Does not block by default, FENCE op if needed.
 
--- J-Type	1101111	    N/A	    N/A	            JAL	            Jump and Link
--- I-Type	1100111	    000	    N/A	            JALR	        Jump and Link Register
+-- J-Type	1101111	    N/A	    N/A	            JAL	            Jump and Link                           1               Stall the pipeline
+-- I-Type	1100111	    000	    N/A	            JALR	        Jump and Link Register                  1               Stall the pipeline
 
--- I-Type	1110011	    000	    000000000000	ECALL	        Environment Call
--- I-Type	1110011	    000	    000000000001	EBREAK	        Environment Breakpoint
+-- I-Type	1110011	    000	    000000000000	ECALL	        Environment Call                        4               Stall the pipeline + execution mode to priviledged
+-- I-Type	1110011	    000	    000000000001	EBREAK	        Environment Breakpoint                  4               Stall the pipeline + execution mode to user
 
--- R-Type	0110011	    000	    0000001	        MUL	            Multiply
--- R-Type	0110011	    001	    0000001	        MULH	        Multiply High (Signed)
--- R-Type	0110011	    010	    0000001	        MULHSU	        Multiply High (Signed x Unsigned)
--- R-Type	0110011	    011	    0000001	        MULHU	        Multiply High (Unsigned)
--- R-Type	0110011	    100	    0000001	        DIV	            Divide (Signed)
--- R-Type	0110011	    101	    0000001	        DIVU	        Divide (Unsigned)
--- R-Type	0110011	    110	    0000001	        REM	            Remainder (Signed)
--- R-Type	0110011	    111	    0000001	        REMU	        Remainder (Unsigned)
+-- R-Type	0110011	    000	    0000001	        MUL	            Multiply                                1               N/A
+-- R-Type	0110011	    001	    0000001	        MULH	        Multiply High (Signed)                  1               N/A
+-- R-Type	0110011	    010	    0000001	        MULHSU	        Multiply High (Signed x Unsigned)       1               N/A
+-- R-Type	0110011	    011	    0000001	        MULHU	        Multiply High (Unsigned)                1               N/A
+-- R-Type	0110011	    100	    0000001	        DIV	            Divide (Signed)                         1               N/A
+-- R-Type	0110011	    101	    0000001	        DIVU	        Divide (Unsigned)                       1               N/A
+-- R-Type	0110011	    110	    0000001	        REM	            Remainder (Signed)                      1               N/A
+-- R-Type	0110011	    111	    0000001	        REMU	        Remainder (Unsigned)                    1               N/A
