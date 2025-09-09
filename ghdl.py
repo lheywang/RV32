@@ -12,7 +12,7 @@
 # Libs
 import pathlib
 import subprocess
-
+import shutil
 
 # ----------------------------------------------------------------------------------------------
 # Function definitions
@@ -112,7 +112,7 @@ def set_top(files: list[pathlib.Path]):
 # Configurations variables
 # Theses are fixed and can't be changed
 WORKDIR = "build/"
-GHDL_CMD = "ghdl "
+GHDL_CMD = str(shutil.which("ghdl")) + " "
 GTKWAVE_CMD = "gtkwave "
 BASE_DIR = "src"
 # Theses are fixed, but are prompted for changes. --> This is default values only
@@ -131,21 +131,29 @@ print(" GHDL Python interface. Here we go !")
 print("=" * 100)
 
 # Fetch files on the folder
-p = pathlib.Path(BASE_DIR)
-u = list_files(p)
+base_path = pathlib.Path(BASE_DIR)
+source_files = list_files(base_path)
+
+# Add the build folder
+pathlib.Path("build/").mkdir(parents=True, exist_ok=True)
 
 # User inputs
 set_len()
-set_top(u)
+set_top(source_files)
 
 # Create the commands arguments
+# Here, we use the known ghdl file, and glob them. This trick GHDL to make it's own search, and thus benefit from the auto-ordering functionnality.
+filelist = []
 filenames = ""
-for file in u:
-    filenames = filenames + f" {str(file)}"
+for file in source_files:
+    if not str(file.parent) + "/*.vhd" in filelist:
+        filelist.append(str(file.parent) + "/*.vhd")
+
+for file in filelist :
+    filenames = filenames + file + " "
 
 # Build some commands
 GHDL_COMPILE = GHDL_CMD + "-a " + f"--workdir={WORKDIR} " + filenames
-
 GHDL_ELABORATE = GHDL_CMD + "-m " + f"--workdir={WORKDIR} " + TOP
 GHDL_SIMULATE = (
     GHDL_CMD
@@ -159,10 +167,10 @@ GTKWAVE_SHOW = GTKWAVE_CMD + f"-a {PRESENTATION}" + f" {WAVEFILE}"
 
 # Store the different elements into a common list :
 commands = [
-    GHDL_COMPILE.split(),
-    GHDL_ELABORATE.split(),
-    GHDL_SIMULATE.split(),
-    GTKWAVE_SHOW.split(),
+    GHDL_COMPILE,
+    GHDL_ELABORATE,
+    GHDL_SIMULATE,
+    GTKWAVE_SHOW,
 ]
 
 # Starting the main loop, until the user exit (ctrl + c)
@@ -183,9 +191,11 @@ while True:
             capture_output=True,
             text=True,
             check=True,
+            shell=True,
+            cwd = "."
         )
 
-        # CHeck if prints are needed :
+        # Check if prints are needed :
         if result.stdout:
             print(result.stdout)
         if result.stderr:
