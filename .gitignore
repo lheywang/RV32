@@ -1,3 +1,14 @@
 # .gitignore
 
-build/*
+# Remove files without extension
+*
+!*/
+!*.*
+
+# Then, removes some specifics patterns
+# Compiled files
+*.o
+
+# Simulations results
+*.ghw
+*.cf
