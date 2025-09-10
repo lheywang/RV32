@@ -30,12 +30,12 @@ end entity;
 
 architecture behavioral of decoder is
 
-        -- Defining the different decoders
-        type decoders is (U, I, R, B, S, J, default);
+        -- Defining the different selected_decoders
+        type decocders_type is (U, I, R, B, S, J, default_t, illegal_t);
 
         -- signals
-        signal illegal_internal :      std_logic           := '0';
-        signal decoder :                decoders            := default;
+        signal illegal_internal :      std_logic                 := '0';
+        signal selected_decoder :      decocders_type            := default_t;
 
         -- function to convert a 5 bit register ID (0 to 31) into it's correct representation for control
         function f_regID_to_ctrl (
@@ -58,53 +58,54 @@ architecture behavioral of decoder is
 
                 if (nRST = '0') then
                     illegal_internal <= '0';
-                    decoder <= default;
+                    selected_decoder <= default_t;
 
                 elsif rising_edge(clock) then
 
+                    -- Select the opcode, and perform an instruction size check (last two bits must be "11").
                     case instruction(6 downto 0) is
 
                         when "0110111" => 
-                            decoder <= U;
+                            selected_decoder <= U;
                             illegal_internal <= '0';
                         when "0010111" =>
-                            decoder <= U;
+                            selected_decoder <= U;
                             illegal_internal <= '0';
 
                         when "0010011" =>
-                            decoder <= I;
+                            selected_decoder <= I;
                             illegal_internal <= '0';
                         when "0001111" =>
-                            decoder <= I;
+                            selected_decoder <= I;
                             illegal_internal <= '0';
                         when "1100111" =>
-                            decoder <= I;
+                            selected_decoder <= I;
                             illegal_internal <= '0';
                         when "1110011" =>
-                            decoder <= I;
+                            selected_decoder <= I;
                             illegal_internal <= '0';
 
                         when "0110011" => 
-                            decoder <= R;
+                            selected_decoder <= R;
                             illegal_internal <= '0';
                         
                         when "1100011" =>
-                            decoder <= B;
+                            selected_decoder <= B;
                             illegal_internal <= '0';
                         
                         when "0100011" =>
-                            decoder <= S;
+                            selected_decoder <= S;
                             illegal_internal <= '0';
                         when "0000011" =>
-                            decoder <= S;
+                            selected_decoder <= S;
                             illegal_internal <= '0';
 
                         when "1101111" =>
-                            decoder <= J;
+                            selected_decoder <= J;
                             illegal_internal <= '0';
 
                         when others =>
-                            decoder <= default;
+                            selected_decoder <= illegal_t;
                             illegal_internal <= '1';
 
                     end case;
@@ -112,8 +113,8 @@ architecture behavioral of decoder is
                 
             end process;
 
-        -- Hardware decoder selection logic
-        P2 : process(clock, nRST)
+        -- Hardware selected_decoder selection logic
+        P2 : process(selected_decoder, nRST)
             begin
                 if (nRST = '0') then
                     rs1 <= (others => '0');
@@ -122,72 +123,79 @@ architecture behavioral of decoder is
                     rd <= (others => '0');
                     opcode <= (others => '0');
 
-                elsif rising_edge(clock) then
+                else
 
-                    if (illegal_internal = '0') then
+                    -- Todo : Parse sub-opcode instruction and check for validity.
+                    case selected_decoder is 
 
-                        case decoder is 
+                        -- Register to register operation
+                        when R =>
+                            rd <=                                   f_regID_to_ctrl(instruction(11 downto 7));
+                            rs1 <=      "00" &                      f_regID_to_ctrl(instruction(19 downto 15));
+                            rs2 <=                                  f_regID_to_ctrl(instruction(24 downto 20));
+                            imm <=                                  (others => '0');
+                            opcode <=                               instruction(31 downto 25)                       & instruction(14 downto 12)     & instruction(6 downto 2);
 
-                            -- Register to register operation
-                            when R =>
-                                rd <=                                   f_regID_to_ctrl(instruction(11 downto 7));
-                                rs1 <=      "00" &                      f_regID_to_ctrl(instruction(19 downto 15));
-                                rs2 <=                                  f_regID_to_ctrl(instruction(24 downto 20));
-                                imm <=                                  (others => '0');
-                                opcode <=                               instruction(31 downto 25)                       & instruction(14 downto 12)     & instruction(6 downto 2);
+                        -- Immediate to register operation
+                        when I =>
+                            rd <=                                   f_regID_to_ctrl(instruction(11 downto 7));
+                            rs1 <=      "00" &                      f_regID_to_ctrl(instruction(19 downto 15));
+                            rs2 <=                                  (others => '0');
+                            imm <=                                  (others => instruction(31));
+                            imm(11 downto 0) <=                     instruction(31 downto 20);
+                            opcode <=   "0000000" &                 instruction(14 downto 12)                       & instruction(6 downto 2);
 
-                            -- Immediate to register operation
-                            when I =>
-                                rd <=                                   f_regID_to_ctrl(instruction(11 downto 7));
-                                rs1 <=      "00" &                      f_regID_to_ctrl(instruction(19 downto 15));
-                                rs2 <=                                  (others => '0');
-                                imm <=                                  (others => instruction(31));
-                                imm(11 downto 0) <=                     instruction(31 downto 20);
-                                opcode <=   "0000000" &                 instruction(14 downto 12)                       & instruction(6 downto 2);
+                        -- Memory operation
+                        when S =>
+                            rd <=                                   (others => '0');
+                            rs1 <=      "00" &                      f_regID_to_ctrl(instruction(19 downto 15));
+                            rs2 <=                                  f_regID_to_ctrl(instruction(24 downto 20));
+                            imm <=                                  (others => instruction(31));
+                            imm(11 downto 0) <=                     instruction(31 downto 25)                       & instruction(11 downto 7);
+                            opcode <=   "0000000" &                 instruction(14 downto 12)                       & instruction(6 downto 2);
 
-                            -- Memory operation
-                            when S =>
-                                rd <=                                   (others => '0');
-                                rs1 <=      "00" &                      f_regID_to_ctrl(instruction(19 downto 15));
-                                rs2 <=                                  f_regID_to_ctrl(instruction(24 downto 20));
-                                imm <=                                  (others => instruction(31));
-                                imm(11 downto 0) <=                     instruction(31 downto 25)                       & instruction(11 downto 7);
-                                opcode <=   "0000000" &                 instruction(14 downto 12)                       & instruction(6 downto 2);
+                        -- Branches
+                        when B =>
+                            rd <=                                   (others => '0');
+                            rs1 <=      "00" &                      f_regID_to_ctrl(instruction(19 downto 15));
+                            rs2 <=                                  f_regID_to_ctrl(instruction(24 downto 20));
+                            imm <=                                  (others => instruction(31));
+                            imm(11 downto 0) <=                     instruction(31)                                 & instruction(7)                & instruction(30 downto 25)         & instruction(11 downto 8);
+                            opcode <=   "0000000" &                 instruction(14 downto 12)                       & instruction(6 downto 2);
 
-                            -- Branches
-                            when B =>
-                                rd <=                                   (others => '0');
-                                rs1 <=      "00" &                      f_regID_to_ctrl(instruction(19 downto 15));
-                                rs2 <=                                  f_regID_to_ctrl(instruction(24 downto 20));
-                                imm <=                                  (others => instruction(31));
-                                imm(11 downto 0) <=                     instruction(31)                                 & instruction(7)                & instruction(30 downto 25)         & instruction(11 downto 8);
-                                opcode <=   "0000000" &                 instruction(14 downto 12)                       & instruction(6 downto 2);
+                        -- Immediates values loading
+                        when U =>
+                            rd <=                                   f_regID_to_ctrl(instruction(11 downto 7));
+                            rs1 <=                                  (others => '0');
+                            rs2 <=                                  (others => '0');
+                            imm <=                                  instruction(31 downto 12)                       & "000000000000";
+                            opcode <=   "0000000000" &              instruction(6 downto 2);
 
-                            -- Immediates values loading
-                            when U =>
-                                rd <=                                   f_regID_to_ctrl(instruction(11 downto 7));
-                                rs1 <=                                  (others => '0');
-                                rs2 <=                                  (others => '0');
-                                imm <=                                  instruction(31 downto 12)                       & "000000000000";
-                                opcode <=   "0000000000" &              instruction(6 downto 2);
+                        -- Jumps
+                        when J =>
+                            rd <=                                   (others => '0');
+                            rs1 <=      "00" &                      f_regID_to_ctrl(instruction(19 downto 15));
+                            rs2 <=                                  f_regID_to_ctrl(instruction(24 downto 20));
+                            imm <=                                  (others => instruction(31));
+                            imm(20 downto 1) <=                     instruction(31)                                 & instruction(19 downto 12)     & instruction(20)                   & instruction(30 downto 21);
+                            imm(0) <=                               '0';
+                            opcode <=   "0000000000" &              instruction(6 downto 2);
+                            
+                        when illegal_t =>
+                            rd <=                                   (others => '0');
+                            rs1 <=                                  (others => '0');
+                            rs2 <=                                  (others => '0');
+                            imm <=                                  (others => '0');
+                            opcode <=                               (others => '1');
 
-                            -- Jumps
-                            when J =>
-                                rd <=                                   (others => '0');
-                                rs1 <=      "00" &                      f_regID_to_ctrl(instruction(19 downto 15));
-                                rs2 <=                                  f_regID_to_ctrl(instruction(24 downto 20));
-                                imm <=                                  (others => instruction(31));
-                                imm(20 downto 1) <=                     instruction(31)                                 & instruction(19 downto 12)     & instruction(20)                   & instruction(30 downto 21);
-                                imm(0) <=                               '0';
-                                opcode <=   "0000000000" &              instruction(6 downto 2);
-                                
+                        when others =>
+                            rd <=                                   (others => '0');
+                            rs1 <=                                  (others => '0');
+                            rs2 <=                                  (others => '0');
+                            imm <=                                  (others => '0');
+                            opcode <=                               (others => '0');
 
-                            when others =>
-                                -- We can't get here, because the default case is asserted by an ILLEGAL state, which block the IF on our case.
-
-                        end case;
-
-                    end if;
+                    end case;
             
                 end if;
 

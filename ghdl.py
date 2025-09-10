@@ -148,6 +148,7 @@ set_top(source_files)
 # Here, we use the known ghdl file, and glob them. This trick GHDL to make it's own search, and thus benefit from the auto-ordering functionnality.
 filelist = []
 filenames = ""
+filenames2 = ""
 for file in source_files:
     if not str(file.parent) + "/*.vhd" in filelist:
         filelist.append(str(file.parent) + "/*.vhd")
@@ -155,9 +156,12 @@ for file in source_files:
 for file in filelist:
     filenames = filenames + file + " "
 
+for file in source_files:
+    filenames2 = filenames2 + f" {str(file)}"
+
 # Build some commands
 # Enable auto-ordering of the files
-GHDL_ANALYSIS = GHDL_CMD + "-i " + f"--workdir={WORKDIR} " + filenames
+GHDL_ANALYSIS = GHDL_CMD + "-i " + f"--workdir={WORKDIR} " + filenames2
 GHDL_ELABORATE = GHDL_CMD + "-m " + f"--workdir={WORKDIR} " + TOP
 GHDL_SIMULATE = (
     GHDL_CMD

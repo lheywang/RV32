@@ -46,7 +46,7 @@ architecture behavioral of decoder_tb is
             P2 : process
                 begin
                     nRST_t <= '0';
-                    wait for 30 ns;
+                    wait for 10 ns;
                     nRST_t <= '1';
                     wait for 1 sec;
                 end process;
@@ -72,7 +72,7 @@ architecture behavioral of decoder_tb is
                     instruction_t <= B"01110100101001101010011110110111"; 
                     wait for 20 ns;
 
-                    -- AUIPC (add upper immediate to PC) 01110100101001101010 (value) 01111 (15) 00101 (lui) 11 (32 bits)
+                    -- AUIPC (add upper immediate to PC) 01110100101001101010 (value) 01111 (15) 00101 (auipc) 11 (32 bits)
                     -- U Type format
                     instruction_t <= B"01110100101001101010011110010111"; 
                     wait for 20 ns;

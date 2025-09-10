@@ -1,22 +1,22 @@
 [*]
 [*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
-[*] Tue Sep  9 20:45:52 2025
+[*] Wed Sep 10 14:49:40 2025
 [*]
 [dumpfile] "/home/user/RV32/build/wave.ghw"
-[dumpfile_mtime] "Tue Sep  9 20:45:47 2025"
-[dumpfile_size] 3269
+[dumpfile_mtime] "Wed Sep 10 14:48:19 2025"
+[dumpfile_size] 3235
 [savefile] "/home/user/RV32/build/signals.gtkw"
 [timestart] 0
-[size] 2560 985
-[pos] -1 -1
-*-26.548271 347300000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[size] 3840 2053
+[pos] -27 -24
+*-25.845110 104000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.decoder_tb.
 [treeopen] top.decoder_tb.u1.
 [sst_width] 273
 [signals_width] 221
 [sst_expanded] 1
-[sst_vpaned_height] 291
+[sst_vpaned_height] 663
 @200
 -Clock
 @28
@@ -31,7 +31,7 @@ top.decoder_tb.u1.nrst
 #{top.decoder_tb.u1.instruction[31:0]} top.decoder_tb.u1.instruction[31] top.decoder_tb.u1.instruction[30] top.decoder_tb.u1.instruction[29] top.decoder_tb.u1.instruction[28] top.decoder_tb.u1.instruction[27] top.decoder_tb.u1.instruction[26] top.decoder_tb.u1.instruction[25] top.decoder_tb.u1.instruction[24] top.decoder_tb.u1.instruction[23] top.decoder_tb.u1.instruction[22] top.decoder_tb.u1.instruction[21] top.decoder_tb.u1.instruction[20] top.decoder_tb.u1.instruction[19] top.decoder_tb.u1.instruction[18] top.decoder_tb.u1.instruction[17] top.decoder_tb.u1.instruction[16] top.decoder_tb.u1.instruction[15] top.decoder_tb.u1.instruction[14] top.decoder_tb.u1.instruction[13] top.decoder_tb.u1.instruction[12] top.decoder_tb.u1.instruction[11] top.decoder_tb.u1.instruction[10] top.decoder_tb.u1.instruction[9] top.decoder_tb.u1.instruction[8] top.decoder_tb.u1.instruction[7] top.decoder_tb.u1.instruction[6] top.decoder_tb.u1.instruction[5] top.decoder_tb.u1.instruction[4] top.decoder_tb.u1.instruction[3] top.decoder_tb.u1.instruction[2] top.decoder_tb.u1.instruction[1] top.decoder_tb.u1.instruction[0]
 @200
 -Outputs
-@29
+@28
 top.decoder_tb.u1.illegal
 @22
 #{top.decoder_tb.u1.opcode[16:0]} top.decoder_tb.u1.opcode[14] top.decoder_tb.u1.opcode[13] top.decoder_tb.u1.opcode[12] top.decoder_tb.u1.opcode[11] top.decoder_tb.u1.opcode[10] top.decoder_tb.u1.opcode[9] top.decoder_tb.u1.opcode[8] top.decoder_tb.u1.opcode[7] top.decoder_tb.u1.opcode[6] top.decoder_tb.u1.opcode[5] top.decoder_tb.u1.opcode[4] top.decoder_tb.u1.opcode[3] top.decoder_tb.u1.opcode[2] top.decoder_tb.u1.opcode[1] top.decoder_tb.u1.opcode[0]
@@ -42,7 +42,7 @@ top.decoder_tb.u1.illegal
 @200
 -
 -Internals
-@420
-top.decoder_tb.u1.decoder
+@421
+top.decoder_tb.u1.selected_decoder
 [pattern_trace] 1
 [pattern_trace] 0
