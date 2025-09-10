@@ -9,10 +9,13 @@
 # date :        07-09-2025
 # ==============================================================================================
 
+# Commands order website : http://ghdl.free.fr/ghdl/Starting-with-a-design.html
+
 # Libs
 import pathlib
 import subprocess
 import shutil
+
 
 # ----------------------------------------------------------------------------------------------
 # Function definitions
@@ -149,11 +152,12 @@ for file in source_files:
     if not str(file.parent) + "/*.vhd" in filelist:
         filelist.append(str(file.parent) + "/*.vhd")
 
-for file in filelist :
+for file in filelist:
     filenames = filenames + file + " "
 
 # Build some commands
-GHDL_COMPILE = GHDL_CMD + "-a " + f"--workdir={WORKDIR} " + filenames
+# Enable auto-ordering of the files
+GHDL_ANALYSIS = GHDL_CMD + "-i " + f"--workdir={WORKDIR} " + filenames
 GHDL_ELABORATE = GHDL_CMD + "-m " + f"--workdir={WORKDIR} " + TOP
 GHDL_SIMULATE = (
     GHDL_CMD
@@ -167,7 +171,7 @@ GTKWAVE_SHOW = GTKWAVE_CMD + f"-a {PRESENTATION}" + f" {WAVEFILE}"
 
 # Store the different elements into a common list :
 commands = [
-    GHDL_COMPILE,
+    GHDL_ANALYSIS,
     GHDL_ELABORATE,
     GHDL_SIMULATE,
     GTKWAVE_SHOW,
@@ -185,14 +189,14 @@ index = 0
 # result = None
 while True:
     try:
-        print(f"Running {commands[index % 4]}")
+        print(f"Running {commands[index % len(commands)]}")
         result = subprocess.run(
-            commands[index % 4],
+            commands[index % len(commands)],
             capture_output=True,
             text=True,
             check=True,
             shell=True,
-            cwd = "."
+            cwd=".",
         )
 
         # Check if prints are needed :
@@ -204,7 +208,7 @@ while True:
         # Incrementing counter
         index += 1
 
-        if (index % 4) == 0:
+        if (index % len(commands)) == 0:
             print("-" * 100)
             print("Restarting simulator...")
             print("-" * 100)
