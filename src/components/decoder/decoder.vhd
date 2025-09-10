@@ -141,7 +141,8 @@ architecture behavioral of decoder is
                                 rd <=                                   f_regID_to_ctrl(instruction(11 downto 7));
                                 rs1 <=      "00" &                      f_regID_to_ctrl(instruction(19 downto 15));
                                 rs2 <=                                  (others => '0');
-                                imm <=      "00000000000000000000" &    instruction(31 downto 20);
+                                imm <=                                  (others => instruction(31));
+                                imm(11 downto 0) <=                     instruction(31 downto 20);
                                 opcode <=   "0000000" &                 instruction(14 downto 12)                       & instruction(6 downto 2);
 
                             -- Memory operation
@@ -149,7 +150,8 @@ architecture behavioral of decoder is
                                 rd <=                                   (others => '0');
                                 rs1 <=      "00" &                      f_regID_to_ctrl(instruction(19 downto 15));
                                 rs2 <=                                  f_regID_to_ctrl(instruction(24 downto 20));
-                                imm <=      "00000000000000000000" &    instruction(31 downto 25)                       & instruction(11 downto 7);
+                                imm <=                                  (others => instruction(31));
+                                imm(11 downto 0) <=                     instruction(31 downto 25)                       & instruction(11 downto 7);
                                 opcode <=   "0000000" &                 instruction(14 downto 12)                       & instruction(6 downto 2);
 
                             -- Branches
@@ -157,7 +159,8 @@ architecture behavioral of decoder is
                                 rd <=                                   (others => '0');
                                 rs1 <=      "00" &                      f_regID_to_ctrl(instruction(19 downto 15));
                                 rs2 <=                                  f_regID_to_ctrl(instruction(24 downto 20));
-                                imm <=      "00000000000000000000" &    instruction(31)                                 & instruction(7)                & instruction(30 downto 25)         & instruction(11 downto 8);
+                                imm <=                                  (others => instruction(31));
+                                imm(11 downto 0) <=                     instruction(31)                                 & instruction(7)                & instruction(30 downto 25)         & instruction(11 downto 8);
                                 opcode <=   "0000000" &                 instruction(14 downto 12)                       & instruction(6 downto 2);
 
                             -- Immediates values loading
@@ -173,7 +176,9 @@ architecture behavioral of decoder is
                                 rd <=                                   (others => '0');
                                 rs1 <=      "00" &                      f_regID_to_ctrl(instruction(19 downto 15));
                                 rs2 <=                                  f_regID_to_ctrl(instruction(24 downto 20));
-                                imm <=      "000000000000" &            instruction(31)                                 & instruction(19 downto 12)     & instruction(20)                   & instruction(30 downto 21);
+                                imm <=                                  (others => instruction(31));
+                                imm(20 downto 1) <=                     instruction(31)                                 & instruction(19 downto 12)     & instruction(20)                   & instruction(30 downto 21);
+                                imm(0) <=                               '0';
                                 opcode <=   "0000000000" &              instruction(6 downto 2);
                                 
 
