@@ -1,22 +1,22 @@
 [*]
 [*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
-[*] Wed Sep 10 14:49:40 2025
+[*] Thu Sep 11 16:58:29 2025
 [*]
 [dumpfile] "/home/user/RV32/build/wave.ghw"
-[dumpfile_mtime] "Wed Sep 10 14:48:19 2025"
-[dumpfile_size] 3235
+[dumpfile_mtime] "Thu Sep 11 16:58:01 2025"
+[dumpfile_size] 3231
 [savefile] "/home/user/RV32/build/signals.gtkw"
 [timestart] 0
-[size] 3840 2053
-[pos] -27 -24
-*-25.845110 104000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[size] 2560 985
+[pos] -1 -1
+*-25.845110 180000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.decoder_tb.
 [treeopen] top.decoder_tb.u1.
 [sst_width] 273
 [signals_width] 221
 [sst_expanded] 1
-[sst_vpaned_height] 663
+[sst_vpaned_height] 291
 @200
 -Clock
 @28
@@ -34,15 +34,16 @@ top.decoder_tb.u1.nrst
 @28
 top.decoder_tb.u1.illegal
 @22
-#{top.decoder_tb.u1.opcode[16:0]} top.decoder_tb.u1.opcode[14] top.decoder_tb.u1.opcode[13] top.decoder_tb.u1.opcode[12] top.decoder_tb.u1.opcode[11] top.decoder_tb.u1.opcode[10] top.decoder_tb.u1.opcode[9] top.decoder_tb.u1.opcode[8] top.decoder_tb.u1.opcode[7] top.decoder_tb.u1.opcode[6] top.decoder_tb.u1.opcode[5] top.decoder_tb.u1.opcode[4] top.decoder_tb.u1.opcode[3] top.decoder_tb.u1.opcode[2] top.decoder_tb.u1.opcode[1] top.decoder_tb.u1.opcode[0]
 #{top.decoder_tb.u1.imm[31:0]} top.decoder_tb.u1.imm[31] top.decoder_tb.u1.imm[30] top.decoder_tb.u1.imm[29] top.decoder_tb.u1.imm[28] top.decoder_tb.u1.imm[27] top.decoder_tb.u1.imm[26] top.decoder_tb.u1.imm[25] top.decoder_tb.u1.imm[24] top.decoder_tb.u1.imm[23] top.decoder_tb.u1.imm[22] top.decoder_tb.u1.imm[21] top.decoder_tb.u1.imm[20] top.decoder_tb.u1.imm[19] top.decoder_tb.u1.imm[18] top.decoder_tb.u1.imm[17] top.decoder_tb.u1.imm[16] top.decoder_tb.u1.imm[15] top.decoder_tb.u1.imm[14] top.decoder_tb.u1.imm[13] top.decoder_tb.u1.imm[12] top.decoder_tb.u1.imm[11] top.decoder_tb.u1.imm[10] top.decoder_tb.u1.imm[9] top.decoder_tb.u1.imm[8] top.decoder_tb.u1.imm[7] top.decoder_tb.u1.imm[6] top.decoder_tb.u1.imm[5] top.decoder_tb.u1.imm[4] top.decoder_tb.u1.imm[3] top.decoder_tb.u1.imm[2] top.decoder_tb.u1.imm[1] top.decoder_tb.u1.imm[0]
 #{top.decoder_tb.u1.rd[31:0]} top.decoder_tb.u1.rd[31] top.decoder_tb.u1.rd[30] top.decoder_tb.u1.rd[29] top.decoder_tb.u1.rd[28] top.decoder_tb.u1.rd[27] top.decoder_tb.u1.rd[26] top.decoder_tb.u1.rd[25] top.decoder_tb.u1.rd[24] top.decoder_tb.u1.rd[23] top.decoder_tb.u1.rd[22] top.decoder_tb.u1.rd[21] top.decoder_tb.u1.rd[20] top.decoder_tb.u1.rd[19] top.decoder_tb.u1.rd[18] top.decoder_tb.u1.rd[17] top.decoder_tb.u1.rd[16] top.decoder_tb.u1.rd[15] top.decoder_tb.u1.rd[14] top.decoder_tb.u1.rd[13] top.decoder_tb.u1.rd[12] top.decoder_tb.u1.rd[11] top.decoder_tb.u1.rd[10] top.decoder_tb.u1.rd[9] top.decoder_tb.u1.rd[8] top.decoder_tb.u1.rd[7] top.decoder_tb.u1.rd[6] top.decoder_tb.u1.rd[5] top.decoder_tb.u1.rd[4] top.decoder_tb.u1.rd[3] top.decoder_tb.u1.rd[2] top.decoder_tb.u1.rd[1] top.decoder_tb.u1.rd[0]
 #{top.decoder_tb.u1.rs2[31:0]} top.decoder_tb.u1.rs2[31] top.decoder_tb.u1.rs2[30] top.decoder_tb.u1.rs2[29] top.decoder_tb.u1.rs2[28] top.decoder_tb.u1.rs2[27] top.decoder_tb.u1.rs2[26] top.decoder_tb.u1.rs2[25] top.decoder_tb.u1.rs2[24] top.decoder_tb.u1.rs2[23] top.decoder_tb.u1.rs2[22] top.decoder_tb.u1.rs2[21] top.decoder_tb.u1.rs2[20] top.decoder_tb.u1.rs2[19] top.decoder_tb.u1.rs2[18] top.decoder_tb.u1.rs2[17] top.decoder_tb.u1.rs2[16] top.decoder_tb.u1.rs2[15] top.decoder_tb.u1.rs2[14] top.decoder_tb.u1.rs2[13] top.decoder_tb.u1.rs2[12] top.decoder_tb.u1.rs2[11] top.decoder_tb.u1.rs2[10] top.decoder_tb.u1.rs2[9] top.decoder_tb.u1.rs2[8] top.decoder_tb.u1.rs2[7] top.decoder_tb.u1.rs2[6] top.decoder_tb.u1.rs2[5] top.decoder_tb.u1.rs2[4] top.decoder_tb.u1.rs2[3] top.decoder_tb.u1.rs2[2] top.decoder_tb.u1.rs2[1] top.decoder_tb.u1.rs2[0]
 #{top.decoder_tb.u1.rs1[33:0]} top.decoder_tb.u1.rs1[33] top.decoder_tb.u1.rs1[32] top.decoder_tb.u1.rs1[31] top.decoder_tb.u1.rs1[30] top.decoder_tb.u1.rs1[29] top.decoder_tb.u1.rs1[28] top.decoder_tb.u1.rs1[27] top.decoder_tb.u1.rs1[26] top.decoder_tb.u1.rs1[25] top.decoder_tb.u1.rs1[24] top.decoder_tb.u1.rs1[23] top.decoder_tb.u1.rs1[22] top.decoder_tb.u1.rs1[21] top.decoder_tb.u1.rs1[20] top.decoder_tb.u1.rs1[19] top.decoder_tb.u1.rs1[18] top.decoder_tb.u1.rs1[17] top.decoder_tb.u1.rs1[16] top.decoder_tb.u1.rs1[15] top.decoder_tb.u1.rs1[14] top.decoder_tb.u1.rs1[13] top.decoder_tb.u1.rs1[12] top.decoder_tb.u1.rs1[11] top.decoder_tb.u1.rs1[10] top.decoder_tb.u1.rs1[9] top.decoder_tb.u1.rs1[8] top.decoder_tb.u1.rs1[7] top.decoder_tb.u1.rs1[6] top.decoder_tb.u1.rs1[5] top.decoder_tb.u1.rs1[4] top.decoder_tb.u1.rs1[3] top.decoder_tb.u1.rs1[2] top.decoder_tb.u1.rs1[1] top.decoder_tb.u1.rs1[0]
+@421
+top.decoder_tb.u1.opcode
 @200
 -
 -Internals
-@421
+@420
 top.decoder_tb.u1.selected_decoder
 [pattern_trace] 1
 [pattern_trace] 0
