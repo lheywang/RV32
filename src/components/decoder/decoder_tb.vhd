@@ -11,9 +11,9 @@ end entity;
 architecture behavioral of decoder_tb is
 
         signal instruction_t :  std_logic_vector(31 downto 0)       := X"00000000";
-        signal rs1_t :          std_logic_vector(33 downto 0);
-        signal rs2_t :          std_logic_vector(31 downto 0);
-        signal rd_t :           std_logic_vector(31 downto 0);
+        signal rs1_t :          std_logic_vector(4 downto 0);
+        signal rs2_t :          std_logic_vector(4 downto 0);
+        signal rd_t :           std_logic_vector(4 downto 0);
         signal imm_t :          std_logic_vector(31 downto 0);
         signal opcode_t :       instructions;
         signal illegal_t :      std_logic;
@@ -24,8 +24,7 @@ architecture behavioral of decoder_tb is
 
         U1 : entity work.decoder(behavioral)
             generic map (
-                XLEN        => 32,
-                REG_NB      => 32
+                XLEN        => 32
             )
             port map (
                 instruction => instruction_t,

@@ -28,7 +28,7 @@ entity core_controller is
 
         -- Memory signals : 
         mem_addr :      out     std_logic_vector((XLEN - 1) downto 0)       := (others => '0');     -- Memory address
-        mem_byteen :    out     std_logic_vector(3 downto 0);               := (others => '1');     -- Memory byte selection
+        mem_byteen :    out     std_logic_vector(3 downto 0)                := (others => '1');     -- Memory byte selection
         mem_read :      out     std_logic                                   := '1';                 -- Memory read order
         mem_write :     out     std_logic                                   := '1';                 -- Memory write order
         mem_valid :     in      std_logic;                                                          -- Memory operation is complete.
@@ -61,10 +61,21 @@ entity core_controller is
         ctl_interrupt : in      std_logic;                                                          -- Interrupt flag
         
         -- Generics outputs :
-        excep_occured : out     std_logic                                   := '0';                 -- Generic flag to signal an exception occured (LED ?)
+        excep_occured : out     std_logic                                   := '0'                  -- Generic flag to signal an exception occured (LED ?)
     );
 end entity;
 
 architecture behavioral of core_controller is
+
+            -- function to convert a 5 bit register ID (0 to 31) into it's correct representation for control
+        function f_regID_to_ctrl (
+            inp : in std_logic_vector(4 downto 0))
+            return std_logic_vector is
+                variable retval : std_logic_vector(31 downto 0) := (others => '0');
+                variable pos_int    : integer range 0 to 31;
+                begin
+                    retval(to_integer(unsigned(inp))) := '1';
+                return retval;
+            end function;
     begin
     end architecture;

@@ -5,9 +5,8 @@ use work.common.all;
 
 entity decoder is 
     generic (
-        XLEN :      integer := 32;                                          -- Width of the data outputs. 
+        XLEN :      integer := 32                                           -- Width of the data outputs. 
                                                                             -- Warning : This does not change the number of registers not instruction lenght
-        REG_NB :    integer := 32                                           -- Number of processors registers.
     );
     port (
         -- instruction input
@@ -15,9 +14,9 @@ entity decoder is
 
         -- outputs
         -- buses
-        rs1 :           out     std_logic_vector((REG_NB + 1) downto 0)                 := (others => '0');    -- Two more register here, for the selection of immediate value and PC respectively.
-        rs2 :           out     std_logic_vector((REG_NB - 1) downto 0)                 := (others => '0');   
-        rd :            out     std_logic_vector((REG_NB - 1) downto 0)                 := (others => '0');
+        rs1 :           out     std_logic_vector(4 downto 0)                            := (others => '0');    -- Two more register here, for the selection of immediate value and PC respectively.
+        rs2 :           out     std_logic_vector(4 downto 0)                            := (others => '0');   
+        rd :            out     std_logic_vector(4 downto 0)                            := (others => '0');
         imm :           out     std_logic_vector((XLEN - 1) downto 0)                   := (others => '0');
         opcode :        out     instructions;                         
         -- signals
@@ -43,22 +42,10 @@ architecture behavioral of decoder is
         signal selected_decoder :      decocders_type                                   := default_t;
 
         -- Latchs outputs
-        signal  rs1_internal :          std_logic_vector((REG_NB + 1) downto 0)         := (others => '0');
-        signal  rs2_internal :          std_logic_vector((REG_NB - 1) downto 0)         := (others => '0');
-        signal  rd_internal :           std_logic_vector((REG_NB - 1) downto 0)         := (others => '0');
+        signal  rs1_internal :          std_logic_vector(4 downto 0)                    := (others => '0');
+        signal  rs2_internal :          std_logic_vector(4 downto 0)                    := (others => '0');
+        signal  rd_internal :           std_logic_vector(4 downto 0)                    := (others => '0');
         signal  imm_internal :          std_logic_vector((XLEN - 1) downto 0)           := (others => '0');
-
-        -- function to convert a 5 bit register ID (0 to 31) into it's correct representation for control
-        function f_regID_to_ctrl (
-            inp : in std_logic_vector(4 downto 0))
-            return std_logic_vector is
-                variable retval : std_logic_vector(31 downto 0) := (others => '0');
-                variable pos_int    : integer range 0 to 31;
-                begin
-                    retval(to_integer(unsigned(inp))) := '1';
-                return retval;
-            end function;
-
 
     begin
 
@@ -140,11 +127,10 @@ architecture behavioral of decoder is
 
                         -- Register to register operation
                         when R =>
-                            rd_internal <=                                  f_regID_to_ctrl(instruction(11 downto 7));
-                            rs1_internal <=                                 "00"
-                                                                          & f_regID_to_ctrl(instruction(19 downto 15));
+                            rd_internal <=                                  instruction(11 downto 7);
+                            rs1_internal <=                                 instruction(19 downto 15);
                                                                            
-                            rs2_internal <=                                 f_regID_to_ctrl(instruction(24 downto 20));
+                            rs2_internal <=                                 instruction(24 downto 20);
                             imm_internal <=                                 (others => '0');
                         
                             -- Instruction identification
@@ -242,9 +228,8 @@ architecture behavioral of decoder is
 
                         -- Immediate to register operation
                         when I =>
-                            rd_internal <=                                  f_regID_to_ctrl(instruction(11 downto 7));
-                            rs1_internal <=                                 "00"
-                                                                          & f_regID_to_ctrl(instruction(19 downto 15)); 
+                            rd_internal <=                                  instruction(11 downto 7);
+                            rs1_internal <=                                 instruction(19 downto 15); 
                             rs2_internal <=                                 (others => '0');
                             imm_internal <=                                 (others => instruction(31));
                             imm_internal(11 downto 0) <=                    instruction(31 downto 20);
@@ -349,9 +334,8 @@ architecture behavioral of decoder is
                         -- Memory operation
                         when S =>
                             rd_internal <=                                  (others => '0');
-                            rs1_internal <=                                 "00"
-                                                                          & f_regID_to_ctrl(instruction(19 downto 15)); 
-                            rs2_internal <=                                 f_regID_to_ctrl(instruction(24 downto 20));
+                            rs1_internal <=                                 instruction(19 downto 15); 
+                            rs2_internal <=                                 instruction(24 downto 20);
                             imm_internal <=                                 (others => instruction(31));
                             imm_internal(11 downto 0) <=                    instruction(31 downto 25)                       
                                                                           & instruction(11 downto 7);
@@ -375,9 +359,8 @@ architecture behavioral of decoder is
                         -- Branches
                         when B =>
                             rd_internal <=                                  (others => '0');
-                            rs1_internal <=                                 "00"
-                                                                          & f_regID_to_ctrl(instruction(19 downto 15));
-                            rs2_internal <=                                 f_regID_to_ctrl(instruction(24 downto 20));
+                            rs1_internal <=                                 instruction(19 downto 15);
+                            rs2_internal <=                                 instruction(24 downto 20);
                             imm_internal <=                                 (others => instruction(31));
                             imm_internal(11 downto 0) <=                    instruction(31)                                 
                                                                           & instruction(7)                
@@ -413,7 +396,7 @@ architecture behavioral of decoder is
 
                         -- Immediates values loading
                         when U =>
-                            rd_internal <=                                   f_regID_to_ctrl(instruction(11 downto 7));
+                            rd_internal <=                                   instruction(11 downto 7);
                             rs1_internal <=                                  (others => '0');
                             rs2_internal <=                                  (others => '0');
                             imm_internal <=                                  instruction(31 downto 12)                       
@@ -437,9 +420,8 @@ architecture behavioral of decoder is
                         -- Jumps
                         when J =>
                             rd_internal <=                                  (others => '0');
-                            rs1_internal <=                                 "00"
-                                                                          & f_regID_to_ctrl(instruction(19 downto 15)); 
-                            rs2_internal <=                                 f_regID_to_ctrl(instruction(24 downto 20));
+                            rs1_internal <=                                 instruction(19 downto 15); 
+                            rs2_internal <=                                 instruction(24 downto 20);
                             imm_internal <=                                 (others => instruction(31));
                             imm_internal(20 downto 1) <=                    instruction(31)                                 
                                                                           & instruction(19 downto 12)     
