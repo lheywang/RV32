@@ -33,6 +33,7 @@ entity core_controller is
         mem_write :     out     std_logic                                   := '1';                 -- Memory write order
         mem_valid :     in      std_logic;                                                          -- Memory operation is complete.
         mem_addrerr :   in      std_logic;                                                          -- Incorrect memory address.
+        mem_busy :      in      std_logic;                                                          -- Indicate that the memory is doing IO operations.
         
         -- Program counter signals : 
         pc_value :      in      std_logic_vector((XLEN -1) downto 0);                               -- Readback of the PC value
@@ -66,7 +67,7 @@ end entity;
 
 architecture behavioral of core_controller is
 
-            -- function to convert a 5 bit register ID (0 to 31) into it's correct representation for control
+        -- function to convert a 5 bit register ID (0 to 31) into it's correct representation for control
         function f_regID_to_ctrl (
             inp : in std_logic_vector(4 downto 0))
             return std_logic_vector is
