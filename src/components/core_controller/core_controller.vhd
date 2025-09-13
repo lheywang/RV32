@@ -46,14 +46,13 @@ entity core_controller is
         reg_rs2 :       out     std_logic_vector((REG_NB - 1) downto 0)     := (others => '0');     -- Selection signals for the register file (2)
         reg_rd :        out     std_logic_vector((REG_NB - 1) downto 0)     := (others => '0');     -- Selection signals for the register file (out)
         reg_rs1_in :    in      std_logic_vector((XLEN - 1) downto 0);                              -- Register rs1 input signal
+        reg_rs2_out :   out     std_logic_vector((XLEN - 1) downto 0)       := (others => 'Z');     -- Forced output for an argument
 
         -- Alu controls
         alu_cmd :       out     commands                                    := c_ADD;               -- ALU controls signals
         alu_sign :      out     std_logic                                   := '0';                 -- ALU sign mode : 0 = unsigned, 1 = signed
         alu_status :    in      status;                                                             -- ALU feedback status (equal, greater, zero...) 
-        alu_MSB_en :    out     std_logic                                   := '0';                 -- Enable 32 MSB of MUL
-        alu_LSB_en :    out     std_logic                                   := '1';                 -- Enable 32 LSB (all operations)
-        alu_value :     out     std_logic_vector((XLEN - 1) downto 0)       := (others => 'Z');     -- value forced on the RS2 value, to pass immediates.
+        alu_out_en :    out     std_logic                                   := '1';                 -- Enable output (output bus is shared with memory)
         alu_overflow :  in      std_logic;                                                          -- ALU overflow
         alu_underflow : in      std_logic;                                                          -- ALU underflow
 
