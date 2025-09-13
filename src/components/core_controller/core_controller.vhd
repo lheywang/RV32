@@ -1,0 +1,70 @@
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+use work.common.all;
+
+entity core_controller is 
+    generic (
+        -- Size generic values :
+        XLEN :      integer := 32;                                                                  -- Number of bits stored by the register. 
+        REG_NB :    integer := 32;                                                                  -- Number of registers in the processor.
+
+        -- Handler exceptions : 
+        INT_ADDR :  integer := X"70000";                                                            -- Address of the interrupt handler to jump.
+        EXP_ADDR :  integer := X"7F000"                                                             -- Address of the exception handler to jump.
+    );
+    port (
+        -- General inputs : 
+        clock :         in      std_logic;                                                          -- Global core clock.
+        nRST :          in      std_logic;                                                          -- System reset
+        
+        -- Decoder signals : 
+        dec_rs1 :       in      std_logic_vector((REG_NB + 1) downto 0);                            -- Register selection 1
+        dec_rs2 :       in      std_logic_vector((REG_NB - 1) downto 0);                            -- Register selection 2
+        dec_rd :        in      std_logic_vector((REG_NB - 1) downto 0);                            -- Register selection for write
+        dec_imm :       in      std_logic_vector((XLEN - 1) downto 0);                              -- Immediate value, already signed extended
+        dec_opcode :    in      instructions;                                                       -- Opcode, custom type
+        dec_illegal :   in      std_logic;                                                          -- Illegal instruction exception handler
+
+        -- Memory signals : 
+        mem_addr :      out     std_logic_vector((XLEN - 1) downto 0)       := (others => '0');     -- Memory address
+        mem_byteen :    out     std_logic_vector(3 downto 0);               := (others => '1');     -- Memory byte selection
+        mem_read :      out     std_logic                                   := '1';                 -- Memory read order
+        mem_write :     out     std_logic                                   := '1';                 -- Memory write order
+        mem_valid :     in      std_logic;                                                          -- Memory operation is complete.
+        mem_addrerr :   in      std_logic;                                                          -- Incorrect memory address.
+        
+        -- Program counter signals : 
+        pc_value :      in      std_logic_vector((XLEN -1) downto 0);                               -- Readback of the PC value
+        pc_overflow :   in      std_logic;                                                          -- Overflow status of the PC.
+        pc_enable :     out     std_logic                                   := '1';                 -- Enable of the PC counter
+        pc_wren :       out     std_logic                                   := '0';                 -- Load a new value on the program counter
+        pc_loadvalue :  out     std_logic_vector((XLEN - 1) downto 0)       := (others => '0');     -- Value to be loaded on the program counter
+
+        -- Regs selection : 
+        reg_rs1 :       out     std_logic_vector((REG_NB - 1) downto 0)     := (others => '0');     -- Selection signals for the register file (1)
+        reg_rs2 :       out     std_logic_vector((REG_NB - 1) downto 0)     := (others => '0');     -- Selection signals for the register file (2)
+        reg_rd :        out     std_logic_vector((REG_NB - 1) downto 0)     := (others => '0');     -- Selection signals for the register file (out)
+        reg_rs1_in :    in      std_logic_vector((XLEN - 1) downto 0);                              -- Register rs1 input signal
+
+        -- Alu controls
+        alu_cmd :       out     commands                                    := c_ADD;               -- ALU controls signals
+        alu_sign :      out     std_logic                                   := '0';                 -- ALU sign mode : 0 = unsigned, 1 = signed
+        alu_status :    in      status;                                                             -- ALU feedback status (equal, greater, zero...) 
+        alu_MSB_en :    out     std_logic                                   := '0';                 -- Enable 32 MSB of MUL
+        alu_LSB_en :    out     std_logic                                   := '1';                 -- Enable 32 LSB (all operations)
+        alu_value :     out     std_logic_vector((XLEN - 1) downto 0)       := (others => 'Z');     -- value forced on the RS2 value, to pass immediates.
+        alu_overflow :  in      std_logic;                                                          -- ALU overflow
+        alu_underflow : in      std_logic;                                                          -- ALU underflow
+
+        -- Generics inputs :
+        ctl_interrupt : in      std_logic;                                                          -- Interrupt flag
+        
+        -- Generics outputs :
+        excep_occured : out     std_logic                                   := '0';                 -- Generic flag to signal an exception occured (LED ?)
+    );
+end entity;
+
+architecture behavioral of core_controller is
+    begin
+    end architecture;
