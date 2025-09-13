@@ -29,6 +29,31 @@ package common is
         i_DIV,      i_DIVU,     i_REM,      i_REMU
     );
 
+    type commands is (
+        c_ADD,      c_SUB,
+
+        c_SLL,      c_SRL,      c_SRA,
+
+        c_SLT,      c_SLTU,
+
+        c_AND,      c_OR,       c_XOR,
+
+        c_DIV,      c_MUL,      c_REM,
+
+        c_NONE
+    ); -- Warning : DIV and REM aren't implemented.
+
+    type alu_status is (
+        s_EQ,       s_NEQ,
+
+        s_GREATER, 
+        s_SMALLER,
+
+        s_ZERO,
+
+        s_NONE
+    ); -- Always from RS1 compared to RS2 POV.
+
 end common;
 
 package body common is 

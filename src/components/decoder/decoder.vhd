@@ -1,7 +1,6 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-
 use work.common.all;
 
 entity decoder is 
@@ -501,19 +500,19 @@ architecture behavioral of decoder is
 -- R-Type	0110011	    100	    0000000	        XOR	            XOR                                     1               N/A
 -- R-Type	0110011	    101	    0000000	        SRL	            Shift Right Logical                     1               N/A
 -- R-Type	0110011	    110	    0000000	        OR	            OR                                      1               N/A
--- R-Type	0110011	    111	    0000000	        AND	            AND     
+-- R-Type	0110011	    111	    0000000	        AND	            AND                                     1               N/A
 
 -- R-Type	0110011	    000	    0100000	        SUB	            Subtract                                1               N/A
 -- R-Type	0110011	    101	    0100000	        SRA	            Shift Right Arithmetic                  1               N/A
 
--- R-Type	0110011	    000	    0000001	        MUL	            Multiply                                1               N/A
--- R-Type	0110011	    001	    0000001	        MULH	        Multiply High (Signed)                  1               N/A
--- R-Type	0110011	    010	    0000001	        MULHSU	        Multiply High (Signed x Unsigned)       1               N/A
--- R-Type	0110011	    011	    0000001	        MULHU	        Multiply High (Unsigned)                1               N/A
--- R-Type	0110011	    100	    0000001	        DIV	            Divide (Signed)                         1               N/A
--- R-Type	0110011	    101	    0000001	        DIVU	        Divide (Unsigned)                       1               N/A
--- R-Type	0110011	    110	    0000001	        REM	            Remainder (Signed)                      1               N/A
--- R-Type	0110011	    111	    0000001	        REMU	        Remainder (Unsigned)                    1               N/A
+-- R-Type	0110011	    000	    0000001	        MUL	            Multiply                                1               generate trap (non implemented)
+-- R-Type	0110011	    001	    0000001	        MULH	        Multiply High (Signed)                  1               generate trap (non implemented)
+-- R-Type	0110011	    010	    0000001	        MULHSU	        Multiply High (Signed x Unsigned)       1               generate trap (non implemented)
+-- R-Type	0110011	    011	    0000001	        MULHU	        Multiply High (Unsigned)                1               generate trap (non implemented)
+-- R-Type	0110011	    100	    0000001	        DIV	            Divide (Signed)                         1               generate trap (non implemented)
+-- R-Type	0110011	    101	    0000001	        DIVU	        Divide (Unsigned)                       1               generate trap (non implemented)
+-- R-Type	0110011	    110	    0000001	        REM	            Remainder (Signed)                      1               generate trap (non implemented)
+-- R-Type	0110011	    111	    0000001	        REMU	        Remainder (Unsigned)                    1               generate trap (non implemented)
 
 
 -- I-Type	0010011	    000	    N/A	            ADDI	        Add Immediate                           1               N/A
@@ -526,7 +525,7 @@ architecture behavioral of decoder is
 -- I-Type	0010011	    101	    0000000	        SRLI	        Shift Right Logical Immediate           1               N/A
 -- I-Type	0010011	    101	    0100000	        SRAI	        Shift Right Arithmetic Immediate        1               N/A
 
--- I-Type	0001111	    000	    N/A	            FENCE	        Fence                                   ?               Block any unterminated IO operation
+-- I-Type	0001111	    000	    N/A	            FENCE	        Fence                                   ?               Block any unterminated IO operation --> NOP
 
 -- I-Type	0000011	    000	    N/A	            LB	            Load Byte                               ?               May take time (how much ?). Does not block by default, FENCE op if needed.
 -- I-Type	0000011	    001	    N/A	            LH	            Load Halfword                           ?               May take time (how much ?). Does not block by default, FENCE op if needed.
@@ -538,6 +537,7 @@ architecture behavioral of decoder is
 
 -- I-Type	1110011	    000	    000000000000	ECALL	        Environment Call                        4               Stall the pipeline + execution mode to priviledged
 -- I-Type	1110011	    000	    000000000001	EBREAK	        Environment Breakpoint                  4               Stall the pipeline + execution mode to user
+-- Unused ECALL / EBREAK for simple implementation
 
 -- S-Type	0100011	    000	    N/A	            SB	            Store Byte                              ?               May take time (how much ?). Does not block by default, FENCE op if needed.
 -- S-Type	0100011	    001	    N/A	            SH	            Store Halfword                          ?               May take time (how much ?). Does not block by default, FENCE op if needed.
