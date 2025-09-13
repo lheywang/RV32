@@ -10,10 +10,12 @@ end entity;
 architecture behavioral of reg_tb is
 
     signal datain_t :       std_logic_vector(31 downto 0)           := X"deadbeef";
-    signal dataout_t :      std_logic_vector(31 downto 0)           := (others => '0');
+    signal dataout1_t :      std_logic_vector(31 downto 0)          := (others => '0');
+    signal dataout2_t :      std_logic_vector(31 downto 0)          := (others => '0');
     signal clock_t :        std_logic                               := '0';
     signal nRST_t :         std_logic                               := '0';
-    signal WREN_t :         std_logic                               := '0';
+    signal WREN1_t :         std_logic                              := '0';
+    signal WREN2_t :         std_logic                              := '0';
     signal INPU_t :         std_logic                               := '0';
 
     begin
@@ -24,10 +26,12 @@ architecture behavioral of reg_tb is
             )
             port map (
                 datain  =>  datain_t,
-                dataout =>  dataout_t,
+                dataout1=>  dataout1_t,
+                dataout2=>  dataout2_t,
                 clock   =>  clock_t,
                 nRST    =>  nRST_t,
-                WREN    =>  WREN_t,
+                WREN1   =>  WREN1_t,
+                WREN2   =>  WREN2_t,
                 INPU    =>  INPU_t
             );
 
@@ -65,9 +69,16 @@ architecture behavioral of reg_tb is
         P4 : process
             begin
                 wait for 100 ns;
-                WREN_t <= '1';
+                WREN1_t <= '1';
                 wait for 40 ns;
-                WREN_t <= '0';
+                WREN1_t <= '0';
+                WREN2_t <= '1';
+                wait for 40 ns;
+                WREN1_t <= '1';
+                wait for 40 ns;
+                WREN1_t <= '0';
+                WREN2_t <= '0';
+                wait for 40 ns;
             end process;
 
 
