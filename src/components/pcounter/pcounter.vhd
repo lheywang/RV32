@@ -5,7 +5,8 @@ use IEEE.numeric_std.all;
 entity pcounter is 
     generic (
         XLEN :      integer := 32;                                      -- Width of the data address.
-        RESET_ADDR :integer := 0                                        -- Address immediately outputed on reset
+        RESET_ADDR :integer := 0;                                       -- Address immediately outputed on reset
+        INCREMENT : integer := 4                                        -- Increment step of the program counter.
     );
     port (
         -- IO ports
@@ -46,7 +47,7 @@ architecture behavioral of pcounter is
                         internal_nOVER <= '0';
 
                     elsif (enable = '1') and (internal_nOVER = '0') then
-                        internal_address <= internal_address + 1;
+                        internal_address <= internal_address + INCREMENT;
 
                         if (internal_address = address_maxval) then
                             internal_nOVER <= '1';
@@ -57,10 +58,6 @@ architecture behavioral of pcounter is
                 end if;
 
             end process;
-
-        -- internal_nOVER <= '1' when std_logic_vector(internal_address) = address_maxval else
-        --                   '0'; 
-
 
         -- Output assignement, in any time.
         address <= std_logic_vector(internal_address); 
