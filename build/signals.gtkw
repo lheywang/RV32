@@ -1,12 +1,12 @@
 [*]
 [*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
-[*] Sat Sep 13 07:41:20 2025
+[*] Sat Sep 13 08:03:40 2025
 [*]
 [dumpfile] "/home/lheywang/Dev/RV32/build/wave.ghw"
-[dumpfile_mtime] "Sat Sep 13 07:40:33 2025"
-[dumpfile_size] 5293
+[dumpfile_mtime] "Sat Sep 13 08:03:33 2025"
+[dumpfile_size] 5313
 [savefile] "/home/lheywang/Dev/RV32/build/signals.gtkw"
-[timestart] 785800000
+[timestart] 0
 [size] 1920 1033
 [pos] -1 -1
 *-25.845110 1036700000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
@@ -16,7 +16,7 @@
 [sst_width] 273
 [signals_width] 221
 [sst_expanded] 1
-[sst_vpaned_height] 260
+[sst_vpaned_height] 246
 @200
 -Clock
 @28

@@ -85,47 +85,47 @@ architecture behavioral of decoder_tb is
 
                     -- ADDI (add immediate) 011111111111 (imm) 00011 (3) 000 (funct3) 10000 (16) 00100 (imm) 11 (32 bits)
                     -- I Type format
-                    instruction_t <= B"011111111111_00011_000_10000_00100_11"; 
+                    instruction_t <= B"011111111111_00011_000_00001_00100_11"; 
                     wait for 20 ns;
 
-                    -- SLTI (Set less than immediate) 011111111111 (imm) 00011 (3) 010 (funct3) 10000 (16) 00100 (imm) 11 (32 bits)
+                    -- SLTI (Set less than immediate) 111111111111 (imm) 00011 (3) 010 (funct3) 10000 (16) 00100 (imm) 11 (32 bits)
                     -- I Type format
-                    instruction_t <= B"011111111111_01011_010_10000_00100_11"; 
+                    instruction_t <= B"111111111111_01011_010_10000_00100_11"; 
                     wait for 20 ns;
 
                     -- SLTIU (Set less than immediate unsigned) 011111111111 (imm) 00011 (3) 011 (funct3) 10000 (16) 00100 (imm) 11 (32 bits)
                     -- I Type format
-                    instruction_t <= B"011111111111_01111_011_10000_00100_11"; 
+                    instruction_t <= B"011111111111_11111_011_10000_00100_11"; 
                     wait for 20 ns;
 
-                    -- XORI (XOR immediate) 011111111111 (imm) 00011 (19) 100 (funct3) 10000 (16) 00100 (imm) 11 (32 bits)
+                    -- XORI (XOR immediate) 111111111111 (imm) 00011 (19) 100 (funct3) 10000 (16) 00100 (imm) 11 (32 bits)
                     -- I Type format
-                    instruction_t <= B"011111111111_10011_100_10000_00100_11"; 
+                    instruction_t <= B"111111111111_10011_100_10000_00100_11"; 
                     wait for 20 ns;
 
-                    -- ORI (OR immediate) 011111111111 (imm) 00011 (3) 110 (funct3) 10000 (16) 00100 (imm) 11 (32 bits)
+                    -- ORI (OR immediate) 111111111111 (imm) 00011 (3) 110 (funct3) 10000 (16) 00100 (imm) 11 (32 bits)
                     -- I Type format
-                    instruction_t <= B"011111111111_00011_110_10000_00100_11"; 
+                    instruction_t <= B"111111111111_00011_110_10000_00100_11"; 
                     wait for 20 ns;
 
                     -- ANDI (AND immediate) 011111111111 (imm) 00011 (3) 111 (funct3) 10000 (16) 00100 (imm) 11 (32 bits)
                     -- I Type format
-                    instruction_t <= B"01111111111111111_111_10000_00100_11"; 
+                    instruction_t <= B"011111111111_00011_111_10000_00100_11"; 
                     wait for 20 ns;
 
-                    -- SLLI (Shift left immediate) 011111111111 (imm) 00011 (3) 001 (funct3) 10000 (16) 00100 (imm) 11 (32 bits)
+                    -- SLLI (Shift left immediate) 111111111111 (imm) 00011 (3) 001 (funct3) 10000 (16) 00100 (imm) 11 (32 bits)
                     -- I Type format
-                    instruction_t <= B"011111111111_00011_001_10000_00100_11"; 
+                    instruction_t <= B"111111111111_00011_001_10000_00100_11"; 
                     wait for 20 ns;
 
                     -- SRLI (Shift right immediate) 01000 (imm) 01 (0X) 01111 (imm (15)) 00011 (12) 101 (funct3) 01111 (15) 00100 (imm) 11 (32 bits)
                     -- I Type format
-                    instruction_t <= B"01000_01_01111_01010_101_01111_00100_11"; 
+                    instruction_t <= B"00000_01_01111_01010_101_01111_00100_11"; 
                     wait for 20 ns;
 
                     -- SRAI (Shift right arithemetic immediate) 00000 (imm) 01 (0X) 01111 (imm (15)) 00011 (12) 101 (funct3) 01111 (15) 00100 (imm) 11 (32 bits)
                     -- I Type format
-                    instruction_t <= B"00000_01_01111_01010_101_01111_00100_11"; 
+                    instruction_t <= B"01000_01_01111_01010_101_01111_00100_11"; 
                     wait for 20 ns;
 
                     ----------------------------------------------------
@@ -149,32 +149,32 @@ architecture behavioral of decoder_tb is
 
                     -- SLT 00000 (funct7) 00 (0) 01111 (15) 10001 (17) 010 (funct3) 11111 (31) 01100 (code) 11 (32 bits)
                     -- R Type format
-                    instruction_t <= B"00000_00_01111_10101_010_11111_01100_11"; 
+                    instruction_t <= B"00000_00_01111_10001_010_11111_01100_11"; 
                     wait for 20 ns;
 
                     -- SLTU 00000 (funct7) 00 (0) 01111 (15) 10001 (17) 011 (funct3) 11111 (31) 01100 (code) 11 (32 bits)
                     -- R Type format
-                    instruction_t <= B"00000_00_01111_10111_011_11111_01100_11"; 
+                    instruction_t <= B"00000_00_01111_10001_011_11111_01100_11"; 
                     wait for 20 ns;
 
                     -- XOR 00000 (funct7) 00 (0) 01111 (15) 10001 (17) 100 (funct3) 11111 (31) 01100 (code) 11 (32 bits)
                     -- R Type format
-                    instruction_t <= B"00000_00_01111_11001_100_11111_01100_11"; 
+                    instruction_t <= B"00000_00_01111_10001_100_11111_01100_11"; 
                     wait for 20 ns;
 
                     -- SRL 00000 (funct7) 00 (0) 01111 (15) 10001 (17) 101 (funct3) 11111 (31) 01100 (code) 11 (32 bits)
                     -- R Type format
-                    instruction_t <= B"00000_00_01111_11011_101_11111_01100_11"; 
+                    instruction_t <= B"00000_00_01111_10001_101_11111_01100_11"; 
                     wait for 20 ns;
 
                     -- SRA 01000 (funct7) 00 (0) 01111 (15) 10001 (17) 101 (funct3) 11111 (31) 01100 (code) 11 (32 bits)
                     -- R Type format
-                    instruction_t <= B"01000_00_01111_11011_101_11111_01100_11"; 
+                    instruction_t <= B"01000_00_01111_10001_101_11111_01100_11"; 
                     wait for 20 ns;
 
                     -- OR 00000 (funct7) 00 (0) 01111 (15) 10001 (17) 110 (funct3) 11111 (31) 01100 (code) 11 (32 bits)
                     -- R Type format
-                    instruction_t <= B"00000_00_01111_11101_110_11111_01100_11"; 
+                    instruction_t <= B"00000_00_01111_10001_110_11111_01100_11"; 
                     wait for 20 ns;
 
                     -- AND 00000 (funct7) 00 (0) 01111 (15) 10001 (17) 111 (funct3) 11111 (31) 01100 (code) 11 (32 bits)
@@ -200,9 +200,9 @@ architecture behavioral of decoder_tb is
                     instruction_t <= B"0111111_00111_00110_000_11111_11000_11"; 
                     wait for 20 ns;
 
-                    -- BNE (Branch if not equal) 0111111 00111 (rs2) 00110 (rs1) 001 (funct3) 11111 (offset) 11000 (branch) 11 (32 bits)
+                    -- BNE (Branch if not equal) 1111111 00111 (rs2) 00110 (rs1) 001 (funct3) 11111 (offset) 11000 (branch) 11 (32 bits)
                     -- B Type
-                    instruction_t <= B"0111111_00111_00110_001_11111_11000_11"; 
+                    instruction_t <= B"1111111_00111_00110_001_11111_11000_11"; 
                     wait for 20 ns;
 
                     -- BLT (Branch if less than) 0111111 00111 (rs2) 00110 (rs1) 100 (funct3) 11111 (offset) 11000 (branch) 11 (32 bits)
@@ -210,9 +210,9 @@ architecture behavioral of decoder_tb is
                     instruction_t <= B"0111111_00111_00110_100_11111_11000_11"; 
                     wait for 20 ns;
 
-                    -- BGE (Branch if greater than) 0111111 00111 (rs2) 00110 (rs1) 101 (funct3) 11111 (offset) 11000 (branch) 11 (32 bits)
+                    -- BGE (Branch if greater than) 1111111 00111 (rs2) 00110 (rs1) 101 (funct3) 11111 (offset) 11000 (branch) 11 (32 bits)
                     -- B Type
-                    instruction_t <= B"0111111_00111_00110_101_11111_11000_11"; 
+                    instruction_t <= B"1111111_00111_00110_101_11111_11000_11"; 
                     wait for 20 ns;
 
                     -- BLTU (Branch if less than (unsigned)) 0111111 00111 (rs2) 00110 (rs1) 110 (funct3) 11111 (offset) 11000 (branch) 11 (32 bits)
@@ -220,9 +220,9 @@ architecture behavioral of decoder_tb is
                     instruction_t <= B"0111111_00111_00110_110_11111_11000_11"; 
                     wait for 20 ns;
 
-                    -- BGEU (Branch if greater than (unsigned) 0111111 00111 (rs2) 00110 (rs1) 111 (funct3) 11111 (offset) 11000 (branch) 11 (32 bits)
+                    -- BGEU (Branch if greater than (unsigned) 1111111 00111 (rs2) 00110 (rs1) 111 (funct3) 11111 (offset) 11000 (branch) 11 (32 bits)
                     -- B Type
-                    instruction_t <= B"0111111_00111_00110_111_11111_11000_11"; 
+                    instruction_t <= B"1111111_00111_00110_111_11111_11000_11"; 
                     wait for 20 ns;
 
                     ----------------------------------------------------
