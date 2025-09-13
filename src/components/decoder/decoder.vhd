@@ -62,7 +62,7 @@ architecture behavioral of decoder is
 
                 if (nRST = '0') then
                     illegal_internal <= '0';
-                    selected_decoder <= default_t;
+                    selected_selected_decoder <= default_t;
 
                 elsif rising_edge(clock) then
 
@@ -70,46 +70,46 @@ architecture behavioral of decoder is
                     case instruction(6 downto 0) is
 
                         when "0110111" =>               -- LUI
-                            selected_decoder <= U;
+                            selected_selected_decoder <= U;
                             illegal_internal <= '0';
                         when "0010111" =>               -- AUIPC
-                            selected_decoder <= U;
+                            selected_selected_decoder <= U;
                             illegal_internal <= '0';
 
                         when "0010011" =>               -- Immediates
-                            selected_decoder <= I;
+                            selected_selected_decoder <= I;
                             illegal_internal <= '0';
                         when "0001111" =>               -- FENCE
-                            selected_decoder <= I;
+                            selected_selected_decoder <= I;
                             illegal_internal <= '0';
                         when "1100111" =>               --(JALR)
-                            selected_decoder <= I;
+                            selected_selected_decoder <= I;
                             illegal_internal <= '0';
                         when "1110011" =>               -- Calls
-                            selected_decoder <= I;
+                            selected_selected_decoder <= I;
                             illegal_internal <= '0';
                         when "0000011" =>               -- Store
-                            selected_decoder <= I;
+                            selected_selected_decoder <= I;
                             illegal_internal <= '0';
 
                         when "0110011" =>               -- Register operations
-                            selected_decoder <= R;
+                            selected_selected_decoder <= R;
                             illegal_internal <= '0';
                         
                         when "1100011" =>               -- Branchs
-                            selected_decoder <= B;
+                            selected_selected_decoder <= B;
                             illegal_internal <= '0';
                         
                         when "0100011" =>               -- Loads
-                            selected_decoder <= S;
+                            selected_selected_decoder <= S;
                             illegal_internal <= '0';
 
                         when "1101111" =>               -- Jumps
-                            selected_decoder <= J;
+                            selected_selected_decoder <= J;
                             illegal_internal <= '0';
 
                         when others =>
-                            selected_decoder <= illegal_t;
+                            selected_selected_decoder <= illegal_t;
                             illegal_internal <= '1';
 
                     end case;
@@ -130,7 +130,7 @@ architecture behavioral of decoder is
 
                 else
 
-                    case selected_decoder is 
+                    case selected_selected_decoder is 
 
                         -- Register to register operation
                         when R =>
