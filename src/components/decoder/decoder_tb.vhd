@@ -342,6 +342,20 @@ architecture behavioral of decoder_tb is
                     instruction_t <= B"0000001_00001_00011_111_11111_01100_11"; 
                     wait for 20 ns;
 
+                    ----------------------------------------------------
+                    -- ILLEGALS
+                    ----------------------------------------------------
+
+                    -- (ILLEGAL) SH (Store halfword) 1111111 (offset 1) 00001 (rs2) 00011 (rs1) 010 (funct3) 11111 (offset 2) 01000 (op) 11 (32 bits)
+                    -- S type
+                    instruction_t <= B"1111111_00001_00011_011_11111_01000_11"; 
+                    wait for 20 ns;
+
+                    -- (ILLEGAL) BGE (Branch if greater than) 0111111 00111 (rs2) 00110 (rs1) 101 (funct3) 11111 (offset) 11000 (branch) 11 (32 bits)
+                    -- B Type
+                    instruction_t <= B"0111111_00111_00110_010_11111_11000_11"; 
+                    wait for 20 ns;
+
                     -- End
                     wait for 1 sec;
 
