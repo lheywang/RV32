@@ -120,16 +120,10 @@ def set_top(files: list[pathlib.Path]):
 # Configurations variables
 # Theses are fixed and can't be changed
 WORKDIR = "build/"
+PRESENTATIONDIR = "presentation/"
 GHDL_CMD = str(shutil.which("ghdl")) + " "
 GTKWAVE_CMD = "gtkwave "
 BASE_DIR = "src"
-# Theses are fixed, but are prompted for changes. --> This is default values only
-LEN = "100ns"  # Default len. Can be changed in the prompt
-TOP = "rv32"
-
-# Auto generated variables
-WAVEFILE = WORKDIR + "wave.ghw"
-PRESENTATION = WORKDIR + "signals.gtkw"
 
 # ----------------------------------------------------------------------------------------------
 # Script start
@@ -144,10 +138,23 @@ source_files = list_files(base_path)
 
 # Add the build folder
 pathlib.Path("build/").mkdir(parents=True, exist_ok=True)
+pathlib.Path("presentation/").mkdir(parents=True, exist_ok=True)
 
 # User inputs
 set_len()
 set_top(source_files)
+
+# ----------------------------------------------------------------------------------------------
+# Configuration variables
+# ----------------------------------------------------------------------------------------------
+
+# Auto generated variables
+WAVEFILE = WORKDIR + "wave.ghw"
+PRESENTATION = PRESENTATIONDIR + f"{TOP}.gtkw"
+
+# Create a file, if needed
+with open(PRESENTATION, "w+") as f:
+    pass
 
 # Create the commands arguments
 # Here, we use the known ghdl file, and glob them. This trick GHDL to make it's own search, and thus benefit from the auto-ordering functionnality.
@@ -177,6 +184,7 @@ GHDL_SIMULATE = (
     + f"--stop-time={LEN}"
 )
 GTKWAVE_SHOW = GTKWAVE_CMD + f"-a {PRESENTATION}" + f" {WAVEFILE}"
+GHDL_REMOVE = GHDL_CMD + "--remove " + f"--workdir={WORKDIR}"
 
 # Store the different elements into a common list :
 commands = [
@@ -227,6 +235,16 @@ while True:
         print("=" * 100)
         print("Exiting code ghdl handler !")
         print("=" * 100)
+        print("Cleanning before leaving...")
+        print(f"Running {GHDL_REMOVE}")
+        result = subprocess.run(
+            GHDL_REMOVE,
+            capture_output=True,
+            text=True,
+            check=True,
+            shell=True,
+            cwd=".",
+        )
         exit(0)
 
     except subprocess.CalledProcessError as e:
@@ -248,4 +266,14 @@ while True:
         print("=" * 100)
         print(f"Unknown error. Check the output of ghdl directly. Python returned {e}")
         print("=" * 100)
+        print("Cleanning before leaving...")
+        print(f"Running {GHDL_REMOVE}")
+        result = subprocess.run(
+            GHDL_REMOVE,
+            capture_output=True,
+            text=True,
+            check=True,
+            shell=True,
+            cwd=".",
+        )
         exit(-2)
