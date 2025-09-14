@@ -36,18 +36,7 @@ package common is
         c_AND,      c_OR,       c_XOR,
 
         c_NONE
-    ); -- Warning : DIV and REM aren't implemented.
-
-    type alu_status is (
-        s_EQ,
-
-        s_GREATER, 
-        s_SMALLER,
-
-        s_ZERO,
-
-        s_NONE
-    ); -- Always from RS1 compared to RS2 POV.
+    );
 
 end common;
 
