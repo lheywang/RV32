@@ -18,14 +18,18 @@ port (
     outen :         in      std_logic;                                                          -- Enable output drivers
 
     -- Status output
-    status :        out     alu_status                                  := s_NONE;              -- status output (branches)
-    overflow :      out     std_logic                                   := '0'                  -- Overflow detected
+    zero :          out     std_logic                                   := '0';                 -- Result is ZERO
+    overflow :      out     std_logic                                   := '0';                 -- Overflow detected
+    beq :           out     std_logic                                   := '0';                 -- Indicate that the BEQ  condition is valid for jump
+    bne :           out     std_logic                                   := '0';                 -- Indicate that the BNE  condition is valid for jump
+    blt :           out     std_logic                                   := '0';                 -- Indicate that the BLT  condition is valid for jump
+    bge :           out     std_logic                                   := '0';                 -- Indicate that the BGE  condition is valid for jump
+    bltu :          out     std_logic                                   := '0';                 -- Indicate that the BLTU condition is valid for jump
+    bgeu :          out     std_logic                                   := '0'                  -- Indicate that the BGEU condition is valid for jump
 );
 end entity;
 
 architecture behavioral of alu is
-
-        signal zero :       std_logic                                   := '0';
 
     begin
 
@@ -109,18 +113,37 @@ architecture behavioral of alu is
 
             overflow    <= v_ovf;
             
-            if (unsigned(res) = 0) then
+            if (unsigned(res) = 0) and (command /= c_None) then -- This make c_NONE be used for branchs evaluations.
                 zero <= '1';
             else
                 zero <= '0';
             end if;
 
-        end process;
+            -- Jumps condition checks
+            if (unsigned(arg1) = unsigned(arg2)) then
+                beq <= '1';
+                bne <= '0';
+            else
+                beq <= '0';
+                bne <= '1';
+            end if;
 
-    status      <=  s_ZERO      when (zero = '1') else
-                    s_EQ        when (unsigned(arg1) = unsigned(arg2)) else
-                    s_GREATER   when (unsigned(arg1) > unsigned(arg2)) else
-                    s_SMALLER   when (unsigned(arg1) < unsigned(arg2)) else
-                    s_NONE;
+            if (unsigned(arg1) < unsigned(arg2)) then
+                bltu <= '1';
+                bgeu <= '0';
+            else
+                bltu <= '0';
+                bgeu <= '1';
+            end if;
+
+            if (signed(arg1) < signed(arg2)) then
+                blt <= '1';
+                bge <= '0';
+            else
+                blt <= '0';
+                bge <= '1';
+            end if;
+
+        end process;
         
     end architecture;

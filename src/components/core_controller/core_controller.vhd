@@ -51,11 +51,14 @@ entity core_controller is
 
         -- Alu controls
         alu_cmd :       out     commands                                    := c_ADD;               -- ALU controls signals
-        alu_sign :      out     std_logic                                   := '0';                 -- ALU sign mode : 0 = unsigned, 1 = signed
-        alu_status :    in      status;                                                             -- ALU feedback status (equal, greater, zero...) 
         alu_out_en :    out     std_logic                                   := '1';                 -- Enable output (output bus is shared with memory)
         alu_overflow :  in      std_logic;                                                          -- ALU overflow
-        alu_underflow : in      std_logic;                                                          -- ALU underflow
+        alu_beq :       in      std_logic                                   := '0';                 -- Indicate that the BEQ  condition is valid for jump
+        alu_bne :       in      std_logic                                   := '0';                 -- Indicate that the BNE  condition is valid for jump
+        alu_blt :       in      std_logic                                   := '0';                 -- Indicate that the BLT  condition is valid for jump
+        alu_bge :       in      std_logic                                   := '0';                 -- Indicate that the BGE  condition is valid for jump
+        alu_bltu :      in      std_logic                                   := '0';                 -- Indicate that the BLTU condition is valid for jump
+        alu_bgeu :      in      std_logic                                   := '0'                  -- Indicate that the BGEU condition is valid for jump
 
         -- Generics inputs :
         ctl_interrupt : in      std_logic;                                                          -- Interrupt flag

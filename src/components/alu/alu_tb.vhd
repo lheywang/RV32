@@ -1,4 +1,4 @@
--- recommended sim lenght : 2 us
+-- recommended sim lenght : 5 us
 
 library IEEE;
 use IEEE.std_logic_1164.all;
@@ -15,8 +15,13 @@ architecture behavioral of alu_tb is
         signal result_t :   std_logic_vector(31 downto 0)               := (others => '0');
         signal command_t :  commands                                    := c_NONE;
         signal outen_t :    std_logic                                   := '0';
-        signal status_t :   alu_status                                  := s_NONE;
         signal overflow_t : std_logic                                   := '0';
+        signal beq_t :      std_logic                                   := '0';
+        signal bne_t :      std_logic                                   := '0';
+        signal blt_t :      std_logic                                   := '0';
+        signal bge_t :      std_logic                                   := '0';
+        signal bltu_t :     std_logic                                   := '0';
+        signal bgeu_t :     std_logic                                   := '0';
 
     begin
 
@@ -30,33 +35,40 @@ architecture behavioral of alu_tb is
                 result      =>  result_t,
                 command     =>  command_t,
                 outen       =>  outen_t,
-                status      =>  status_t,
-                overflow    =>  overflow_t
+                overflow    =>  overflow_t,
+                beq         =>  beq_t,
+                bne         =>  bne_t,
+                bge         =>  bge_t,
+                blt         =>  blt_t,
+                bltu        =>  bltu_t,
+                bgeu        =>  bgeu_t
             );
 
         -- Instructions cycles
         P1 : process
         begin
             command_t <=    c_ADD;
-            wait for 120 ns;
+            wait for 140 ns;
             command_t <=    c_SUB;
-            wait for 120 ns;
+            wait for 140 ns;
             command_t <=    c_AND;
-            wait for 120 ns;
+            wait for 140 ns;
             command_t <=    c_OR;
-            wait for 120 ns;
+            wait for 140 ns;
             command_t <=    c_XOR;
-            wait for 120 ns;
+            wait for 140 ns;
             command_t <=    c_SLL;
-            wait for 120 ns;
+            wait for 140 ns;
             command_t <=    c_SRL;
-            wait for 120 ns;
+            wait for 140 ns;
             command_t <=    c_SRA;
-            wait for 120 ns;
+            wait for 140 ns;
             command_t <=    c_SLT;
-            wait for 120 ns;
+            wait for 140 ns;
             command_t <=    c_SLTU;
-            wait for 120 ns;
+            wait for 140 ns;
+            command_t <=    c_NONE;
+            wait for 140 ns;
         end process;
 
         -- Input controls
@@ -83,7 +95,19 @@ architecture behavioral of alu_tb is
             arg1_t <=     std_logic_vector(to_signed(-64,           arg1_t'length));
             arg2_t <=     std_logic_vector(to_signed(2147483640,    arg2_t'length));
             wait for 20 ns;
+            arg1_t <=     std_logic_vector(to_signed(128,           arg1_t'length));
+            arg2_t <=     std_logic_vector(to_signed(128,           arg2_t'length));
+            wait for 20 ns;            
 
+        end process;
+
+        -- Output enable control
+        P3 : process
+        begin
+            outen_t <= '1';
+            wait for 1540 ns;
+            outen_t <= '0';
+            wait for 1540 ns;
         end process;
 
     end architecture;
