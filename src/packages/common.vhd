@@ -23,10 +23,7 @@ package common is
 
         i_JAL,      i_JALR,
 
-        i_ECALL,    i_EBREAK,
-
-        i_MUL,      i_MULH,     i_MULHSU,   i_MULHU,
-        i_DIV,      i_DIVU,     i_REM,      i_REMU
+        i_ECALL,    i_EBREAK
     );
 
     type commands is (
@@ -38,13 +35,11 @@ package common is
 
         c_AND,      c_OR,       c_XOR,
 
-        c_DIV,      c_MUL,      c_REM,
-
         c_NONE
     ); -- Warning : DIV and REM aren't implemented.
 
     type alu_status is (
-        s_EQ,       s_NEQ,
+        s_EQ,
 
         s_GREATER, 
         s_SMALLER,
