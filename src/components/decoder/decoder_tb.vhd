@@ -296,50 +296,50 @@ architecture behavioral of decoder_tb is
                     instruction_t <= B"000000000001000000000000011100_11"; 
                     wait for 20 ns;
 
-                    --==================================================
-                    -- RV32M
-                    --==================================================
+                    -- --==================================================
+                    -- -- RV32M
+                    -- --==================================================
 
-                    -- MUL 0000001 (funct7) 00001 (rs2) 00011 (rs1) 000 (funct3) 11111 (rd) 01100 (op) 11 (32 bits)
-                    -- R Type format 
-                    instruction_t <= B"0000001_00001_00011_000_11111_01100_11"; 
-                    wait for 20 ns;
+                    -- -- MUL 0000001 (funct7) 00001 (rs2) 00011 (rs1) 000 (funct3) 11111 (rd) 01100 (op) 11 (32 bits)
+                    -- -- R Type format 
+                    -- instruction_t <= B"0000001_00001_00011_000_11111_01100_11"; 
+                    -- wait for 20 ns;
 
-                    -- MULH 0000001 (funct7) 00001 (rs2) 00011 (rs1) 001 (funct3) 11111 (rd) 01100 (op) 11 (32 bits)
-                    -- R Type format
-                    instruction_t <= B"0000001_00001_00011_001_11111_01100_11"; 
-                    wait for 20 ns;
+                    -- -- MULH 0000001 (funct7) 00001 (rs2) 00011 (rs1) 001 (funct3) 11111 (rd) 01100 (op) 11 (32 bits)
+                    -- -- R Type format
+                    -- instruction_t <= B"0000001_00001_00011_001_11111_01100_11"; 
+                    -- wait for 20 ns;
 
 
-                    -- MULHSU 0000001 (funct7) 00001 (rs2) 00011 (rs1) 010 (funct3) 11111 (rd) 01100 (op) 11 (32 bits)
-                    -- R Type format
-                    instruction_t <= B"0000001_00001_00011_010_11111_01100_11"; 
-                    wait for 20 ns;
+                    -- -- MULHSU 0000001 (funct7) 00001 (rs2) 00011 (rs1) 010 (funct3) 11111 (rd) 01100 (op) 11 (32 bits)
+                    -- -- R Type format
+                    -- instruction_t <= B"0000001_00001_00011_010_11111_01100_11"; 
+                    -- wait for 20 ns;
 
-                    -- MULHU 0000001 (funct7) 00001 (rs2) 00011 (rs1) 011 (funct3) 11111 (rd) 01100 (op) 11 (32 bits)
-                    -- R Type format
-                    instruction_t <= B"0000001_00001_00011_011_11111_01100_11"; 
-                    wait for 20 ns;
+                    -- -- MULHU 0000001 (funct7) 00001 (rs2) 00011 (rs1) 011 (funct3) 11111 (rd) 01100 (op) 11 (32 bits)
+                    -- -- R Type format
+                    -- instruction_t <= B"0000001_00001_00011_011_11111_01100_11"; 
+                    -- wait for 20 ns;
 
-                    -- DIV 0000001 (funct7) 00001 (rs2) 00011 (rs1) 100 (funct3) 11111 (rd) 01100 (op) 11 (32 bits)
-                    -- R Type format
-                    instruction_t <= B"0000001_00001_00011_100_11111_01100_11"; 
-                    wait for 20 ns;
+                    -- -- DIV 0000001 (funct7) 00001 (rs2) 00011 (rs1) 100 (funct3) 11111 (rd) 01100 (op) 11 (32 bits)
+                    -- -- R Type format
+                    -- instruction_t <= B"0000001_00001_00011_100_11111_01100_11"; 
+                    -- wait for 20 ns;
 
-                    -- DIVU 0000001 (funct7) 00001 (rs2) 00011 (rs1) 101 (funct3) 11111 (rd) 01100 (op) 11 (32 bits)
-                    -- R Type format
-                    instruction_t <= B"0000001_00001_00011_101_11111_01100_11"; 
-                    wait for 20 ns;
+                    -- -- DIVU 0000001 (funct7) 00001 (rs2) 00011 (rs1) 101 (funct3) 11111 (rd) 01100 (op) 11 (32 bits)
+                    -- -- R Type format
+                    -- instruction_t <= B"0000001_00001_00011_101_11111_01100_11"; 
+                    -- wait for 20 ns;
 
-                    -- REM 0000001 (funct7) 00001 (rs2) 00011 (rs1) 110 (funct3) 11111 (rd) 01100 (op) 11 (32 bits)
-                    -- R Type format
-                    instruction_t <= B"0000001_00001_00011_110_11111_01100_11"; 
-                    wait for 20 ns;
+                    -- -- REM 0000001 (funct7) 00001 (rs2) 00011 (rs1) 110 (funct3) 11111 (rd) 01100 (op) 11 (32 bits)
+                    -- -- R Type format
+                    -- instruction_t <= B"0000001_00001_00011_110_11111_01100_11"; 
+                    -- wait for 20 ns;
 
-                    -- REMU 0000001 (funct7) 00001 (rs2) 00011 (rs1) 111 (funct3) 11111 (rd) 01100 (op) 11 (32 bits)
-                    -- R Type format
-                    instruction_t <= B"0000001_00001_00011_111_11111_01100_11"; 
-                    wait for 20 ns;
+                    -- -- REMU 0000001 (funct7) 00001 (rs2) 00011 (rs1) 111 (funct3) 11111 (rd) 01100 (op) 11 (32 bits)
+                    -- -- R Type format
+                    -- instruction_t <= B"0000001_00001_00011_111_11111_01100_11"; 
+                    -- wait for 20 ns;
 
                     ----------------------------------------------------
                     -- ILLEGALS

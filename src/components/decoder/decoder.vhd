@@ -186,39 +186,39 @@ architecture behavioral of decoder is
 
                                     end case;
 
-                                when "0000001" => -- RV32M extension
+                                -- when "0000001" => -- RV32M extension
 
-                                    case instruction(14 downto 12) is
+                                --     case instruction(14 downto 12) is
 
-                                        when "000" =>
-                                            opcode <= i_MUL;
-                                            illegal_internal2 <= '0';
-                                        when "001" =>
-                                            opcode <= i_MULH;
-                                            illegal_internal2 <= '0';
-                                        when "010" =>
-                                            opcode <= i_MULHSU;
-                                            illegal_internal2 <= '0';
-                                        when "011" =>
-                                            opcode <= i_MULHU;
-                                            illegal_internal2 <= '0';
-                                        when "100" =>
-                                            opcode <= i_DIV;
-                                            illegal_internal2 <= '0';
-                                        when "101" =>
-                                            opcode <= i_DIVU;
-                                            illegal_internal2 <= '0';
-                                        when "110" => 
-                                            opcode <= i_REM;
-                                            illegal_internal2 <= '0';
-                                        when "111" =>
-                                            opcode <= i_REMU; 
-                                            illegal_internal2 <= '0';
-                                        when others =>
-                                            opcode <= i_NOP;
-                                            illegal_internal2 <= '1';
+                                --         when "000" =>
+                                --             opcode <= i_MUL;
+                                --             illegal_internal2 <= '0';
+                                --         when "001" =>
+                                --             opcode <= i_MULH;
+                                --             illegal_internal2 <= '0';
+                                --         when "010" =>
+                                --             opcode <= i_MULHSU;
+                                --             illegal_internal2 <= '0';
+                                --         when "011" =>
+                                --             opcode <= i_MULHU;
+                                --             illegal_internal2 <= '0';
+                                --         when "100" =>
+                                --             opcode <= i_DIV;
+                                --             illegal_internal2 <= '0';
+                                --         when "101" =>
+                                --             opcode <= i_DIVU;
+                                --             illegal_internal2 <= '0';
+                                --         when "110" => 
+                                --             opcode <= i_REM;
+                                --             illegal_internal2 <= '0';
+                                --         when "111" =>
+                                --             opcode <= i_REMU; 
+                                --             illegal_internal2 <= '0';
+                                --         when others =>
+                                --             opcode <= i_NOP;
+                                --             illegal_internal2 <= '1';
 
-                                    end case;
+                                --   end case;
 
                                 when others => 
                                     opcode <= i_NOP;
