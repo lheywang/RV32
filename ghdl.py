@@ -153,7 +153,7 @@ WAVEFILE = WORKDIR + "wave.ghw"
 PRESENTATION = PRESENTATIONDIR + f"{TOP}.gtkw"
 
 # Create a file, if needed
-with open(PRESENTATION, "w+") as f:
+with open(PRESENTATION, "a+") as f:
     pass
 
 # Create the commands arguments
