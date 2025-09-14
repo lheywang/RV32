@@ -58,7 +58,7 @@ entity core_controller is
         alu_blt :       in      std_logic                                   := '0';                 -- Indicate that the BLT  condition is valid for jump
         alu_bge :       in      std_logic                                   := '0';                 -- Indicate that the BGE  condition is valid for jump
         alu_bltu :      in      std_logic                                   := '0';                 -- Indicate that the BLTU condition is valid for jump
-        alu_bgeu :      in      std_logic                                   := '0'                  -- Indicate that the BGEU condition is valid for jump
+        alu_bgeu :      in      std_logic                                   := '0';                 -- Indicate that the BGEU condition is valid for jump
 
         -- Generics inputs :
         ctl_interrupt : in      std_logic;                                                          -- Interrupt flag
