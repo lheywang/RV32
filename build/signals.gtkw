@@ -1,64 +1,54 @@
 [*]
 [*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
-[*] Sat Sep 13 08:03:40 2025
+[*] Sun Sep 14 13:35:22 2025
 [*]
 [dumpfile] "/home/lheywang/Dev/RV32/build/wave.ghw"
-[dumpfile_mtime] "Sat Sep 13 08:03:33 2025"
-[dumpfile_size] 5313
+[dumpfile_mtime] "Sun Sep 14 13:33:55 2025"
+[dumpfile_size] 10939
 [savefile] "/home/lheywang/Dev/RV32/build/signals.gtkw"
 [timestart] 0
 [size] 1920 1033
 [pos] -1 -1
-*-25.845110 1036700000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-25.845110 166600000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
-[treeopen] top.decoder_tb.
-[treeopen] top.decoder_tb.u1.
+[treeopen] top.alu_tb.
+[treeopen] top.alu_tb.u1.
 [sst_width] 273
 [signals_width] 221
 [sst_expanded] 1
-[sst_vpaned_height] 246
+[sst_vpaned_height] 220
 @200
--Clock
-@28
-top.decoder_tb.u1.clock
-@200
--
 -Controls
+@420
+top.alu_tb.u1.command
 @28
-top.decoder_tb.u1.nrst
+top.alu_tb.u1.outen
 @200
 -
 -Inputs
-@22
-#{top.decoder_tb.u1.instruction[31:0]} top.decoder_tb.u1.instruction[31] top.decoder_tb.u1.instruction[30] top.decoder_tb.u1.instruction[29] top.decoder_tb.u1.instruction[28] top.decoder_tb.u1.instruction[27] top.decoder_tb.u1.instruction[26] top.decoder_tb.u1.instruction[25] top.decoder_tb.u1.instruction[24] top.decoder_tb.u1.instruction[23] top.decoder_tb.u1.instruction[22] top.decoder_tb.u1.instruction[21] top.decoder_tb.u1.instruction[20] top.decoder_tb.u1.instruction[19] top.decoder_tb.u1.instruction[18] top.decoder_tb.u1.instruction[17] top.decoder_tb.u1.instruction[16] top.decoder_tb.u1.instruction[15] top.decoder_tb.u1.instruction[14] top.decoder_tb.u1.instruction[13] top.decoder_tb.u1.instruction[12] top.decoder_tb.u1.instruction[11] top.decoder_tb.u1.instruction[10] top.decoder_tb.u1.instruction[9] top.decoder_tb.u1.instruction[8] top.decoder_tb.u1.instruction[7] top.decoder_tb.u1.instruction[6] top.decoder_tb.u1.instruction[5] top.decoder_tb.u1.instruction[4] top.decoder_tb.u1.instruction[3] top.decoder_tb.u1.instruction[2] top.decoder_tb.u1.instruction[1] top.decoder_tb.u1.instruction[0]
+@420
+#{top.alu_tb.u1.arg1[31:0]} top.alu_tb.u1.arg1[31] top.alu_tb.u1.arg1[30] top.alu_tb.u1.arg1[29] top.alu_tb.u1.arg1[28] top.alu_tb.u1.arg1[27] top.alu_tb.u1.arg1[26] top.alu_tb.u1.arg1[25] top.alu_tb.u1.arg1[24] top.alu_tb.u1.arg1[23] top.alu_tb.u1.arg1[22] top.alu_tb.u1.arg1[21] top.alu_tb.u1.arg1[20] top.alu_tb.u1.arg1[19] top.alu_tb.u1.arg1[18] top.alu_tb.u1.arg1[17] top.alu_tb.u1.arg1[16] top.alu_tb.u1.arg1[15] top.alu_tb.u1.arg1[14] top.alu_tb.u1.arg1[13] top.alu_tb.u1.arg1[12] top.alu_tb.u1.arg1[11] top.alu_tb.u1.arg1[10] top.alu_tb.u1.arg1[9] top.alu_tb.u1.arg1[8] top.alu_tb.u1.arg1[7] top.alu_tb.u1.arg1[6] top.alu_tb.u1.arg1[5] top.alu_tb.u1.arg1[4] top.alu_tb.u1.arg1[3] top.alu_tb.u1.arg1[2] top.alu_tb.u1.arg1[1] top.alu_tb.u1.arg1[0]
+#{top.alu_tb.u1.arg2[31:0]} top.alu_tb.u1.arg2[31] top.alu_tb.u1.arg2[30] top.alu_tb.u1.arg2[29] top.alu_tb.u1.arg2[28] top.alu_tb.u1.arg2[27] top.alu_tb.u1.arg2[26] top.alu_tb.u1.arg2[25] top.alu_tb.u1.arg2[24] top.alu_tb.u1.arg2[23] top.alu_tb.u1.arg2[22] top.alu_tb.u1.arg2[21] top.alu_tb.u1.arg2[20] top.alu_tb.u1.arg2[19] top.alu_tb.u1.arg2[18] top.alu_tb.u1.arg2[17] top.alu_tb.u1.arg2[16] top.alu_tb.u1.arg2[15] top.alu_tb.u1.arg2[14] top.alu_tb.u1.arg2[13] top.alu_tb.u1.arg2[12] top.alu_tb.u1.arg2[11] top.alu_tb.u1.arg2[10] top.alu_tb.u1.arg2[9] top.alu_tb.u1.arg2[8] top.alu_tb.u1.arg2[7] top.alu_tb.u1.arg2[6] top.alu_tb.u1.arg2[5] top.alu_tb.u1.arg2[4] top.alu_tb.u1.arg2[3] top.alu_tb.u1.arg2[2] top.alu_tb.u1.arg2[1] top.alu_tb.u1.arg2[0]
 @200
 -
 -Outputs
 @28
-top.decoder_tb.u1.illegal
-top.decoder_tb.u1.illegal_internal
-top.decoder_tb.u1.illegal_internal2
+top.alu_tb.u1.overflow
+top.alu_tb.u1.zero
 @200
 -
--Bus Outputs
-@22
-#{top.decoder_tb.u1.imm[31:0]} top.decoder_tb.u1.imm[31] top.decoder_tb.u1.imm[30] top.decoder_tb.u1.imm[29] top.decoder_tb.u1.imm[28] top.decoder_tb.u1.imm[27] top.decoder_tb.u1.imm[26] top.decoder_tb.u1.imm[25] top.decoder_tb.u1.imm[24] top.decoder_tb.u1.imm[23] top.decoder_tb.u1.imm[22] top.decoder_tb.u1.imm[21] top.decoder_tb.u1.imm[20] top.decoder_tb.u1.imm[19] top.decoder_tb.u1.imm[18] top.decoder_tb.u1.imm[17] top.decoder_tb.u1.imm[16] top.decoder_tb.u1.imm[15] top.decoder_tb.u1.imm[14] top.decoder_tb.u1.imm[13] top.decoder_tb.u1.imm[12] top.decoder_tb.u1.imm[11] top.decoder_tb.u1.imm[10] top.decoder_tb.u1.imm[9] top.decoder_tb.u1.imm[8] top.decoder_tb.u1.imm[7] top.decoder_tb.u1.imm[6] top.decoder_tb.u1.imm[5] top.decoder_tb.u1.imm[4] top.decoder_tb.u1.imm[3] top.decoder_tb.u1.imm[2] top.decoder_tb.u1.imm[1] top.decoder_tb.u1.imm[0]
-#{top.decoder_tb.u1.rd[31:0]} top.decoder_tb.u1.rd[31] top.decoder_tb.u1.rd[30] top.decoder_tb.u1.rd[29] top.decoder_tb.u1.rd[28] top.decoder_tb.u1.rd[27] top.decoder_tb.u1.rd[26] top.decoder_tb.u1.rd[25] top.decoder_tb.u1.rd[24] top.decoder_tb.u1.rd[23] top.decoder_tb.u1.rd[22] top.decoder_tb.u1.rd[21] top.decoder_tb.u1.rd[20] top.decoder_tb.u1.rd[19] top.decoder_tb.u1.rd[18] top.decoder_tb.u1.rd[17] top.decoder_tb.u1.rd[16] top.decoder_tb.u1.rd[15] top.decoder_tb.u1.rd[14] top.decoder_tb.u1.rd[13] top.decoder_tb.u1.rd[12] top.decoder_tb.u1.rd[11] top.decoder_tb.u1.rd[10] top.decoder_tb.u1.rd[9] top.decoder_tb.u1.rd[8] top.decoder_tb.u1.rd[7] top.decoder_tb.u1.rd[6] top.decoder_tb.u1.rd[5] top.decoder_tb.u1.rd[4] top.decoder_tb.u1.rd[3] top.decoder_tb.u1.rd[2] top.decoder_tb.u1.rd[1] top.decoder_tb.u1.rd[0]
-#{top.decoder_tb.u1.rs2[31:0]} top.decoder_tb.u1.rs2[31] top.decoder_tb.u1.rs2[30] top.decoder_tb.u1.rs2[29] top.decoder_tb.u1.rs2[28] top.decoder_tb.u1.rs2[27] top.decoder_tb.u1.rs2[26] top.decoder_tb.u1.rs2[25] top.decoder_tb.u1.rs2[24] top.decoder_tb.u1.rs2[23] top.decoder_tb.u1.rs2[22] top.decoder_tb.u1.rs2[21] top.decoder_tb.u1.rs2[20] top.decoder_tb.u1.rs2[19] top.decoder_tb.u1.rs2[18] top.decoder_tb.u1.rs2[17] top.decoder_tb.u1.rs2[16] top.decoder_tb.u1.rs2[15] top.decoder_tb.u1.rs2[14] top.decoder_tb.u1.rs2[13] top.decoder_tb.u1.rs2[12] top.decoder_tb.u1.rs2[11] top.decoder_tb.u1.rs2[10] top.decoder_tb.u1.rs2[9] top.decoder_tb.u1.rs2[8] top.decoder_tb.u1.rs2[7] top.decoder_tb.u1.rs2[6] top.decoder_tb.u1.rs2[5] top.decoder_tb.u1.rs2[4] top.decoder_tb.u1.rs2[3] top.decoder_tb.u1.rs2[2] top.decoder_tb.u1.rs2[1] top.decoder_tb.u1.rs2[0]
-#{top.decoder_tb.u1.rs1[33:0]} top.decoder_tb.u1.rs1[33] top.decoder_tb.u1.rs1[32] top.decoder_tb.u1.rs1[31] top.decoder_tb.u1.rs1[30] top.decoder_tb.u1.rs1[29] top.decoder_tb.u1.rs1[28] top.decoder_tb.u1.rs1[27] top.decoder_tb.u1.rs1[26] top.decoder_tb.u1.rs1[25] top.decoder_tb.u1.rs1[24] top.decoder_tb.u1.rs1[23] top.decoder_tb.u1.rs1[22] top.decoder_tb.u1.rs1[21] top.decoder_tb.u1.rs1[20] top.decoder_tb.u1.rs1[19] top.decoder_tb.u1.rs1[18] top.decoder_tb.u1.rs1[17] top.decoder_tb.u1.rs1[16] top.decoder_tb.u1.rs1[15] top.decoder_tb.u1.rs1[14] top.decoder_tb.u1.rs1[13] top.decoder_tb.u1.rs1[12] top.decoder_tb.u1.rs1[11] top.decoder_tb.u1.rs1[10] top.decoder_tb.u1.rs1[9] top.decoder_tb.u1.rs1[8] top.decoder_tb.u1.rs1[7] top.decoder_tb.u1.rs1[6] top.decoder_tb.u1.rs1[5] top.decoder_tb.u1.rs1[4] top.decoder_tb.u1.rs1[3] top.decoder_tb.u1.rs1[2] top.decoder_tb.u1.rs1[1] top.decoder_tb.u1.rs1[0]
 @420
-top.decoder_tb.u1.opcode
+#{top.alu_tb.u1.result[31:0]} top.alu_tb.u1.result[31] top.alu_tb.u1.result[30] top.alu_tb.u1.result[29] top.alu_tb.u1.result[28] top.alu_tb.u1.result[27] top.alu_tb.u1.result[26] top.alu_tb.u1.result[25] top.alu_tb.u1.result[24] top.alu_tb.u1.result[23] top.alu_tb.u1.result[22] top.alu_tb.u1.result[21] top.alu_tb.u1.result[20] top.alu_tb.u1.result[19] top.alu_tb.u1.result[18] top.alu_tb.u1.result[17] top.alu_tb.u1.result[16] top.alu_tb.u1.result[15] top.alu_tb.u1.result[14] top.alu_tb.u1.result[13] top.alu_tb.u1.result[12] top.alu_tb.u1.result[11] top.alu_tb.u1.result[10] top.alu_tb.u1.result[9] top.alu_tb.u1.result[8] top.alu_tb.u1.result[7] top.alu_tb.u1.result[6] top.alu_tb.u1.result[5] top.alu_tb.u1.result[4] top.alu_tb.u1.result[3] top.alu_tb.u1.result[2] top.alu_tb.u1.result[1] top.alu_tb.u1.result[0]
 @200
 -
--Internals
-@420
-top.decoder_tb.u1.selected_decoder
-@200
--
-@22
-#{top.decoder_tb.u1.imm_internal[31:0]} top.decoder_tb.u1.imm_internal[31] top.decoder_tb.u1.imm_internal[30] top.decoder_tb.u1.imm_internal[29] top.decoder_tb.u1.imm_internal[28] top.decoder_tb.u1.imm_internal[27] top.decoder_tb.u1.imm_internal[26] top.decoder_tb.u1.imm_internal[25] top.decoder_tb.u1.imm_internal[24] top.decoder_tb.u1.imm_internal[23] top.decoder_tb.u1.imm_internal[22] top.decoder_tb.u1.imm_internal[21] top.decoder_tb.u1.imm_internal[20] top.decoder_tb.u1.imm_internal[19] top.decoder_tb.u1.imm_internal[18] top.decoder_tb.u1.imm_internal[17] top.decoder_tb.u1.imm_internal[16] top.decoder_tb.u1.imm_internal[15] top.decoder_tb.u1.imm_internal[14] top.decoder_tb.u1.imm_internal[13] top.decoder_tb.u1.imm_internal[12] top.decoder_tb.u1.imm_internal[11] top.decoder_tb.u1.imm_internal[10] top.decoder_tb.u1.imm_internal[9] top.decoder_tb.u1.imm_internal[8] top.decoder_tb.u1.imm_internal[7] top.decoder_tb.u1.imm_internal[6] top.decoder_tb.u1.imm_internal[5] top.decoder_tb.u1.imm_internal[4] top.decoder_tb.u1.imm_internal[3] top.decoder_tb.u1.imm_internal[2] top.decoder_tb.u1.imm_internal[1] top.decoder_tb.u1.imm_internal[0]
-#{top.decoder_tb.u1.rd_internal[31:0]} top.decoder_tb.u1.rd_internal[31] top.decoder_tb.u1.rd_internal[30] top.decoder_tb.u1.rd_internal[29] top.decoder_tb.u1.rd_internal[28] top.decoder_tb.u1.rd_internal[27] top.decoder_tb.u1.rd_internal[26] top.decoder_tb.u1.rd_internal[25] top.decoder_tb.u1.rd_internal[24] top.decoder_tb.u1.rd_internal[23] top.decoder_tb.u1.rd_internal[22] top.decoder_tb.u1.rd_internal[21] top.decoder_tb.u1.rd_internal[20] top.decoder_tb.u1.rd_internal[19] top.decoder_tb.u1.rd_internal[18] top.decoder_tb.u1.rd_internal[17] top.decoder_tb.u1.rd_internal[16] top.decoder_tb.u1.rd_internal[15] top.decoder_tb.u1.rd_internal[14] top.decoder_tb.u1.rd_internal[13] top.decoder_tb.u1.rd_internal[12] top.decoder_tb.u1.rd_internal[11] top.decoder_tb.u1.rd_internal[10] top.decoder_tb.u1.rd_internal[9] top.decoder_tb.u1.rd_internal[8] top.decoder_tb.u1.rd_internal[7] top.decoder_tb.u1.rd_internal[6] top.decoder_tb.u1.rd_internal[5] top.decoder_tb.u1.rd_internal[4] top.decoder_tb.u1.rd_internal[3] top.decoder_tb.u1.rd_internal[2] top.decoder_tb.u1.rd_internal[1] top.decoder_tb.u1.rd_internal[0]
-#{top.decoder_tb.u1.rs2_internal[31:0]} top.decoder_tb.u1.rs2_internal[31] top.decoder_tb.u1.rs2_internal[30] top.decoder_tb.u1.rs2_internal[29] top.decoder_tb.u1.rs2_internal[28] top.decoder_tb.u1.rs2_internal[27] top.decoder_tb.u1.rs2_internal[26] top.decoder_tb.u1.rs2_internal[25] top.decoder_tb.u1.rs2_internal[24] top.decoder_tb.u1.rs2_internal[23] top.decoder_tb.u1.rs2_internal[22] top.decoder_tb.u1.rs2_internal[21] top.decoder_tb.u1.rs2_internal[20] top.decoder_tb.u1.rs2_internal[19] top.decoder_tb.u1.rs2_internal[18] top.decoder_tb.u1.rs2_internal[17] top.decoder_tb.u1.rs2_internal[16] top.decoder_tb.u1.rs2_internal[15] top.decoder_tb.u1.rs2_internal[14] top.decoder_tb.u1.rs2_internal[13] top.decoder_tb.u1.rs2_internal[12] top.decoder_tb.u1.rs2_internal[11] top.decoder_tb.u1.rs2_internal[10] top.decoder_tb.u1.rs2_internal[9] top.decoder_tb.u1.rs2_internal[8] top.decoder_tb.u1.rs2_internal[7] top.decoder_tb.u1.rs2_internal[6] top.decoder_tb.u1.rs2_internal[5] top.decoder_tb.u1.rs2_internal[4] top.decoder_tb.u1.rs2_internal[3] top.decoder_tb.u1.rs2_internal[2] top.decoder_tb.u1.rs2_internal[1] top.decoder_tb.u1.rs2_internal[0]
-#{top.decoder_tb.u1.rs1_internal[33:0]} top.decoder_tb.u1.rs1_internal[33] top.decoder_tb.u1.rs1_internal[32] top.decoder_tb.u1.rs1_internal[31] top.decoder_tb.u1.rs1_internal[30] top.decoder_tb.u1.rs1_internal[29] top.decoder_tb.u1.rs1_internal[28] top.decoder_tb.u1.rs1_internal[27] top.decoder_tb.u1.rs1_internal[26] top.decoder_tb.u1.rs1_internal[25] top.decoder_tb.u1.rs1_internal[24] top.decoder_tb.u1.rs1_internal[23] top.decoder_tb.u1.rs1_internal[22] top.decoder_tb.u1.rs1_internal[21] top.decoder_tb.u1.rs1_internal[20] top.decoder_tb.u1.rs1_internal[19] top.decoder_tb.u1.rs1_internal[18] top.decoder_tb.u1.rs1_internal[17] top.decoder_tb.u1.rs1_internal[16] top.decoder_tb.u1.rs1_internal[15] top.decoder_tb.u1.rs1_internal[14] top.decoder_tb.u1.rs1_internal[13] top.decoder_tb.u1.rs1_internal[12] top.decoder_tb.u1.rs1_internal[11] top.decoder_tb.u1.rs1_internal[10] top.decoder_tb.u1.rs1_internal[9] top.decoder_tb.u1.rs1_internal[8] top.decoder_tb.u1.rs1_internal[7] top.decoder_tb.u1.rs1_internal[6] top.decoder_tb.u1.rs1_internal[5] top.decoder_tb.u1.rs1_internal[4] top.decoder_tb.u1.rs1_internal[3] top.decoder_tb.u1.rs1_internal[2] top.decoder_tb.u1.rs1_internal[1] top.decoder_tb.u1.rs1_internal[0]
+-Branchs
+@28
+top.alu_tb.u1.beq
+top.alu_tb.u1.bne
+top.alu_tb.u1.bge
+top.alu_tb.u1.blt
+top.alu_tb.u1.bgeu
+@29
+top.alu_tb.u1.bltu
 [pattern_trace] 1
 [pattern_trace] 0
