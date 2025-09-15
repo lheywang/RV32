@@ -1,0 +1,49 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Mon Sep 15 20:09:55 2025
+[*]
+[dumpfile] "/home/user/RV32/build/wave.ghw"
+[dumpfile_mtime] "Mon Sep 15 20:09:11 2025"
+[dumpfile_size] 4181122
+[savefile] "/home/user/RV32/presentation/ram_tb.gtkw"
+[timestart] 0
+[size] 2560 985
+[pos] -1 -1
+*-26.700001 160000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top.
+[treeopen] top.ram_tb.
+[treeopen] top.ram_tb.u1.
+[sst_width] 273
+[signals_width] 268
+[sst_expanded] 1
+[sst_vpaned_height] 291
+@200
+-clocks
+@28
+top.ram_tb.u1.clock
+@200
+-
+-controls
+@28
+top.ram_tb.u1.nrst
+top.ram_tb.u1.wr
+@200
+-
+-inputs
+@22
+#{top.ram_tb.addr_t[31:0]} top.ram_tb.addr_t[31] top.ram_tb.addr_t[30] top.ram_tb.addr_t[29] top.ram_tb.addr_t[28] top.ram_tb.addr_t[27] top.ram_tb.addr_t[26] top.ram_tb.addr_t[25] top.ram_tb.addr_t[24] top.ram_tb.addr_t[23] top.ram_tb.addr_t[22] top.ram_tb.addr_t[21] top.ram_tb.addr_t[20] top.ram_tb.addr_t[19] top.ram_tb.addr_t[18] top.ram_tb.addr_t[17] top.ram_tb.addr_t[16] top.ram_tb.addr_t[15] top.ram_tb.addr_t[14] top.ram_tb.addr_t[13] top.ram_tb.addr_t[12] top.ram_tb.addr_t[11] top.ram_tb.addr_t[10] top.ram_tb.addr_t[9] top.ram_tb.addr_t[8] top.ram_tb.addr_t[7] top.ram_tb.addr_t[6] top.ram_tb.addr_t[5] top.ram_tb.addr_t[4] top.ram_tb.addr_t[3] top.ram_tb.addr_t[2] top.ram_tb.addr_t[1] top.ram_tb.addr_t[0]
+#{top.ram_tb.datain_t[31:0]} top.ram_tb.datain_t[31] top.ram_tb.datain_t[30] top.ram_tb.datain_t[29] top.ram_tb.datain_t[28] top.ram_tb.datain_t[27] top.ram_tb.datain_t[26] top.ram_tb.datain_t[25] top.ram_tb.datain_t[24] top.ram_tb.datain_t[23] top.ram_tb.datain_t[22] top.ram_tb.datain_t[21] top.ram_tb.datain_t[20] top.ram_tb.datain_t[19] top.ram_tb.datain_t[18] top.ram_tb.datain_t[17] top.ram_tb.datain_t[16] top.ram_tb.datain_t[15] top.ram_tb.datain_t[14] top.ram_tb.datain_t[13] top.ram_tb.datain_t[12] top.ram_tb.datain_t[11] top.ram_tb.datain_t[10] top.ram_tb.datain_t[9] top.ram_tb.datain_t[8] top.ram_tb.datain_t[7] top.ram_tb.datain_t[6] top.ram_tb.datain_t[5] top.ram_tb.datain_t[4] top.ram_tb.datain_t[3] top.ram_tb.datain_t[2] top.ram_tb.datain_t[1] top.ram_tb.datain_t[0]
+@28
+#{top.ram_tb.byte_en_t[3:0]} top.ram_tb.byte_en_t[3] top.ram_tb.byte_en_t[2] top.ram_tb.byte_en_t[1] top.ram_tb.byte_en_t[0]
+@200
+-
+-outputs
+@22
+#{top.ram_tb.dataout_t[31:0]} top.ram_tb.dataout_t[31] top.ram_tb.dataout_t[30] top.ram_tb.dataout_t[29] top.ram_tb.dataout_t[28] top.ram_tb.dataout_t[27] top.ram_tb.dataout_t[26] top.ram_tb.dataout_t[25] top.ram_tb.dataout_t[24] top.ram_tb.dataout_t[23] top.ram_tb.dataout_t[22] top.ram_tb.dataout_t[21] top.ram_tb.dataout_t[20] top.ram_tb.dataout_t[19] top.ram_tb.dataout_t[18] top.ram_tb.dataout_t[17] top.ram_tb.dataout_t[16] top.ram_tb.dataout_t[15] top.ram_tb.dataout_t[14] top.ram_tb.dataout_t[13] top.ram_tb.dataout_t[12] top.ram_tb.dataout_t[11] top.ram_tb.dataout_t[10] top.ram_tb.dataout_t[9] top.ram_tb.dataout_t[8] top.ram_tb.dataout_t[7] top.ram_tb.dataout_t[6] top.ram_tb.dataout_t[5] top.ram_tb.dataout_t[4] top.ram_tb.dataout_t[3] top.ram_tb.dataout_t[2] top.ram_tb.dataout_t[1] top.ram_tb.dataout_t[0]
+@28
+top.ram_tb.u1.illegal_addr
+top.ram_tb.u1.mem_busy
+@29
+top.ram_tb.u1.data_valid
+[pattern_trace] 1
+[pattern_trace] 0
