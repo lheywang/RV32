@@ -1,0 +1,56 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Tue Sep 16 19:01:59 2025
+[*]
+[dumpfile] "/home/user/RV32/build/wave.ghw"
+[dumpfile_mtime] "Tue Sep 16 19:00:08 2025"
+[dumpfile_size] 6277985
+[savefile] "/home/user/RV32/presentation/rom_tb.gtkw"
+[timestart] 0
+[size] 2560 985
+[pos] -27 -24
+*-26.493404 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top.
+[treeopen] top.rom_tb.
+[treeopen] top.rom_tb.u1.
+[sst_width] 273
+[signals_width] 142
+[sst_expanded] 1
+[sst_vpaned_height] 291
+@200
+-Clocks
+@28
+top.rom_tb.u1.clock
+@200
+-
+-Reset
+@28
+top.rom_tb.u1.nrst
+@200
+-
+-Inputs
+@22
+#{top.rom_tb.u1.addr1[31:0]} top.rom_tb.u1.addr1[31] top.rom_tb.u1.addr1[30] top.rom_tb.u1.addr1[29] top.rom_tb.u1.addr1[28] top.rom_tb.u1.addr1[27] top.rom_tb.u1.addr1[26] top.rom_tb.u1.addr1[25] top.rom_tb.u1.addr1[24] top.rom_tb.u1.addr1[23] top.rom_tb.u1.addr1[22] top.rom_tb.u1.addr1[21] top.rom_tb.u1.addr1[20] top.rom_tb.u1.addr1[19] top.rom_tb.u1.addr1[18] top.rom_tb.u1.addr1[17] top.rom_tb.u1.addr1[16] top.rom_tb.u1.addr1[15] top.rom_tb.u1.addr1[14] top.rom_tb.u1.addr1[13] top.rom_tb.u1.addr1[12] top.rom_tb.u1.addr1[11] top.rom_tb.u1.addr1[10] top.rom_tb.u1.addr1[9] top.rom_tb.u1.addr1[8] top.rom_tb.u1.addr1[7] top.rom_tb.u1.addr1[6] top.rom_tb.u1.addr1[5] top.rom_tb.u1.addr1[4] top.rom_tb.u1.addr1[3] top.rom_tb.u1.addr1[2] top.rom_tb.u1.addr1[1] top.rom_tb.u1.addr1[0]
+#{top.rom_tb.u1.addr2[31:0]} top.rom_tb.u1.addr2[31] top.rom_tb.u1.addr2[30] top.rom_tb.u1.addr2[29] top.rom_tb.u1.addr2[28] top.rom_tb.u1.addr2[27] top.rom_tb.u1.addr2[26] top.rom_tb.u1.addr2[25] top.rom_tb.u1.addr2[24] top.rom_tb.u1.addr2[23] top.rom_tb.u1.addr2[22] top.rom_tb.u1.addr2[21] top.rom_tb.u1.addr2[20] top.rom_tb.u1.addr2[19] top.rom_tb.u1.addr2[18] top.rom_tb.u1.addr2[17] top.rom_tb.u1.addr2[16] top.rom_tb.u1.addr2[15] top.rom_tb.u1.addr2[14] top.rom_tb.u1.addr2[13] top.rom_tb.u1.addr2[12] top.rom_tb.u1.addr2[11] top.rom_tb.u1.addr2[10] top.rom_tb.u1.addr2[9] top.rom_tb.u1.addr2[8] top.rom_tb.u1.addr2[7] top.rom_tb.u1.addr2[6] top.rom_tb.u1.addr2[5] top.rom_tb.u1.addr2[4] top.rom_tb.u1.addr2[3] top.rom_tb.u1.addr2[2] top.rom_tb.u1.addr2[1] top.rom_tb.u1.addr2[0]
+#{top.rom_tb.u1.byte_en1[3:0]} top.rom_tb.u1.byte_en1[3] top.rom_tb.u1.byte_en1[2] top.rom_tb.u1.byte_en1[1] top.rom_tb.u1.byte_en1[0]
+#{top.rom_tb.u1.byte_en2[3:0]} top.rom_tb.u1.byte_en2[3] top.rom_tb.u1.byte_en2[2] top.rom_tb.u1.byte_en2[1] top.rom_tb.u1.byte_en2[0]
+@200
+-
+-Outputs
+@22
+#{top.rom_tb.u1.dataout1[31:0]} top.rom_tb.u1.dataout1[31] top.rom_tb.u1.dataout1[30] top.rom_tb.u1.dataout1[29] top.rom_tb.u1.dataout1[28] top.rom_tb.u1.dataout1[27] top.rom_tb.u1.dataout1[26] top.rom_tb.u1.dataout1[25] top.rom_tb.u1.dataout1[24] top.rom_tb.u1.dataout1[23] top.rom_tb.u1.dataout1[22] top.rom_tb.u1.dataout1[21] top.rom_tb.u1.dataout1[20] top.rom_tb.u1.dataout1[19] top.rom_tb.u1.dataout1[18] top.rom_tb.u1.dataout1[17] top.rom_tb.u1.dataout1[16] top.rom_tb.u1.dataout1[15] top.rom_tb.u1.dataout1[14] top.rom_tb.u1.dataout1[13] top.rom_tb.u1.dataout1[12] top.rom_tb.u1.dataout1[11] top.rom_tb.u1.dataout1[10] top.rom_tb.u1.dataout1[9] top.rom_tb.u1.dataout1[8] top.rom_tb.u1.dataout1[7] top.rom_tb.u1.dataout1[6] top.rom_tb.u1.dataout1[5] top.rom_tb.u1.dataout1[4] top.rom_tb.u1.dataout1[3] top.rom_tb.u1.dataout1[2] top.rom_tb.u1.dataout1[1] top.rom_tb.u1.dataout1[0]
+#{top.rom_tb.u1.dataout2[31:0]} top.rom_tb.u1.dataout2[31] top.rom_tb.u1.dataout2[30] top.rom_tb.u1.dataout2[29] top.rom_tb.u1.dataout2[28] top.rom_tb.u1.dataout2[27] top.rom_tb.u1.dataout2[26] top.rom_tb.u1.dataout2[25] top.rom_tb.u1.dataout2[24] top.rom_tb.u1.dataout2[23] top.rom_tb.u1.dataout2[22] top.rom_tb.u1.dataout2[21] top.rom_tb.u1.dataout2[20] top.rom_tb.u1.dataout2[19] top.rom_tb.u1.dataout2[18] top.rom_tb.u1.dataout2[17] top.rom_tb.u1.dataout2[16] top.rom_tb.u1.dataout2[15] top.rom_tb.u1.dataout2[14] top.rom_tb.u1.dataout2[13] top.rom_tb.u1.dataout2[12] top.rom_tb.u1.dataout2[11] top.rom_tb.u1.dataout2[10] top.rom_tb.u1.dataout2[9] top.rom_tb.u1.dataout2[8] top.rom_tb.u1.dataout2[7] top.rom_tb.u1.dataout2[6] top.rom_tb.u1.dataout2[5] top.rom_tb.u1.dataout2[4] top.rom_tb.u1.dataout2[3] top.rom_tb.u1.dataout2[2] top.rom_tb.u1.dataout2[1] top.rom_tb.u1.dataout2[0]
+@200
+-
+-Status
+@28
+top.rom_tb.u1.wrong_addr1
+top.rom_tb.u1.wrong_addr2
+top.rom_tb.u1.mem_busy1
+top.rom_tb.u1.mem_busy2
+top.rom_tb.u1.data_valid1
+top.rom_tb.u1.data_valid2
+top.rom_tb.u1.busy1
+top.rom_tb.u1.busy2
+[pattern_trace] 1
+[pattern_trace] 0
