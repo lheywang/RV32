@@ -108,5 +108,6 @@ architecture behavioral of ram is
         end process;
     
         illegal_addr <= wrong_addr;
+        busy <= mem_busy;
 
     end architecture;
