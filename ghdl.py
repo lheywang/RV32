@@ -181,7 +181,8 @@ GHDL_SIMULATE = (
     + f"--workdir={WORKDIR} "
     + TOP
     + f" --wave={WAVEFILE} "
-    + f"--stop-time={LEN}"
+    + f"--stop-time={LEN} "
+    + "--max-stack-alloc=0"
 )
 GTKWAVE_SHOW = GTKWAVE_CMD + f"-a {PRESENTATION}" + f" {WAVEFILE}"
 GHDL_REMOVE = GHDL_CMD + "--remove " + f"--workdir={WORKDIR}"
