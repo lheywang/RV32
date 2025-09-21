@@ -43,15 +43,17 @@ entity core_controller is
         pc_loadvalue :  out     std_logic_vector((XLEN - 1) downto 0)       := (others => '0');     -- Value to be loaded on the program counter
 
         -- Regs selection : 
-        reg_rs1 :       out     std_logic_vector((REG_NB - 1) downto 0)     := (others => '0');     -- Selection signals for the register file (1)
-        reg_rs2 :       out     std_logic_vector((REG_NB - 1) downto 0)     := (others => '0');     -- Selection signals for the register file (2)
-        reg_rd :        out     std_logic_vector((REG_NB - 1) downto 0)     := (others => '0');     -- Selection signals for the register file (out)
+        reg_we :        out     std_logic:                                  := '0';                 -- Write enable of the register file
+        reg_wa :        out     integer range 0 to (REG_NB - 1)             := 0                    -- Written register.
+        reg_ra1 :       out     integer range 0 to (REG_NB - 1)             := 0                    -- Output register 1.
+        reg_ra2 :       out     integer range 0 to (REG_NB - 1)             := 0                    -- Output register 2.
         reg_rs1_in :    in      std_logic_vector((XLEN - 1) downto 0);                              -- Register rs1 input signal
         reg_rs2_out :   out     std_logic_vector((XLEN - 1) downto 0)       := (others => 'Z');     -- Forced output for an argument
 
         -- Alu controls
         alu_cmd :       out     commands                                    := c_ADD;               -- ALU controls signals
         alu_out_en :    out     std_logic                                   := '1';                 -- Enable output (output bus is shared with memory)
+        alu_zero :      in      std_logic;                                                          -- ALU produced a zero output                                                      
         alu_overflow :  in      std_logic;                                                          -- ALU overflow
         alu_beq :       in      std_logic                                   := '0';                 -- Indicate that the BEQ  condition is valid for jump
         alu_bne :       in      std_logic                                   := '0';                 -- Indicate that the BNE  condition is valid for jump
@@ -64,7 +66,9 @@ entity core_controller is
         ctl_interrupt : in      std_logic;                                                          -- Interrupt flag
         
         -- Generics outputs :
-        excep_occured : out     std_logic                                   := '0'                  -- Generic flag to signal an exception occured (LED ?)
+        excep_occured : out     std_logic                                   := '0';                 -- Generic flag to signal an exception occured (LED ?)
+        pipe_stop :     out     std_logic                                   := '1';                 -- Stop the pipeline (0 active)
+        pipe_stall :    out     std_logic                                   := '1'                  -- Clear the pipeline
     );
 end entity;
 
@@ -81,4 +85,35 @@ architecture behavioral of core_controller is
                 return retval;
             end function;
     begin
+
+        P1 : process(clock, nRST)
+        begin
+
+            -- Handle reset
+            if (nRST = '0') then
+
+            
+            elsif rising_edge(clock) then
+
+                -- Handle potential exceptions
+                if   (dec_illegal = '1') or 
+                        (mem_addrerr = '1') or 
+                        (pc_overflow = '1') or 
+                        (alu_overflow = '1') then
+
+                -- Handle potential interrupts
+                elsif (ctl_interrupt = '1') then
+
+
+                -- Else handle the "normal" operation of the system
+                else
+
+
+                end if; -- situation handler
+
+            end if; -- rising_edge(clock)
+
+        end process;
+
+        
     end architecture;
