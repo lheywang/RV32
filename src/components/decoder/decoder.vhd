@@ -14,7 +14,7 @@ entity decoder is
 
         -- outputs
         -- buses
-        rs1 :           out     std_logic_vector(4 downto 0)                            := (others => '0');    -- Two more register here, for the selection of immediate value and PC respectively.
+        rs1 :           out     std_logic_vector(4 downto 0)                            := (others => '0');
         rs2 :           out     std_logic_vector(4 downto 0)                            := (others => '0');   
         rd :            out     std_logic_vector(4 downto 0)                            := (others => '0');
         imm :           out     std_logic_vector((XLEN - 1) downto 0)                   := (others => '0');
@@ -31,7 +31,7 @@ end entity;
 architecture behavioral of decoder is
 
         -- Defining the different selected_decoders
-        type decocders_type is (U, I, R, B, S, J, default_t, illegal_t);
+        type decocders_type is (U, I, R, B, S, J, default_t, illegal_t, NOP);
 
         -- signals
         signal illegal_internal :      std_logic                                        := '0';
@@ -99,6 +99,10 @@ architecture behavioral of decoder is
 
                         when "1101111" =>               -- Jumps
                             selected_decoder <= J;
+                            illegal_internal <= '0';
+
+                        when "0000000" =>               -- All zero, seen as NOP
+                            selected_decoder <= NOP;
                             illegal_internal <= '0';
 
                         when others =>
@@ -441,12 +445,21 @@ architecture behavioral of decoder is
                             
                             end case;
 
+                        when NOP =>
+                            rd_internal <=                                  (others => '0');
+                            rs1_internal <=                                 (others => '0');
+                            rs2_internal <=                                 (others => '0');
+                            imm_internal <=                                 (others => '0');
+                            opcode <=                                       i_NOP;  
+                            illegal_internal2 <=                            '0';                     
+                        
                         when others =>
-                            rd_internal <=                                   (others => '0');
-                            rs1_internal <=                                  (others => '0');
-                            rs2_internal <=                                  (others => '0');
-                            imm_internal <=                                  (others => '0');
-                            opcode <=                                        i_NOP;
+                            rd_internal <=                                  (others => '0');
+                            rs1_internal <=                                 (others => '0');
+                            rs2_internal <=                                 (others => '0');
+                            imm_internal <=                                 (others => '0');
+                            opcode <=                                       i_NOP;
+                            illegal_internal2 <=                            '1'; 
 
                     end case;
             
@@ -486,16 +499,6 @@ architecture behavioral of decoder is
 
 -- R-Type	0110011	    000	    0100000	        SUB	            Subtract                                1               N/A
 -- R-Type	0110011	    101	    0100000	        SRA	            Shift Right Arithmetic                  1               N/A
-
--- R-Type	0110011	    000	    0000001	        MUL	            Multiply                                1               generate trap (non implemented)
--- R-Type	0110011	    001	    0000001	        MULH	        Multiply High (Signed)                  1               generate trap (non implemented)
--- R-Type	0110011	    010	    0000001	        MULHSU	        Multiply High (Signed x Unsigned)       1               generate trap (non implemented)
--- R-Type	0110011	    011	    0000001	        MULHU	        Multiply High (Unsigned)                1               generate trap (non implemented)
--- R-Type	0110011	    100	    0000001	        DIV	            Divide (Signed)                         1               generate trap (non implemented)
--- R-Type	0110011	    101	    0000001	        DIVU	        Divide (Unsigned)                       1               generate trap (non implemented)
--- R-Type	0110011	    110	    0000001	        REM	            Remainder (Signed)                      1               generate trap (non implemented)
--- R-Type	0110011	    111	    0000001	        REMU	        Remainder (Unsigned)                    1               generate trap (non implemented)
-
 
 -- I-Type	0010011	    000	    N/A	            ADDI	        Add Immediate                           1               N/A
 -- I-Type	0010011	    010	    N/A	            SLTI	        Set if Less Than Immediate              1               N/A       
