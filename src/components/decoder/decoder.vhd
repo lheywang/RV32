@@ -14,9 +14,9 @@ entity decoder is
 
         -- outputs
         -- buses
-        rs1 :           out     std_logic_vector(4 downto 0)                            := (others => '0');
-        rs2 :           out     std_logic_vector(4 downto 0)                            := (others => '0');   
-        rd :            out     std_logic_vector(4 downto 0)                            := (others => '0');
+        rs1 :           out     std_logic_vector((XLEN / 8) downto 0)                   := (others => '0');
+        rs2 :           out     std_logic_vector((XLEN / 8) downto 0)                   := (others => '0');   
+        rd :            out     std_logic_vector((XLEN / 8) downto 0)                   := (others => '0');
         imm :           out     std_logic_vector((XLEN - 1) downto 0)                   := (others => '0');
         opcode :        out     instructions;                         
         -- signals
@@ -24,6 +24,7 @@ entity decoder is
 
         -- Clocks
         clock :         in      std_logic;
+        clock_en :      in      std_logic;
         nRST :          in      std_logic
     );
 end entity;
@@ -57,7 +58,7 @@ architecture behavioral of decoder is
                     illegal_internal    <= '0';
                     selected_decoder    <= default_t;
 
-                elsif rising_edge(clock) then
+                elsif rising_edge(clock) and (clock_en = '1') then
 
                     -- Select the opcode, and perform an instruction size check (last two bits must be "11").
                     case instruction(6 downto 0) is

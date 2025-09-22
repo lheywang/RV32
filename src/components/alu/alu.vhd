@@ -108,7 +108,7 @@ architecture behavioral of alu is
             if (outen = '1') then
                 result      <= res;
             else
-                result      <= (others => 'Z');
+                result      <= (others => '0');
             end if;
 
             overflow    <= v_ovf;

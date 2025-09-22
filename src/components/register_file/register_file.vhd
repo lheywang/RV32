@@ -9,6 +9,7 @@ entity register_file is
     );
     port (
         clock   : in  std_logic;
+        clock_en : in std_logic;
         nRST    : in  std_logic;
 
         -- single write port
@@ -37,7 +38,7 @@ begin
     begin
         if nRST = '0' then
             reg_array <= (others => (others => '0'));
-        elsif rising_edge(clock) then
+        elsif rising_edge(clock) and (clock_en = '1') then
             if (we = '1') and (wa /= 0) then
                 reg_array(wa) <= wd;
             end if;

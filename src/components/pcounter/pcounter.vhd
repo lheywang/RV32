@@ -18,6 +18,7 @@ entity pcounter is
 
         -- Clocks
         clock :     in      std_logic;                                  -- Main clock
+        clock_en :  in      std_logic;                                  -- Clock enable
 
         -- Control signals
         nRST :      in      std_logic;                                  -- Reset. Force a 0'b00--000 value
@@ -40,7 +41,7 @@ architecture behavioral of pcounter is
                     internal_address <= to_unsigned(RESET_ADDR, internal_address'length);
                     internal_nOVER <= '0';
                 
-                elsif rising_edge(clock) then
+                elsif rising_edge(clock) and (clock_en = '1') then
 
                     if (load = '1') then
                         internal_address <= unsigned(address_in);
