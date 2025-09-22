@@ -19,7 +19,7 @@ entity core_controller is
         nRST :          in      std_logic;                                                          -- System reset
         
         -- Decoder signals : 
-        dec_rs1 :       in      std_logic_vector((REG_NB + 1) downto 0);                            -- Register selection 1
+        dec_rs1 :       in      std_logic_vector((REG_NB - 1) downto 0);                            -- Register selection 1
         dec_rs2 :       in      std_logic_vector((REG_NB - 1) downto 0);                            -- Register selection 2
         dec_rd :        in      std_logic_vector((REG_NB - 1) downto 0);                            -- Register selection for write
         dec_imm :       in      std_logic_vector((XLEN - 1) downto 0);                              -- Immediate value, already signed extended
@@ -31,9 +31,7 @@ entity core_controller is
         mem_byteen :    out     std_logic_vector(3 downto 0)                := (others => '1');     -- Memory byte selection
         mem_read :      out     std_logic                                   := '1';                 -- Memory read order
         mem_write :     out     std_logic                                   := '1';                 -- Memory write order
-        mem_valid :     in      std_logic;                                                          -- Memory operation is complete.
         mem_addrerr :   in      std_logic;                                                          -- Incorrect memory address.
-        mem_busy :      in      std_logic;                                                          -- Indicate that the memory is doing IO operations.
         
         -- Program counter signals : 
         pc_value :      in      std_logic_vector((XLEN -1) downto 0);                               -- Readback of the PC value
@@ -84,36 +82,137 @@ architecture behavioral of core_controller is
                     retval(to_integer(unsigned(inp))) := '1';
                 return retval;
             end function;
+
+        type FSM_state is (
+            STD,                -- Handle most opcodes (ADD, ADDI, LUI...) and even memory (since memory runs at twice the core clock !)
+            JMP1, JMP2,         -- Handle jumps (JMP1 : Compute addresses, write control signals + stop pipeline. JMP2 : Now, values are saved, so clear pipeline and wait for valid instruction.)
+            BRANCH, BRANCH2,    -- Handle branches (BRANCH1 : Compute addresses, evaluates signals + stop pipeline. BRANCH2 : compare values, outputs signals)
+            WAITING,            -- Handle wait states
+            IRQ,                -- IRQ handler (compared as a BRANCH)
+            ERR                 -- Exception handler (compared as a BRANCH)
+        );
+
+        -- Storing FSM states
+        signal state :          FSM_state := STD;
+        signal next_state :     FSM_state := STD;
+
+        -- Storing data between cycle to ensure pipeline operation
+        signal save_rs1, next_rs1 :       std_logic_vector((REG_NB - 1) downto 0);
+        signal save_rs2, next_rs2 :       std_logic_vector((REG_NB - 1) downto 0);
+        signal save_rd, next_rd :         std_logic_vector((REG_NB - 1) downto 0);
+        signal save_imm, next_imm :       std_logic_vector((XLEN - 1) downto 0);
+        signal save_opcode, next_opcode : instructions;
+
     begin
 
+        -- Process that handle reset, and clocks evolutions
         P1 : process(clock, nRST)
         begin
-
-            -- Handle reset
             if (nRST = '0') then
-
+                state <= STD;
             
             elsif rising_edge(clock) then
+                -- Updating state
+                state <= next_state;
 
-                -- Handle potential exceptions
-                if   (dec_illegal = '1') or 
-                        (mem_addrerr = '1') or 
-                        (pc_overflow = '1') or 
-                        (alu_overflow = '1') then
+                -- Updating save values
+                save_rs1 <= next_rs1;
+                save_rs2 <= next_rs2;
+                save_rd <= next_rd;
+                save_imm <= next_imm;
+                save_opcode <= next_opcode;
+            
+            end if;
+        end process;
 
-                -- Handle potential interrupts
-                elsif (ctl_interrupt = '1') then
+        -- Process that handle states evolutions
+        P2 : process(nRST, state)
+        begin
+            if (nRST = '0') then
+                next_state <= STD;
 
+            -- Handle potential exceptions
+            elsif   (dec_illegal = '1') or 
+                    (mem_addrerr = '1') or 
+                    (pc_overflow = '1') or 
+                    (alu_overflow = '1') then
+                next_state <= ERR;
 
-                -- Else handle the "normal" operation of the system
-                else
+            -- Handle potential interrupts
+            elsif (ctl_interrupt = '1') then
+                next_state <= IRQ;
 
+            else
 
-                end if; -- situation handler
+                case state is =>
+                    when JMP1 =>
+                        next_state <= JMP2;
 
-            end if; -- rising_edge(clock)
+                    when BRANCH1 => 
+                        next_state <= BRANCH2;
+
+                    when others =>
+
+                        next_rs1 <= dec_rs1;
+                        next_rs2 <= dec_rs2;
+                        next_rd <= dec_rd;
+                        next_imm <= dec_imm;
+                        next_opcode <= dec_opcode;
+
+                        case dec_opcode is =>
+
+                            when    i_BEQ   |  
+                                    i_BNE   |
+                                    i_BLT   |
+                                    i_BGE   |
+                                    i_BLTU  |
+                                    i_BGEU  =>
+                                next_state <= BRANCH1;
+
+                            when    i_JAL   |
+                                    i_JALR  =>
+                                next_state <= JMP1;
+
+                            when    i_NOP   |
+                                    i_ECALL |
+                                    i_EBREAK|
+                                    i_FENCE =>
+                                next_state <= WAITING;
+
+                            when others =>
+                                next_state <= STD;
+
+                        end case;
+                    end case;
+
+            end if;
 
         end process;
 
+
+        P3 : process(state)
+        begin
+
+            case state is =>
+                
+                    when STD =>
+
+                    when JMP1 =>
+
+                    when JMP2 =>
+
+                    when BRANCH1 => 
+
+                    when BRANCH2 =>
+
+                    when WAITING =>
+
+                    when ERR =>
+
+                    when IRQ =>
+
+                end case;
+
+        end process;
         
     end architecture;
