@@ -1,0 +1,4 @@
+[config]
+source = "test.S"
+flags = "-nostdlib -nostartfiles"
+linker_script = "linker.ld"
