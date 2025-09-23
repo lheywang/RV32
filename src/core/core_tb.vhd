@@ -59,72 +59,29 @@ architecture behavioral of core_tb is
                 core_trap           =>  core_trap_t
             );
 
-        ROM : entity altera_mf.altsyncram(SYN)
-            generic map (
-                address_reg_b => "CLOCK0",
-                clock_enable_input_a => "BYPASS",
-                clock_enable_input_b => "BYPASS",
-                clock_enable_output_a => "BYPASS",
-                clock_enable_output_b => "BYPASS",
-                indata_reg_b => "CLOCK0",
-                init_file => "./IP/ROM/mem.hex",
-                intended_device_family => "MAX 10",
-                lpm_type => "altsyncram",
-                numwords_a => 12288,
-                numwords_b => 12288,
-                operation_mode => "BIDIR_DUAL_PORT",
-                outdata_aclr_a => "CLEAR0",
-                outdata_aclr_b => "CLEAR0",
-                outdata_reg_a => "CLOCK0",
-                outdata_reg_b => "CLOCK0",
-                power_up_uninitialized => "FALSE",
-                widthad_a => 14,
-                widthad_b => 14,
-                width_a => 32,
-                width_b => 32,
-                width_byteena_a => 1,
-                width_byteena_b => 1,
-                wrcontrol_wraddress_reg_b => "CLOCK0"
-            )
-            port map (
-                aclr0 => aclr,
-                address_a => address_a,
-                address_b => address_b,
-                clock0 => clock,
-                data_a => sub_wire0,
-                data_b => sub_wire0,
-                wren_a => sub_wire1,
-                wren_b => sub_wire1,
-                q_a => sub_wire2,
-                q_b => sub_wire3
+        -- The two memory elements depends on the altera_mf library, which, if not available WILL cause compilation issues.
+        -- Ensure you have them, or, try to make without.
+        RAM : entity work.ram(SYN)
+            port map 
+            (
+                aclr                =>  nRST_t,
+                address             =>  mem_addr_t(14 downto 2), -- To correct : write a memory address translator that match the different addres spaces. 
+                byteena             =>  mem_byten_t,
+                clock               =>  clk_t,
+                data                =>  mem_wdata_t,
+                wren                =>  mem_we_t,
+                q                   =>  mem_rdata_t
             );
 
-        RAM : entity altera_mf.altsyncram(SYN)
-            generic map (
-                byte_size => 8,
-                clock_enable_input_a => "BYPASS",
-                clock_enable_output_a => "BYPASS",
-                intended_device_family => "MAX 10",
-                lpm_hint => "ENABLE_RUNTIME_MOD=NO",
-                lpm_type => "altsyncram",
-                numwords_a => 6144,
-                operation_mode => "SINGLE_PORT",
-                outdata_aclr_a => "CLEAR0",
-                outdata_reg_a => "CLOCK0",
-                power_up_uninitialized => "FALSE",
-                read_during_write_mode_port_a => "DONT_CARE",
-                widthad_a => 13,
-                width_a => 32,
-                width_byteena_a => 4
-            )
-            port map (
-                aclr0 => aclr,
-                address_a => address,
-                byteena_a => byteena,
-                clock0 => clock,
-                data_a => data,
-                wren_a => wren,
-                q_a => sub_wire0
+        ROM : entity work.rom(SYN)
+            port map 
+            (
+                aclr                =>  nRST_t,
+                address_a           =>  if_addr_t(15 downto 2),
+                address_b           =>  mem_addr_t(15 downto 2),
+                clock               =>  clk_t,
+                q_a                 =>  if_rdata_t,
+                q_b                 =>  mem_rdata_t
             );
 
         -- Stimulus
