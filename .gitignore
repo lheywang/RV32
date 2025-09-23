@@ -12,3 +12,9 @@
 # Simulations results
 *.ghw
 *.cf
+
+# Assembles / compilations outputs
+*.elf
+*.hex
+*.bin
+*.o
