@@ -64,7 +64,7 @@ architecture behavioral of core_tb is
         RAM : entity work.ram(SYN)
             port map 
             (
-                aclr                =>  nRST_t,
+                aclr                =>  not nRST_t,
                 address             =>  mem_addr_t(14 downto 2), -- To correct : write a memory address translator that match the different addres spaces. 
                 byteena             =>  mem_byten_t,
                 clock               =>  clk_t,
@@ -76,7 +76,7 @@ architecture behavioral of core_tb is
         ROM : entity work.rom(SYN)
             port map 
             (
-                aclr                =>  nRST_t,
+                aclr                =>  not nRST_t,
                 address_a           =>  if_addr_t(15 downto 2),
                 address_b           =>  mem_addr_t(15 downto 2),
                 clock               =>  clk_t,
