@@ -76,7 +76,7 @@ BEGIN
 		clock_enable_output_a => "BYPASS",
 		clock_enable_output_b => "BYPASS",
 		indata_reg_b => "CLOCK0",
-		init_file => "./IP/ROM/mem.hex",
+		init_file => "src/memory/rom/rom.hex",
 		intended_device_family => "MAX 10",
 		lpm_type => "altsyncram",
 		numwords_a => 12288,
