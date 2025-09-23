@@ -30,8 +30,8 @@ entity core_controller is
         -- Memory signals : 
         mem_addr :      out     std_logic_vector((XLEN - 1) downto 0)       := (others => '0');     -- Memory address
         mem_byteen :    out     std_logic_vector(3 downto 0)                := (others => '1');     -- Memory byte selection
-        mem_we :        out     std_logic                                   := '1';                 -- Memory write order (1 = write)
-        mem_req :       out     std_logic;
+        mem_we :        out     std_logic                                   := '0';                 -- Memory write order (1 = write)
+        mem_req :       out     std_logic                                   := '0';
         mem_addrerr :   in      std_logic;                                                          -- Incorrect memory address.
         
         -- Program counter signals : 
