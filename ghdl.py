@@ -173,12 +173,25 @@ for file in source_files:
 
 # Build some commands
 # Enable auto-ordering of the files
-GHDL_ANALYSIS = GHDL_CMD + "-i " + f"--workdir={WORKDIR} " + filenames2
-GHDL_ELABORATE = GHDL_CMD + "-m " + f"--workdir={WORKDIR} " + TOP
+GHDL_DEPENDENCIES = (
+    GHDL_CMD
+    + "-i "
+    + "--work=altera_mf "
+    + f"--workdir={WORKDIR} "
+    + "src/memory/behavioral/altera_mf.vhd "
+    + "src/memory/behavioral/altera_mf_components.vhd "
+)
+GHDL_ANALYSIS = (
+    GHDL_CMD + "-i " + f"--workdir={WORKDIR} " + f"-P{WORKDIR} " + filenames2
+)
+GHDL_ELABORATE = (
+    GHDL_CMD + "-m " + f"--workdir={WORKDIR} " + f"-P{WORKDIR} " + "-fsynopsys " + TOP
+)
 GHDL_SIMULATE = (
     GHDL_CMD
     + "-r "
     + f"--workdir={WORKDIR} "
+    + f"-P{WORKDIR} "
     + TOP
     + f" --wave={WAVEFILE} "
     + f"--stop-time={LEN} "
@@ -189,6 +202,7 @@ GHDL_REMOVE = GHDL_CMD + "--remove " + f"--workdir={WORKDIR}"
 
 # Store the different elements into a common list :
 commands = [
+    GHDL_DEPENDENCIES,
     GHDL_ANALYSIS,
     GHDL_ELABORATE,
     GHDL_SIMULATE,
