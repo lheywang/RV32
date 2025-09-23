@@ -2,6 +2,9 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
+library altera_mf;
+use altera_mf.altera_mf_components.all;
+
 entity core_tb is 
 end entity;
 
@@ -27,7 +30,7 @@ architecture behavioral of core_tb is
 
     begin
 
-        U1 : entity work.core(behavioral)
+        CORE : entity work.core(behavioral)
             generic map ( 
                 XLEN                =>  32,
                 REG_NB              =>  32,
@@ -54,6 +57,74 @@ architecture behavioral of core_tb is
                 mem_err             =>  mem_err_t,
                 core_halt           =>  core_halt_t,
                 core_trap           =>  core_trap_t
+            );
+
+        ROM : entity altera_mf.altsyncram(SYN)
+            generic map (
+                address_reg_b => "CLOCK0",
+                clock_enable_input_a => "BYPASS",
+                clock_enable_input_b => "BYPASS",
+                clock_enable_output_a => "BYPASS",
+                clock_enable_output_b => "BYPASS",
+                indata_reg_b => "CLOCK0",
+                init_file => "./IP/ROM/mem.hex",
+                intended_device_family => "MAX 10",
+                lpm_type => "altsyncram",
+                numwords_a => 12288,
+                numwords_b => 12288,
+                operation_mode => "BIDIR_DUAL_PORT",
+                outdata_aclr_a => "CLEAR0",
+                outdata_aclr_b => "CLEAR0",
+                outdata_reg_a => "CLOCK0",
+                outdata_reg_b => "CLOCK0",
+                power_up_uninitialized => "FALSE",
+                widthad_a => 14,
+                widthad_b => 14,
+                width_a => 32,
+                width_b => 32,
+                width_byteena_a => 1,
+                width_byteena_b => 1,
+                wrcontrol_wraddress_reg_b => "CLOCK0"
+            )
+            port map (
+                aclr0 => aclr,
+                address_a => address_a,
+                address_b => address_b,
+                clock0 => clock,
+                data_a => sub_wire0,
+                data_b => sub_wire0,
+                wren_a => sub_wire1,
+                wren_b => sub_wire1,
+                q_a => sub_wire2,
+                q_b => sub_wire3
+            );
+
+        RAM : entity altera_mf.altsyncram(SYN)
+            generic map (
+                byte_size => 8,
+                clock_enable_input_a => "BYPASS",
+                clock_enable_output_a => "BYPASS",
+                intended_device_family => "MAX 10",
+                lpm_hint => "ENABLE_RUNTIME_MOD=NO",
+                lpm_type => "altsyncram",
+                numwords_a => 6144,
+                operation_mode => "SINGLE_PORT",
+                outdata_aclr_a => "CLEAR0",
+                outdata_reg_a => "CLOCK0",
+                power_up_uninitialized => "FALSE",
+                read_during_write_mode_port_a => "DONT_CARE",
+                widthad_a => 13,
+                width_a => 32,
+                width_byteena_a => 4
+            )
+            port map (
+                aclr0 => aclr,
+                address_a => address,
+                byteena_a => byteena,
+                clock0 => clock,
+                data_a => data,
+                wren_a => wren,
+                q_a => sub_wire0
             );
 
         -- Stimulus
