@@ -1,0 +1,107 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Tue Sep 23 17:33:35 2025
+[*]
+[dumpfile] "/home/user/RV32/build/wave.ghw"
+[dumpfile_mtime] "Tue Sep 23 17:24:46 2025"
+[dumpfile_size] 23019
+[savefile] "/home/user/RV32/presentation/core_tb.gtkw"
+[timestart] 0
+[size] 2560 985
+[pos] -27 -24
+*-25.625097 194800000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top.
+[treeopen] top.core_tb.
+[treeopen] top.core_tb.core.
+[treeopen] top.core_tb.core.alu1.
+[treeopen] top.core_tb.core.dec1.
+[treeopen] top.core_tb.core.regs1.
+[sst_width] 273
+[signals_width] 188
+[sst_expanded] 1
+[sst_vpaned_height] 291
+@200
+-clocks
+@28
+top.core_tb.core.clk
+top.core_tb.core.clk_en
+@200
+-
+-controls
+@28
+top.core_tb.core.nrst
+top.core_tb.core.halt
+top.core_tb.core.irq
+top.core_tb.core.core_halt
+top.core_tb.core.core_trap
+@200
+-
+-PC-related
+@28
+top.core_tb.core.pc_overflow
+top.core_tb.core.pc_en
+top.core_tb.core.pc_wen
+@22
+#{top.core_tb.core.if_addr[31:0]} top.core_tb.core.if_addr[31] top.core_tb.core.if_addr[30] top.core_tb.core.if_addr[29] top.core_tb.core.if_addr[28] top.core_tb.core.if_addr[27] top.core_tb.core.if_addr[26] top.core_tb.core.if_addr[25] top.core_tb.core.if_addr[24] top.core_tb.core.if_addr[23] top.core_tb.core.if_addr[22] top.core_tb.core.if_addr[21] top.core_tb.core.if_addr[20] top.core_tb.core.if_addr[19] top.core_tb.core.if_addr[18] top.core_tb.core.if_addr[17] top.core_tb.core.if_addr[16] top.core_tb.core.if_addr[15] top.core_tb.core.if_addr[14] top.core_tb.core.if_addr[13] top.core_tb.core.if_addr[12] top.core_tb.core.if_addr[11] top.core_tb.core.if_addr[10] top.core_tb.core.if_addr[9] top.core_tb.core.if_addr[8] top.core_tb.core.if_addr[7] top.core_tb.core.if_addr[6] top.core_tb.core.if_addr[5] top.core_tb.core.if_addr[4] top.core_tb.core.if_addr[3] top.core_tb.core.if_addr[2] top.core_tb.core.if_addr[1] top.core_tb.core.if_addr[0]
+@23
+#{top.core_tb.core.if_rdata[31:0]} top.core_tb.core.if_rdata[31] top.core_tb.core.if_rdata[30] top.core_tb.core.if_rdata[29] top.core_tb.core.if_rdata[28] top.core_tb.core.if_rdata[27] top.core_tb.core.if_rdata[26] top.core_tb.core.if_rdata[25] top.core_tb.core.if_rdata[24] top.core_tb.core.if_rdata[23] top.core_tb.core.if_rdata[22] top.core_tb.core.if_rdata[21] top.core_tb.core.if_rdata[20] top.core_tb.core.if_rdata[19] top.core_tb.core.if_rdata[18] top.core_tb.core.if_rdata[17] top.core_tb.core.if_rdata[16] top.core_tb.core.if_rdata[15] top.core_tb.core.if_rdata[14] top.core_tb.core.if_rdata[13] top.core_tb.core.if_rdata[12] top.core_tb.core.if_rdata[11] top.core_tb.core.if_rdata[10] top.core_tb.core.if_rdata[9] top.core_tb.core.if_rdata[8] top.core_tb.core.if_rdata[7] top.core_tb.core.if_rdata[6] top.core_tb.core.if_rdata[5] top.core_tb.core.if_rdata[4] top.core_tb.core.if_rdata[3] top.core_tb.core.if_rdata[2] top.core_tb.core.if_rdata[1] top.core_tb.core.if_rdata[0]
+@200
+-
+-decoder
+@420
+top.core_tb.core.dec1.selected_decoder
+@28
+top.core_tb.core.dec1.illegal_internal
+@420
+top.core_tb.core.dec1.opcode
+@22
+#{top.core_tb.core.dec1.imm[31:0]} top.core_tb.core.dec1.imm[31] top.core_tb.core.dec1.imm[30] top.core_tb.core.dec1.imm[29] top.core_tb.core.dec1.imm[28] top.core_tb.core.dec1.imm[27] top.core_tb.core.dec1.imm[26] top.core_tb.core.dec1.imm[25] top.core_tb.core.dec1.imm[24] top.core_tb.core.dec1.imm[23] top.core_tb.core.dec1.imm[22] top.core_tb.core.dec1.imm[21] top.core_tb.core.dec1.imm[20] top.core_tb.core.dec1.imm[19] top.core_tb.core.dec1.imm[18] top.core_tb.core.dec1.imm[17] top.core_tb.core.dec1.imm[16] top.core_tb.core.dec1.imm[15] top.core_tb.core.dec1.imm[14] top.core_tb.core.dec1.imm[13] top.core_tb.core.dec1.imm[12] top.core_tb.core.dec1.imm[11] top.core_tb.core.dec1.imm[10] top.core_tb.core.dec1.imm[9] top.core_tb.core.dec1.imm[8] top.core_tb.core.dec1.imm[7] top.core_tb.core.dec1.imm[6] top.core_tb.core.dec1.imm[5] top.core_tb.core.dec1.imm[4] top.core_tb.core.dec1.imm[3] top.core_tb.core.dec1.imm[2] top.core_tb.core.dec1.imm[1] top.core_tb.core.dec1.imm[0]
+#{top.core_tb.core.dec1.rd[4:0]} top.core_tb.core.dec1.rd[4] top.core_tb.core.dec1.rd[3] top.core_tb.core.dec1.rd[2] top.core_tb.core.dec1.rd[1] top.core_tb.core.dec1.rd[0]
+#{top.core_tb.core.dec1.rs2[4:0]} top.core_tb.core.dec1.rs2[4] top.core_tb.core.dec1.rs2[3] top.core_tb.core.dec1.rs2[2] top.core_tb.core.dec1.rs2[1] top.core_tb.core.dec1.rs2[0]
+#{top.core_tb.core.dec1.rs1[4:0]} top.core_tb.core.dec1.rs1[4] top.core_tb.core.dec1.rs1[3] top.core_tb.core.dec1.rs1[2] top.core_tb.core.dec1.rs1[1] top.core_tb.core.dec1.rs1[0]
+#{top.core_tb.core.dec1.instruction[31:0]} top.core_tb.core.dec1.instruction[31] top.core_tb.core.dec1.instruction[30] top.core_tb.core.dec1.instruction[29] top.core_tb.core.dec1.instruction[28] top.core_tb.core.dec1.instruction[27] top.core_tb.core.dec1.instruction[26] top.core_tb.core.dec1.instruction[25] top.core_tb.core.dec1.instruction[24] top.core_tb.core.dec1.instruction[23] top.core_tb.core.dec1.instruction[22] top.core_tb.core.dec1.instruction[21] top.core_tb.core.dec1.instruction[20] top.core_tb.core.dec1.instruction[19] top.core_tb.core.dec1.instruction[18] top.core_tb.core.dec1.instruction[17] top.core_tb.core.dec1.instruction[16] top.core_tb.core.dec1.instruction[15] top.core_tb.core.dec1.instruction[14] top.core_tb.core.dec1.instruction[13] top.core_tb.core.dec1.instruction[12] top.core_tb.core.dec1.instruction[11] top.core_tb.core.dec1.instruction[10] top.core_tb.core.dec1.instruction[9] top.core_tb.core.dec1.instruction[8] top.core_tb.core.dec1.instruction[7] top.core_tb.core.dec1.instruction[6] top.core_tb.core.dec1.instruction[5] top.core_tb.core.dec1.instruction[4] top.core_tb.core.dec1.instruction[3] top.core_tb.core.dec1.instruction[2] top.core_tb.core.dec1.instruction[1] top.core_tb.core.dec1.instruction[0]
+@200
+-
+-register-file
+@28
+top.core_tb.core.regs1.we
+@420
+top.core_tb.core.regs1.wa
+top.core_tb.core.regs1.ra1
+top.core_tb.core.regs1.ra2
+@22
+#{top.core_tb.core.regs1.rd1[31:0]} top.core_tb.core.regs1.rd1[31] top.core_tb.core.regs1.rd1[30] top.core_tb.core.regs1.rd1[29] top.core_tb.core.regs1.rd1[28] top.core_tb.core.regs1.rd1[27] top.core_tb.core.regs1.rd1[26] top.core_tb.core.regs1.rd1[25] top.core_tb.core.regs1.rd1[24] top.core_tb.core.regs1.rd1[23] top.core_tb.core.regs1.rd1[22] top.core_tb.core.regs1.rd1[21] top.core_tb.core.regs1.rd1[20] top.core_tb.core.regs1.rd1[19] top.core_tb.core.regs1.rd1[18] top.core_tb.core.regs1.rd1[17] top.core_tb.core.regs1.rd1[16] top.core_tb.core.regs1.rd1[15] top.core_tb.core.regs1.rd1[14] top.core_tb.core.regs1.rd1[13] top.core_tb.core.regs1.rd1[12] top.core_tb.core.regs1.rd1[11] top.core_tb.core.regs1.rd1[10] top.core_tb.core.regs1.rd1[9] top.core_tb.core.regs1.rd1[8] top.core_tb.core.regs1.rd1[7] top.core_tb.core.regs1.rd1[6] top.core_tb.core.regs1.rd1[5] top.core_tb.core.regs1.rd1[4] top.core_tb.core.regs1.rd1[3] top.core_tb.core.regs1.rd1[2] top.core_tb.core.regs1.rd1[1] top.core_tb.core.regs1.rd1[0]
+#{top.core_tb.core.regs1.rd2[31:0]} top.core_tb.core.regs1.rd2[31] top.core_tb.core.regs1.rd2[30] top.core_tb.core.regs1.rd2[29] top.core_tb.core.regs1.rd2[28] top.core_tb.core.regs1.rd2[27] top.core_tb.core.regs1.rd2[26] top.core_tb.core.regs1.rd2[25] top.core_tb.core.regs1.rd2[24] top.core_tb.core.regs1.rd2[23] top.core_tb.core.regs1.rd2[22] top.core_tb.core.regs1.rd2[21] top.core_tb.core.regs1.rd2[20] top.core_tb.core.regs1.rd2[19] top.core_tb.core.regs1.rd2[18] top.core_tb.core.regs1.rd2[17] top.core_tb.core.regs1.rd2[16] top.core_tb.core.regs1.rd2[15] top.core_tb.core.regs1.rd2[14] top.core_tb.core.regs1.rd2[13] top.core_tb.core.regs1.rd2[12] top.core_tb.core.regs1.rd2[11] top.core_tb.core.regs1.rd2[10] top.core_tb.core.regs1.rd2[9] top.core_tb.core.regs1.rd2[8] top.core_tb.core.regs1.rd2[7] top.core_tb.core.regs1.rd2[6] top.core_tb.core.regs1.rd2[5] top.core_tb.core.regs1.rd2[4] top.core_tb.core.regs1.rd2[3] top.core_tb.core.regs1.rd2[2] top.core_tb.core.regs1.rd2[1] top.core_tb.core.regs1.rd2[0]
+#{top.core_tb.core.regs1.wd[31:0]} top.core_tb.core.regs1.wd[31] top.core_tb.core.regs1.wd[30] top.core_tb.core.regs1.wd[29] top.core_tb.core.regs1.wd[28] top.core_tb.core.regs1.wd[27] top.core_tb.core.regs1.wd[26] top.core_tb.core.regs1.wd[25] top.core_tb.core.regs1.wd[24] top.core_tb.core.regs1.wd[23] top.core_tb.core.regs1.wd[22] top.core_tb.core.regs1.wd[21] top.core_tb.core.regs1.wd[20] top.core_tb.core.regs1.wd[19] top.core_tb.core.regs1.wd[18] top.core_tb.core.regs1.wd[17] top.core_tb.core.regs1.wd[16] top.core_tb.core.regs1.wd[15] top.core_tb.core.regs1.wd[14] top.core_tb.core.regs1.wd[13] top.core_tb.core.regs1.wd[12] top.core_tb.core.regs1.wd[11] top.core_tb.core.regs1.wd[10] top.core_tb.core.regs1.wd[9] top.core_tb.core.regs1.wd[8] top.core_tb.core.regs1.wd[7] top.core_tb.core.regs1.wd[6] top.core_tb.core.regs1.wd[5] top.core_tb.core.regs1.wd[4] top.core_tb.core.regs1.wd[3] top.core_tb.core.regs1.wd[2] top.core_tb.core.regs1.wd[1] top.core_tb.core.regs1.wd[0]
+@200
+-
+-alu
+@420
+top.core_tb.core.alu1.command
+@22
+#{top.core_tb.core.alu1.result[31:0]} top.core_tb.core.alu1.result[31] top.core_tb.core.alu1.result[30] top.core_tb.core.alu1.result[29] top.core_tb.core.alu1.result[28] top.core_tb.core.alu1.result[27] top.core_tb.core.alu1.result[26] top.core_tb.core.alu1.result[25] top.core_tb.core.alu1.result[24] top.core_tb.core.alu1.result[23] top.core_tb.core.alu1.result[22] top.core_tb.core.alu1.result[21] top.core_tb.core.alu1.result[20] top.core_tb.core.alu1.result[19] top.core_tb.core.alu1.result[18] top.core_tb.core.alu1.result[17] top.core_tb.core.alu1.result[16] top.core_tb.core.alu1.result[15] top.core_tb.core.alu1.result[14] top.core_tb.core.alu1.result[13] top.core_tb.core.alu1.result[12] top.core_tb.core.alu1.result[11] top.core_tb.core.alu1.result[10] top.core_tb.core.alu1.result[9] top.core_tb.core.alu1.result[8] top.core_tb.core.alu1.result[7] top.core_tb.core.alu1.result[6] top.core_tb.core.alu1.result[5] top.core_tb.core.alu1.result[4] top.core_tb.core.alu1.result[3] top.core_tb.core.alu1.result[2] top.core_tb.core.alu1.result[1] top.core_tb.core.alu1.result[0]
+@28
+top.core_tb.core.alu1.zero
+top.core_tb.core.alu1.overflow
+top.core_tb.core.alu1.beq
+top.core_tb.core.alu1.bne
+top.core_tb.core.alu1.blt
+top.core_tb.core.alu1.bge
+top.core_tb.core.alu1.bltu
+top.core_tb.core.alu1.bgeu
+@200
+-
+-memory
+@28
+top.core_tb.mem_err_t
+top.core_tb.mem_req_t
+top.core_tb.mem_we_t
+@22
+#{top.core_tb.core.mem_addr[31:0]} top.core_tb.core.mem_addr[31] top.core_tb.core.mem_addr[30] top.core_tb.core.mem_addr[29] top.core_tb.core.mem_addr[28] top.core_tb.core.mem_addr[27] top.core_tb.core.mem_addr[26] top.core_tb.core.mem_addr[25] top.core_tb.core.mem_addr[24] top.core_tb.core.mem_addr[23] top.core_tb.core.mem_addr[22] top.core_tb.core.mem_addr[21] top.core_tb.core.mem_addr[20] top.core_tb.core.mem_addr[19] top.core_tb.core.mem_addr[18] top.core_tb.core.mem_addr[17] top.core_tb.core.mem_addr[16] top.core_tb.core.mem_addr[15] top.core_tb.core.mem_addr[14] top.core_tb.core.mem_addr[13] top.core_tb.core.mem_addr[12] top.core_tb.core.mem_addr[11] top.core_tb.core.mem_addr[10] top.core_tb.core.mem_addr[9] top.core_tb.core.mem_addr[8] top.core_tb.core.mem_addr[7] top.core_tb.core.mem_addr[6] top.core_tb.core.mem_addr[5] top.core_tb.core.mem_addr[4] top.core_tb.core.mem_addr[3] top.core_tb.core.mem_addr[2] top.core_tb.core.mem_addr[1] top.core_tb.core.mem_addr[0]
+#{top.core_tb.core.mem_wdata[31:0]} top.core_tb.core.mem_wdata[31] top.core_tb.core.mem_wdata[30] top.core_tb.core.mem_wdata[29] top.core_tb.core.mem_wdata[28] top.core_tb.core.mem_wdata[27] top.core_tb.core.mem_wdata[26] top.core_tb.core.mem_wdata[25] top.core_tb.core.mem_wdata[24] top.core_tb.core.mem_wdata[23] top.core_tb.core.mem_wdata[22] top.core_tb.core.mem_wdata[21] top.core_tb.core.mem_wdata[20] top.core_tb.core.mem_wdata[19] top.core_tb.core.mem_wdata[18] top.core_tb.core.mem_wdata[17] top.core_tb.core.mem_wdata[16] top.core_tb.core.mem_wdata[15] top.core_tb.core.mem_wdata[14] top.core_tb.core.mem_wdata[13] top.core_tb.core.mem_wdata[12] top.core_tb.core.mem_wdata[11] top.core_tb.core.mem_wdata[10] top.core_tb.core.mem_wdata[9] top.core_tb.core.mem_wdata[8] top.core_tb.core.mem_wdata[7] top.core_tb.core.mem_wdata[6] top.core_tb.core.mem_wdata[5] top.core_tb.core.mem_wdata[4] top.core_tb.core.mem_wdata[3] top.core_tb.core.mem_wdata[2] top.core_tb.core.mem_wdata[1] top.core_tb.core.mem_wdata[0]
+#{top.core_tb.core.mem_rdata[31:0]} top.core_tb.core.mem_rdata[31] top.core_tb.core.mem_rdata[30] top.core_tb.core.mem_rdata[29] top.core_tb.core.mem_rdata[28] top.core_tb.core.mem_rdata[27] top.core_tb.core.mem_rdata[26] top.core_tb.core.mem_rdata[25] top.core_tb.core.mem_rdata[24] top.core_tb.core.mem_rdata[23] top.core_tb.core.mem_rdata[22] top.core_tb.core.mem_rdata[21] top.core_tb.core.mem_rdata[20] top.core_tb.core.mem_rdata[19] top.core_tb.core.mem_rdata[18] top.core_tb.core.mem_rdata[17] top.core_tb.core.mem_rdata[16] top.core_tb.core.mem_rdata[15] top.core_tb.core.mem_rdata[14] top.core_tb.core.mem_rdata[13] top.core_tb.core.mem_rdata[12] top.core_tb.core.mem_rdata[11] top.core_tb.core.mem_rdata[10] top.core_tb.core.mem_rdata[9] top.core_tb.core.mem_rdata[8] top.core_tb.core.mem_rdata[7] top.core_tb.core.mem_rdata[6] top.core_tb.core.mem_rdata[5] top.core_tb.core.mem_rdata[4] top.core_tb.core.mem_rdata[3] top.core_tb.core.mem_rdata[2] top.core_tb.core.mem_rdata[1] top.core_tb.core.mem_rdata[0]
+@200
+-
+-controller
+[pattern_trace] 1
+[pattern_trace] 0
