@@ -185,7 +185,13 @@ GHDL_ANALYSIS = (
     GHDL_CMD + "-i " + f"--workdir={WORKDIR} " + f"-P{WORKDIR} " + filenames2
 )
 GHDL_ELABORATE = (
-    GHDL_CMD + "-m " + f"--workdir={WORKDIR} " + f"-P{WORKDIR} " + "-fsynopsys " + TOP
+    GHDL_CMD
+    + "-m "
+    + f"--workdir={WORKDIR} "
+    + f"-P{WORKDIR} "
+    + "-fexplicit "
+    + "-fsynopsys "
+    + TOP
 )
 GHDL_SIMULATE = (
     GHDL_CMD
