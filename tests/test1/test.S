@@ -1,5 +1,6 @@
 	.text
 	.globl 	_start
+    .p2align 2   # align to 4 bytes only
 
 _start:
 	li 		x1,		5				// R1 	<- 	5
@@ -24,3 +25,11 @@ _start:
 	// Shifts
 	slli 	x20,	x1,		1		// R20 	<-	R1 << 1		(10)
 	srli	x21,	x1,		1		// R21 	<-	R1 >> 1		(2)
+    sll     x22,    x1,     x1      // R22  <-  R1 << R1    (160)
+    srl     x23,    x1,     x1      // R23  <-  R1 >> R1    (0)
+
+    // Finals sets
+    slt     x25,    x1,     x2      // R25  <-  R1 < R2     (1)
+    slti    x26,    x1,     10      // R26  <-  R1 < 10     (1)
+    sltu    x27,    x1,     x2      // R27  <-  R1 < R2     (1)
+    sltiu   x28,    x1,     10      // R28  <-  R1 < 10     (1) 
