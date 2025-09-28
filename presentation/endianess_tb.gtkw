@@ -1,0 +1,24 @@
+[*]
+[*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
+[*] Sun Sep 28 08:40:58 2025
+[*]
+[dumpfile] "/home/lheywang/Dev/RV32/build/wave.ghw"
+[dumpfile_mtime] "Sun Sep 28 08:40:38 2025"
+[dumpfile_size] 1456
+[savefile] "/home/lheywang/Dev/RV32/presentation/endianess_tb.gtkw"
+[timestart] 0
+[size] 1920 1033
+[pos] -461 -218
+*0.000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top.
+[treeopen] top.endianess_tb.
+[treeopen] top.endianess_tb.u1.
+[sst_width] 269
+[signals_width] 134
+[sst_expanded] 1
+[sst_vpaned_height] 307
+@22
+#{top.endianess_tb.u1.dataout[31:0]} top.endianess_tb.u1.dataout[31] top.endianess_tb.u1.dataout[30] top.endianess_tb.u1.dataout[29] top.endianess_tb.u1.dataout[28] top.endianess_tb.u1.dataout[27] top.endianess_tb.u1.dataout[26] top.endianess_tb.u1.dataout[25] top.endianess_tb.u1.dataout[24] top.endianess_tb.u1.dataout[23] top.endianess_tb.u1.dataout[22] top.endianess_tb.u1.dataout[21] top.endianess_tb.u1.dataout[20] top.endianess_tb.u1.dataout[19] top.endianess_tb.u1.dataout[18] top.endianess_tb.u1.dataout[17] top.endianess_tb.u1.dataout[16] top.endianess_tb.u1.dataout[15] top.endianess_tb.u1.dataout[14] top.endianess_tb.u1.dataout[13] top.endianess_tb.u1.dataout[12] top.endianess_tb.u1.dataout[11] top.endianess_tb.u1.dataout[10] top.endianess_tb.u1.dataout[9] top.endianess_tb.u1.dataout[8] top.endianess_tb.u1.dataout[7] top.endianess_tb.u1.dataout[6] top.endianess_tb.u1.dataout[5] top.endianess_tb.u1.dataout[4] top.endianess_tb.u1.dataout[3] top.endianess_tb.u1.dataout[2] top.endianess_tb.u1.dataout[1] top.endianess_tb.u1.dataout[0]
+#{top.endianess_tb.u1.datain[31:0]} top.endianess_tb.u1.datain[31] top.endianess_tb.u1.datain[30] top.endianess_tb.u1.datain[29] top.endianess_tb.u1.datain[28] top.endianess_tb.u1.datain[27] top.endianess_tb.u1.datain[26] top.endianess_tb.u1.datain[25] top.endianess_tb.u1.datain[24] top.endianess_tb.u1.datain[23] top.endianess_tb.u1.datain[22] top.endianess_tb.u1.datain[21] top.endianess_tb.u1.datain[20] top.endianess_tb.u1.datain[19] top.endianess_tb.u1.datain[18] top.endianess_tb.u1.datain[17] top.endianess_tb.u1.datain[16] top.endianess_tb.u1.datain[15] top.endianess_tb.u1.datain[14] top.endianess_tb.u1.datain[13] top.endianess_tb.u1.datain[12] top.endianess_tb.u1.datain[11] top.endianess_tb.u1.datain[10] top.endianess_tb.u1.datain[9] top.endianess_tb.u1.datain[8] top.endianess_tb.u1.datain[7] top.endianess_tb.u1.datain[6] top.endianess_tb.u1.datain[5] top.endianess_tb.u1.datain[4] top.endianess_tb.u1.datain[3] top.endianess_tb.u1.datain[2] top.endianess_tb.u1.datain[1] top.endianess_tb.u1.datain[0]
+[pattern_trace] 1
+[pattern_trace] 0
