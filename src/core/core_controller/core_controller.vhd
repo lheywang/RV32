@@ -80,6 +80,17 @@ entity core_controller is
     );
 end entity;
 
+-- Ideas for V2, because that seems too repetive to be optimized :
+-- 
+-- Cycle 1 : copy data and identify how many cycle the operation will need. 
+-- Cycles jumps can be thinked about to optimize branches (we don't wait for an useless cycle...).
+-- 
+-- Cycle 2 : we mount a tree of signals :
+-- Is an immediate involved ? --> arg2sel to 1, and out to immediate 
+-- Is Rd involved ?
+-- Is RS2 involed ?
+-- Is memory ? --> arg1sel to 1, and mem signals
+
 architecture behavioral of core_controller is
 
         -- function to convert a 5 bit register ID (0 to 31) into it's correct representation for control
@@ -175,25 +186,26 @@ architecture behavioral of core_controller is
 
                         case dec_opcode is
 
-                            when    i_BEQ   |  
-                                    i_BNE   |
-                                    i_BLT   |
-                                    i_BGE   |
-                                    i_BLTU  |
-                                    i_BGEU  =>
-                                next_state <= BRANCH1;
+                            when    i_BEQ   |               -- Theses opcodes require some special operations : 
+                                    i_BNE   |               -- First, evaluate the branching condition, and 
+                                    i_BLT   |               -- then, we decide if we take a branch, or not.
+                                    i_BGE   |               --
+                                    i_BLTU  |               -- if yes, we need to flush the decoder and pipelines to 
+                                    i_BGEU  =>              -- to ensure data coherency.
+                                next_state <= BRANCH1;      -- else, we just continue as before.
 
-                            when    i_JAL   |
-                                    i_JALR  =>
+                            when    i_JAL   |               -- Theses opcodes require some special operations : 
+                                    i_JALR  |               -- address computations and THEN, jump.
+                                    i_MRET  |               -- The operations linked to ZICSR instructions are very
+                                    i_ECALL |               -- similar, but target different registers, and may require
+                                    i_EBREAK|               --
+                                    i_AUIPC =>              -- 
                                 next_state <= JMP1;
 
-                            when    i_NOP   |
-                                    i_ECALL |
-                                    i_EBREAK|
-                                    i_FENCE =>
-                                next_state <= WAITING;
+                            when    i_FENCE =>              -- This instruction is implemented as a NOP, since the
+                                next_state <= WAITING;      -- memory and buses are running at twice the core clock.
 
-                            when others =>
+                            when others => -- list here can be quite long, but there's really any instructions.
                                 next_state <= ANY;
 
                         end case;
@@ -211,19 +223,299 @@ architecture behavioral of core_controller is
                 
                     when ANY =>
 
+                        case save_opcode is
+
+                            when i_NOP =>
+                                reg_we      <= '0';
+                                reg_wa      <= 0;
+                                reg_ra1     <= 0;
+                                reg_ra2     <= 0;
+                                reg_rs2_out <= (others => '0');
+                                arg2_sel    <= '0';
+                                arg1_sel    <= '0';
+                                alu_cmd     <= c_NONE;
+
+                            when i_LUI =>
+                                reg_we      <= '1';
+                                reg_wa      <= to_integer(unsigned(save_rd));
+                                reg_ra1     <= 0;
+                                reg_ra2     <= 0;
+                                reg_rs2_out <= save_imm;
+                                arg2_sel    <= '1';
+                                arg1_sel    <= '0';
+                                alu_cmd     <= c_ADD;
+
+                            when i_ADDI =>
+                                reg_we      <= '1';
+                                reg_wa      <= to_integer(unsigned(save_rd));
+                                reg_ra1     <= to_integer(unsigned(save_rs1));
+                                reg_ra2     <= 0;
+                                reg_rs2_out <= save_imm;
+                                arg2_sel    <= '1';
+                                arg1_sel    <= '0';
+                                alu_cmd     <= c_ADD;
+
+                            when i_SLTI =>
+                                reg_we      <= '1';
+                                reg_wa      <= to_integer(unsigned(save_rd));
+                                reg_ra1     <= to_integer(unsigned(save_rs1));
+                                reg_ra2     <= 0;
+                                reg_rs2_out <= save_imm;
+                                arg2_sel    <= '1';
+                                arg1_sel    <= '0';
+                                alu_cmd     <= c_SLT;
+
+                            when i_SLTIU =>
+                                reg_we      <= '1';
+                                reg_wa      <= to_integer(unsigned(save_rd));
+                                reg_ra1     <= to_integer(unsigned(save_rs1));
+                                reg_ra2     <= 0;
+                                reg_rs2_out <= save_imm;
+                                arg2_sel    <= '1';
+                                arg1_sel    <= '0';
+                                alu_cmd     <= c_SLTU;
+
+                            when i_XORI =>
+                                reg_we      <= '1';
+                                reg_wa      <= to_integer(unsigned(save_rd));
+                                reg_ra1     <= to_integer(unsigned(save_rs1));
+                                reg_ra2     <= 0;
+                                reg_rs2_out <= save_imm;
+                                arg2_sel    <= '1';
+                                arg1_sel    <= '0';
+                                alu_cmd     <= c_XOR;
+
+                            when i_ANDI =>
+                                reg_we      <= '0';
+                                reg_wa      <= 0;
+                                reg_ra1     <= 0;
+                                reg_ra2     <= 0;
+                                reg_rs2_out <= (others => '0');
+                                arg2_sel    <= '0';
+                                arg1_sel    <= '0';
+                                alu_cmd     <= c_NONE;
+
+                            when i_SLLI =>
+                                reg_we      <= '0';
+                                reg_wa      <= 0;
+                                reg_ra1     <= 0;
+                                reg_ra2     <= 0;
+                                reg_rs2_out <= (others => '0');
+                                arg2_sel    <= '0';
+                                arg1_sel    <= '0';
+                                alu_cmd     <= c_NONE;
+
+                            when i_SRLI =>
+                                reg_we      <= '0';
+                                reg_wa      <= 0;
+                                reg_ra1     <= 0;
+                                reg_ra2     <= 0;
+                                reg_rs2_out <= (others => '0');
+                                arg2_sel    <= '0';
+                                arg1_sel    <= '0';
+                                alu_cmd     <= c_NONE;
+
+                            when i_SRAI =>
+                                reg_we      <= '0';
+                                reg_wa      <= 0;
+                                reg_ra1     <= 0;
+                                reg_ra2     <= 0;
+                                reg_rs2_out <= (others => '0');
+                                arg2_sel    <= '0';
+                                arg1_sel    <= '0';
+                                alu_cmd     <= c_NONE;
+
+                            when i_ORI =>
+                                reg_we      <= '0';
+                                reg_wa      <= 0;
+                                reg_ra1     <= 0;
+                                reg_ra2     <= 0;
+                                reg_rs2_out <= (others => '0');
+                                arg2_sel    <= '0';
+                                arg1_sel    <= '0';
+                                alu_cmd     <= c_NONE;
+
+                            when i_ADD =>
+                                reg_we      <= '0';
+                                reg_wa      <= 0;
+                                reg_ra1     <= 0;
+                                reg_ra2     <= 0;
+                                reg_rs2_out <= (others => '0');
+                                arg2_sel    <= '0';
+                                arg1_sel    <= '0';
+                                alu_cmd     <= c_NONE;
+
+                            when i_SUB =>
+                                reg_we      <= '0';
+                                reg_wa      <= 0;
+                                reg_ra1     <= 0;
+                                reg_ra2     <= 0;
+                                reg_rs2_out <= (others => '0');
+                                arg2_sel    <= '0';
+                                arg1_sel    <= '0';
+                                alu_cmd     <= c_NONE;
+
+                            when i_SLL =>
+                                reg_we      <= '0';
+                                reg_wa      <= 0;
+                                reg_ra1     <= 0;
+                                reg_ra2     <= 0;
+                                reg_rs2_out <= (others => '0');
+                                arg2_sel    <= '0';
+                                arg1_sel    <= '0';
+                                alu_cmd     <= c_NONE;
+
+                            when i_SLT =>
+                                reg_we      <= '0';
+                                reg_wa      <= 0;
+                                reg_ra1     <= 0;
+                                reg_ra2     <= 0;
+                                reg_rs2_out <= (others => '0');
+                                arg2_sel    <= '0';
+                                arg1_sel    <= '0';
+                                alu_cmd     <= c_NONE;
+
+                            when i_SLTU =>
+                                reg_we      <= '0';
+                                reg_wa      <= 0;
+                                reg_ra1     <= 0;
+                                reg_ra2     <= 0;
+                                reg_rs2_out <= (others => '0');
+                                arg2_sel    <= '0';
+                                arg1_sel    <= '0';
+                                alu_cmd     <= c_NONE;
+
+                            when i_XOR =>
+                                reg_we      <= '0';
+                                reg_wa      <= 0;
+                                reg_ra1     <= 0;
+                                reg_ra2     <= 0;
+                                reg_rs2_out <= (others => '0');
+                                arg2_sel    <= '0';
+                                arg1_sel    <= '0';
+                                alu_cmd     <= c_NONE;
+
+                            when i_SRL =>
+                                reg_we      <= '0';
+                                reg_wa      <= 0;
+                                reg_ra1     <= 0;
+                                reg_ra2     <= 0;
+                                reg_rs2_out <= (others => '0');
+                                arg2_sel    <= '0';
+                                arg1_sel    <= '0';
+                                alu_cmd     <= c_NONE;
+
+                            when i_SRA =>
+                                reg_we      <= '0';
+                                reg_wa      <= 0;
+                                reg_ra1     <= 0;
+                                reg_ra2     <= 0;
+                                reg_rs2_out <= (others => '0');
+                                arg2_sel    <= '0';
+                                arg1_sel    <= '0';
+                                alu_cmd     <= c_NONE;
+
+                            when i_OR =>
+                                reg_we      <= '0';
+                                reg_wa      <= 0;
+                                reg_ra1     <= 0;
+                                reg_ra2     <= 0;
+                                reg_rs2_out <= (others => '0');
+                                arg2_sel    <= '0';
+                                arg1_sel    <= '0';
+                                alu_cmd     <= c_NONE;
+
+                            when i_AND =>
+                                reg_we      <= '0';
+                                reg_wa      <= 0;
+                                reg_ra1     <= 0;
+                                reg_ra2     <= 0;
+                                reg_rs2_out <= (others => '0');
+                                arg2_sel    <= '0';
+                                arg1_sel    <= '0';
+                                alu_cmd     <= c_NONE;
+
+                            when i_SB =>
+
+                            when i_SH =>
+
+                            when i_SW =>
+
+                            when i_LB =>
+
+                            when i_LH =>
+
+                            when i_LW =>
+
+                            when i_LBU =>
+
+                            when i_LHU =>
+
+                            when i_CSRRW =>
+
+                            when i_CSRRS =>
+
+                            when i_CSRRC =>
+
+                            when i_CSRRWI =>
+
+                            when i_CSRRSI =>
+
+                            when i_CSRRCI =>
+
+                            when others =>
+
+                        end case;
+
                     when JMP1 =>
+
+                        case save_opcode is 
+
+                            when i_AUIPC =>
+
+                            when i_JAL =>
+
+                            when i_JALR =>
+
+                            when i_ECALL =>
+
+                            when i_EBREAK =>
+
+                            when i_MRET =>
+
+                            when others =>
+
+                        end case;
 
                     when JMP2 =>
 
                     when BRANCH1 => 
+                    
+                        case save_opcode is 
+
+                            when i_BEQ =>
+
+                            when i_BNE =>
+
+                            when i_BLT =>
+
+                            when i_BGE =>
+
+                            when i_BLTU =>
+
+                            when i_BGEU =>
+
+                            when others =>
+
+                        end case;
 
                     when BRANCH2 =>
 
-                    when WAITING =>
+                    when WAITING => -- i_FENCE
 
-                    when ERR =>
+                    when ERR => -- In fact, this is a jump. It's case is different, because there's an special MCAUSE value to be written.
 
-                    when IRQ =>
+                    when IRQ => -- In fact, this is a jump. It's case is different, because there's an special MCAUSE value to be written.
 
                 end case;
 

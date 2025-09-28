@@ -253,7 +253,7 @@ architecture behavioral of core is
         -- Muxes
         reg_wdata           <= mem_rdata when (mem_request = '1') and (mem_rw = '0') else 
                                alu_out;
-        mem_wdata           <= reg_rdata1 when (mem_request = '1') and (mem_rw = '1') else
+        mem_wdata           <= alu_arg1 when (mem_request = '1') and (mem_rw = '1') else
                                (others => '0');
         alu_arg1            <= csr_rdata1 when (arg1_sel = '1') else
                                reg_rdata1;
