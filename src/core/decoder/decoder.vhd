@@ -6,7 +6,7 @@ use work.common.all;
 entity decoder is 
     generic (
         XLEN :      integer := 32                                           -- Width of the data outputs. 
-                                                                            -- Warning : This does not change the number of registers not instruction lenght
+                                                                            -- Warning : This does not change the number of registers not i_instruction lenght
     );
     port (
         -- instruction input
@@ -48,20 +48,57 @@ architecture behavioral of decoder is
         signal  rd_internal :           std_logic_vector(4 downto 0)                    := (others => '0');
         signal  imm_internal :          std_logic_vector((XLEN - 1) downto 0)           := (others => '0');
 
+        -- Internal instruction bus, with the right endianess
+        signal  i_instruction :         std_logic_vector(31 downto 0)                   := (others => '0');
+        signal  r_instruction :         std_logic_vector(31 downto 0)                   := (others => '0');
+
+        -- remove the first decoder cycle glitch
+        signal  first_flag :            std_logic                                       := '0';
+
     begin
 
-        -- Basic checks
-        P1 : process(clock, nRST) 
+        -- Register the input, to enable constant delays between decoders outputs
+        P0 : process(clock, nRST)
+        begin
+            if (nRST = '0') then
+                r_instruction <= (others => '0');
+                first_flag <= '0';
+
+            elsif rising_edge(clock) and (clock_en = '1') then
+                if (first_flag = '1') then
+                    r_instruction <= instruction;
+                else
+                    first_flag <= '1';
+                end if;
+
+            end if;
+
+        end process;
+
+        -- Endianess correctors
+        U1 : entity work.endianess(rtl)
+            generic map (
+                XLEN        =>  32
+            )
+            port map (
+                datain      =>  r_instruction,
+                dataout     =>  i_instruction
+            );
+
+        -- Combinantional decoder, select the wanted decoder
+        -- Using this not synced to clock enable to split the logic in half, and reduce the critical path
+        -- Before, we've got Fmax = ~100 MHz because of it's too long logic.
+        P1 : process(nRST, i_instruction) 
             begin
 
                 if (nRST = '0') then
                     illegal_internal    <= '0';
                     selected_decoder    <= default_t;
 
-                elsif rising_edge(clock) and (clock_en = '1') then
+                else
 
                     -- Select the opcode, and perform an instruction size check (last two bits must be "11").
-                    case instruction(6 downto 0) is
+                    case i_instruction(6 downto 0) is
 
                         when "0110111" =>               -- LUI
                             selected_decoder <= U;
@@ -115,8 +152,20 @@ architecture behavioral of decoder is
                 
             end process;
 
+        -- P2 : process(clock, nRST, clock_en)
+        --     begin
+        --         if (nRST = '0') then    
+        --             r_selected_decoder <= default_t;
+
+        --         elsif rising_edge(clock) and (clock_en = '1') then
+        --             r_selected_decoder <= selected_decoder;
+
+        --         end if;
+        --     end process;
+
         -- Hardware selected_decoder selection logic
-        P2 : process(instruction, selected_decoder, nRST)
+        -- This process is actually clocked, because we need synchronous outputs.
+        P3 : process(clock, clock_en, nRST)
             begin
                 if (nRST = '0') then
                     rs1_internal <= (others => '0');
@@ -126,24 +175,24 @@ architecture behavioral of decoder is
                     opcode <= i_NOP;
                     illegal_internal2 <= '0';
 
-                else
+                elsif rising_edge(clock) and (clock_en = '1') then
 
                     case selected_decoder is 
 
                         -- Register to register operation
                         when R =>
-                            rd_internal <=                                  instruction(11 downto 7);
-                            rs1_internal <=                                 instruction(19 downto 15);
+                            rd_internal <=                                  i_instruction(11 downto 7);
+                            rs1_internal <=                                 i_instruction(19 downto 15);
                                                                            
-                            rs2_internal <=                                 instruction(24 downto 20);
+                            rs2_internal <=                                 i_instruction(24 downto 20);
                             imm_internal <=                                 (others => '0');
                         
-                            -- Instruction identification
-                            case instruction(31 downto 25) is 
+                            -- i_instruction identification
+                            case i_instruction(31 downto 25) is 
 
                                 when "0000000" => -- ADD SLL SLT XOR SRL OR AND
 
-                                    case instruction(14 downto 12) is
+                                    case i_instruction(14 downto 12) is
 
                                         when "000" =>
                                             opcode <= i_ADD;
@@ -177,7 +226,7 @@ architecture behavioral of decoder is
 
                                 when "0100000" => -- SUB SRA
 
-                                    case instruction(14 downto 12) is
+                                    case i_instruction(14 downto 12) is
 
                                         when "000" =>
                                             opcode <= i_SUB;
@@ -193,7 +242,7 @@ architecture behavioral of decoder is
 
                                 -- when "0000001" => -- RV32M extension
 
-                                --     case instruction(14 downto 12) is
+                                --     case i_instruction(14 downto 12) is
 
                                 --         when "000" =>
                                 --             opcode <= i_MUL;
@@ -233,18 +282,18 @@ architecture behavioral of decoder is
 
                         -- Immediate to register operation
                         when I =>
-                            rd_internal <=                                  instruction(11 downto 7);
-                            rs1_internal <=                                 instruction(19 downto 15); 
+                            rd_internal <=                                  i_instruction(11 downto 7);
+                            rs1_internal <=                                 i_instruction(19 downto 15); 
                             rs2_internal <=                                 (others => '0');
-                            imm_internal <=                                 (others => instruction(31));
-                            imm_internal(11 downto 0) <=                    instruction(31 downto 20);
+                            imm_internal <=                                 (others => i_instruction(31));
+                            imm_internal(11 downto 0) <=                    i_instruction(31 downto 20);
                             
-                            -- Instruction identification
-                            case instruction(6 downto 2) is
+                            -- i_instruction identification
+                            case i_instruction(6 downto 2) is
 
                                 when "00100" => 
                             
-                                    case instruction(14 downto 12) is
+                                    case i_instruction(14 downto 12) is
 
                                         when "000" =>
                                             opcode <= i_ADDI;
@@ -265,7 +314,7 @@ architecture behavioral of decoder is
                                             opcode <= i_ORI;
                                             illegal_internal2 <= '0';
                                         when "101" => 
-                                            if (instruction(30) = '1') then
+                                            if (i_instruction(30) = '1') then
                                                 opcode <= i_SRAI;
                                                 illegal_internal2 <= '0';
                                             else
@@ -288,7 +337,7 @@ architecture behavioral of decoder is
 
                                 when "00000" =>
 
-                                    case instruction(14 downto 12) is
+                                    case i_instruction(14 downto 12) is
 
                                         when "000" =>
                                             opcode <= i_LB;
@@ -312,7 +361,7 @@ architecture behavioral of decoder is
                                     end case;
                                         
                                 when "11001" => 
-                                    if (instruction(14 downto 12) = "000") then
+                                    if (i_instruction(14 downto 12) = "000") then
                                         opcode <= i_JALR; 
                                         illegal_internal2 <= '0';
                                     else
@@ -321,7 +370,7 @@ architecture behavioral of decoder is
                                     end if;
 
                                 when "11100" =>
-                                    if (instruction(20) = '1') then
+                                    if (i_instruction(20) = '1') then
                                         opcode <= i_ECALL; 
                                         illegal_internal2 <= '0';      
                                     else
@@ -339,14 +388,14 @@ architecture behavioral of decoder is
                         -- Memory operation
                         when S =>
                             rd_internal <=                                  (others => '0');
-                            rs1_internal <=                                 instruction(19 downto 15); 
-                            rs2_internal <=                                 instruction(24 downto 20);
-                            imm_internal <=                                 (others => instruction(31));
-                            imm_internal(11 downto 0) <=                    instruction(31 downto 25)                       
-                                                                          & instruction(11 downto 7);
+                            rs1_internal <=                                 i_instruction(19 downto 15); 
+                            rs2_internal <=                                 i_instruction(24 downto 20);
+                            imm_internal <=                                 (others => i_instruction(31));
+                            imm_internal(11 downto 0) <=                    i_instruction(31 downto 25)                       
+                                                                          & i_instruction(11 downto 7);
 
-                            -- Instruction identification
-                            case instruction(14 downto 12) is
+                            -- i_instruction identification
+                            case i_instruction(14 downto 12) is
 
                                 when "000" =>
                                     opcode <= i_SB; 
@@ -364,16 +413,16 @@ architecture behavioral of decoder is
                         -- Branches
                         when B =>
                             rd_internal <=                                  (others => '0');
-                            rs1_internal <=                                 instruction(19 downto 15);
-                            rs2_internal <=                                 instruction(24 downto 20);
-                            imm_internal <=                                 (others => instruction(31));
-                            imm_internal(11 downto 0) <=                    instruction(31)                                 
-                                                                          & instruction(7)                
-                                                                          & instruction(30 downto 25)         
-                                                                          & instruction(11 downto 8);
+                            rs1_internal <=                                 i_instruction(19 downto 15);
+                            rs2_internal <=                                 i_instruction(24 downto 20);
+                            imm_internal <=                                 (others => i_instruction(31));
+                            imm_internal(11 downto 0) <=                    i_instruction(31)                                 
+                                                                          & i_instruction(7)                
+                                                                          & i_instruction(30 downto 25)         
+                                                                          & i_instruction(11 downto 8);
 
-                            -- Instruction identification
-                            case instruction(14 downto 12) is
+                            -- i_instruction identification
+                            case i_instruction(14 downto 12) is
 
                                 when "000" =>
                                     opcode <= i_BEQ; 
@@ -401,14 +450,14 @@ architecture behavioral of decoder is
 
                         -- Immediates values loading
                         when U =>
-                            rd_internal <=                                   instruction(11 downto 7);
+                            rd_internal <=                                   i_instruction(11 downto 7);
                             rs1_internal <=                                  (others => '0');
                             rs2_internal <=                                  (others => '0');
-                            imm_internal <=                                  instruction(31 downto 12)                       
+                            imm_internal <=                                  i_instruction(31 downto 12)                       
                                                                            & "000000000000";
                             
-                            -- Instruction identification
-                            case instruction(6 downto 2) is
+                            -- i_instruction identification
+                            case i_instruction(6 downto 2) is
 
                                 when "01101" =>
                                     opcode <= i_LUI; 
@@ -425,17 +474,17 @@ architecture behavioral of decoder is
                         -- Jumps
                         when J =>
                             rd_internal <=                                  (others => '0');
-                            rs1_internal <=                                 instruction(19 downto 15); 
-                            rs2_internal <=                                 instruction(24 downto 20);
-                            imm_internal <=                                 (others => instruction(31));
-                            imm_internal(20 downto 1) <=                    instruction(31)                                 
-                                                                          & instruction(19 downto 12)     
-                                                                          & instruction(20)                   
-                                                                          & instruction(30 downto 21);
+                            rs1_internal <=                                 i_instruction(19 downto 15); 
+                            rs2_internal <=                                 i_instruction(24 downto 20);
+                            imm_internal <=                                 (others => i_instruction(31));
+                            imm_internal(20 downto 1) <=                    i_instruction(31)                                 
+                                                                          & i_instruction(19 downto 12)     
+                                                                          & i_instruction(20)                   
+                                                                          & i_instruction(30 downto 21);
                             imm_internal(0) <=                              '0';
                             
-                            -- Instruction identification
-                            case instruction(6 downto 2) is
+                            -- i_instruction identification
+                            case i_instruction(6 downto 2) is
 
                                 when "11011" =>
                                     opcode <= i_JAL; 
@@ -485,9 +534,9 @@ architecture behavioral of decoder is
 
     end architecture;
 
-    -- Instructions lists
+    -- i_instructions lists
 
--- Type	    Opcode	    Funct3	Funct7	        Instruction	    Description                             Cycles Numbers  Remarks
+-- Type	    Opcode	    Funct3	Funct7	        i_instruction	    Description                             Cycles Numbers  Remarks
 
 -- R-Type	0110011	    000	    0000000	        ADD	            Add                                     1               N/A
 -- R-Type	0110011	    001	    0000000	        SLL	            Shift Left Logical                      1               N/A
