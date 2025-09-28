@@ -2,11 +2,13 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use work.common.all;
+use work.records.all;
 
 entity core is 
     generic ( 
         XLEN :                      integer := 32;
         REG_NB :                    integer := 32;
+        CSR_NB :                    integer := 9;
         INPUT_FREQ :                integer := 200_000_000;
         RESET_ADDR :                integer := 0;
         INT_ADDR :                  integer := 0;
@@ -54,18 +56,25 @@ architecture behavioral of core is
         signal reg_ra1 :            integer range 0 to (REG_NB-1);
         signal reg_ra2 :            integer range 0 to (REG_NB-1);
 
+        -- Internals signals linked to CSR registers data IO and selection
+        signal csr_wa :             integer range 0 to (CSR_NB - 1);
+        signal csr_we :             std_logic;
+        signal csr_ra1 :            integer range 0 to (CSR_NB - 1);
+        signal csr_rdata1 :         std_logic_vector((XLEN - 1) downto 0);
+
+        -- Signals for choosing the input elements
+        signal arg1_sel :           std_logic;
+        signal arg2_sel :           std_logic;
+        
+        -- Controller data IO
+        signal ctl_rdata1 :         std_logic_vector((XLEN - 1) downto 0);
+
         -- alu signals
         signal alu_cmd :            commands;
-        signal alu_out_en :         std_logic;
-        signal alu_zero :           std_logic;
-        signal alu_overflow :       std_logic;
-        signal alu_beq :            std_logic;
-        signal alu_bne :            std_logic;
-        signal alu_blt :            std_logic;
-        signal alu_bge :            std_logic;
-        signal alu_bltu :           std_logic;
-        signal alu_bgeu :           std_logic;
+        signal alu_status :         alu_feedback;
         signal alu_out :            std_logic_vector((XLEN - 1) downto 0);
+        signal alu_arg1 :           std_logic_vector((XLEN - 1) downto 0);
+        signal alu_arg2 :           std_logic_vector((XLEN - 1) downto 0);
 
         -- decoders signals
         signal dec_rs1 :            std_logic_vector((XLEN / 8) downto 0);
@@ -171,16 +180,11 @@ architecture behavioral of core is
             reg_ra2         =>  reg_ra2,
             reg_rs1_in      =>  reg_rdata1,
             reg_rs2_out     =>  reg_rdata2,
+            csr_we          =>  csr_we,
+            csr_wa          =>  csr_wa,
+            csr_ra1         =>  csr_ra1
             alu_cmd         =>  alu_cmd,
-            alu_out_en      =>  alu_out_en,
-            alu_zero        =>  alu_zero,
-            alu_overflow    =>  alu_overflow,
-            alu_beq         =>  alu_beq,
-            alu_bne         =>  alu_bne,
-            alu_blt         =>  alu_blt,
-            alu_bge         =>  alu_bge,
-            alu_bltu        =>  alu_bltu,
-            alu_bgeu        =>  alu_bgeu,
+            alu_status      =>  alu_status,
             if_err          =>  if_err,
             ctl_interrupt   =>  irq,
             ctl_exception   =>  exception,
@@ -208,25 +212,37 @@ architecture behavioral of core is
             rd2             =>  reg_rdata2
         );
 
+        -- CSR file
+        -- Register file
+        CSR1 : entity work.register_file(rtl)
+        generic map (
+            XLEN            =>  XLEN,
+            REG_NB          =>  CSR_NB
+        )
+        port map (
+            clock           =>  clk,
+            clock_en        =>  clk_en,
+            nRST            =>  nRST,
+            we              =>  csr_we,
+            wa              =>  csr_wa,
+            wd              =>  reg_wdata,      -- Shared output bus with the ALU output
+            ra1             =>  csr_ra1,
+            ra2             =>  0,              -- Stuck read port to 0...
+            rd1             =>  csr_rdata1,
+            rd2             =>  open            -- Don't care about second read port...
+        );
+
         -- Arithmetic and Logic unit
         ALU1 : entity work.alu(behavioral)
         generic map (
             XLEN            =>  XLEN
         )
         port map (
-            arg1            =>  reg_rdata1,
-            arg2            =>  reg_rdata2,
+            arg1            =>  alu_arg1,
+            arg2            =>  alu_arg1,
             result          =>  alu_out,
             command         =>  alu_cmd,
-            outen           =>  alu_out_en,
-            zero            =>  alu_zero,
-            overflow        =>  alu_overflow,
-            beq             =>  alu_beq,
-            bne             =>  alu_bne,
-            blt             =>  alu_blt,
-            bge             =>  alu_bge,
-            bltu            =>  alu_bltu,
-            bgeu            =>  alu_bgeu
+            status          =>  alu_status
         );
 
         -- Static mappings
@@ -234,9 +250,14 @@ architecture behavioral of core is
         mem_req             <=  mem_request;
         mem_we              <=  mem_rw;
 
+        -- Muxes
         reg_wdata           <= mem_rdata when (mem_request = '1') and (mem_rw = '0') else 
                                alu_out;
         mem_wdata           <= reg_rdata1 when (mem_request = '1') and (mem_rw = '1') else
                                (others => '0');
+        alu_arg1            <= csr_rdata1 when (arg1_sel = '1') else
+                               reg_rdata1;
+        alu_arg2            <= ctl_rdata1 when (arg2_sel = '1') else
+                               reg_rdata2;  
 
     end architecture;

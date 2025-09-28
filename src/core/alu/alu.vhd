@@ -2,6 +2,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use work.common.all;
+use work.records.all;
 
 entity alu is 
 generic (
@@ -15,17 +16,9 @@ port (
 
     -- Controls
     command :       in      commands;                                                           -- Required operation
-    outen :         in      std_logic;                                                          -- Enable output drivers
 
     -- Status output
-    zero :          out     std_logic                                   := '0';                 -- Result is ZERO
-    overflow :      out     std_logic                                   := '0';                 -- Overflow detected
-    beq :           out     std_logic                                   := '0';                 -- Indicate that the BEQ  condition is valid for jump
-    bne :           out     std_logic                                   := '0';                 -- Indicate that the BNE  condition is valid for jump
-    blt :           out     std_logic                                   := '0';                 -- Indicate that the BLT  condition is valid for jump
-    bge :           out     std_logic                                   := '0';                 -- Indicate that the BGE  condition is valid for jump
-    bltu :          out     std_logic                                   := '0';                 -- Indicate that the BLTU condition is valid for jump
-    bgeu :          out     std_logic                                   := '0'                  -- Indicate that the BGEU condition is valid for jump
+    status :        out     alu_feedback
 );
 end entity;
 
@@ -33,7 +26,7 @@ architecture behavioral of alu is
 
     begin
 
-        P1: process(arg1, arg2, command, outen)
+        P1: process(arg1, arg2, command)
 
             variable tmp    : signed(XLEN-1 downto 0);
             variable res    : std_logic_vector(XLEN-1 downto 0);
@@ -105,43 +98,38 @@ architecture behavioral of alu is
             end case;
 
             -- outputs assignment
-            if (outen = '1') then
-                result      <= res;
-            else
-                result      <= (others => '0');
-            end if;
-
-            overflow    <= v_ovf;
+            result      <= res;
+            status.overflow    <= v_ovf;
             
             if (unsigned(res) = 0) and (command /= c_None) then -- This make c_NONE be used for branchs evaluations.
-                zero <= '1';
+                status.zero <= '1';
             else
-                zero <= '0';
+                status.zero <= '0';
             end if;
 
             -- Jumps condition checks
             if (unsigned(arg1) = unsigned(arg2)) then
-                beq <= '1';
-                bne <= '0';
+                status.beq <= '1';
+                status.bne <= '0';
             else
-                beq <= '0';
-                bne <= '1';
+                status.beq <= '0';
+                status.bne <= '1';
             end if;
 
             if (unsigned(arg1) < unsigned(arg2)) then
-                bltu <= '1';
-                bgeu <= '0';
+                status.bltu <= '1';
+                status.bgeu <= '0';
             else
-                bltu <= '0';
-                bgeu <= '1';
+                status.bltu <= '0';
+                status.bgeu <= '1';
             end if;
 
             if (signed(arg1) < signed(arg2)) then
-                blt <= '1';
-                bge <= '0';
+                status.blt <= '1';
+                status.bge <= '0';
             else
-                blt <= '0';
-                bge <= '1';
+                status.blt <= '0';
+                status.bge <= '1';
             end if;
 
         end process;

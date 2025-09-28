@@ -2,12 +2,17 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use work.common.all;
+use work.records.all;
 
 entity core_controller is 
     generic (
         -- Size generic values :
         XLEN :      integer := 32;                                                                  -- Number of bits stored by the register. 
         REG_NB :    integer := 32;                                                                  -- Number of registers in the processor.
+        CSR_NB :    integer := 9;                                                                   -- Number of used CSR registers. WARNING : This part is not fully spec compliant, in the 
+                                                                                                    -- meaning that the address of the register is not correct. There's logically some "space"
+                                                                                                    -- between them, that we ignore. We reuse the same register_file as generic regs, and the
+                                                                                                    -- data is thus joined under the same structure. The controller handle that difference.
 
         -- Handler exceptions : 
         INT_ADDR :  integer := 0;                                                                   -- Address of the interrupt handler to jump.
@@ -47,19 +52,21 @@ entity core_controller is
         reg_ra1 :       out     integer range 0 to (REG_NB - 1)             := 0;                   -- Output register 1.
         reg_ra2 :       out     integer range 0 to (REG_NB - 1)             := 0;                   -- Output register 2.
         reg_rs1_in :    in      std_logic_vector((XLEN - 1) downto 0);                              -- Register rs1 input signal
-        reg_rs2_out :   out     std_logic_vector((XLEN - 1) downto 0)       := (others => 'Z');     -- Forced output for an argument
+        reg_rs2_out :   out     std_logic_vector((XLEN - 1) downto 0)       := (others => '0');     -- Forced output for an argument
+
+        -- CSR regs controls
+        csr_we :        out     std_logic                                   := '0';                 -- CSR write enable of the register file
+        csr_wa :        out     integer range 0 to (CSR_NB - 1)             := 0;                   -- Written CSR register address
+        csr_ra1 :       out     integer range 0 to (CSR_NB - 1)             := 0;                   -- Readen CSR register address 
+                                                                                                    -- There's no CSR RA2 because we'll never need the second output port
+
+        -- Regs muxes
+        arg1_sel :      out     std_logic                                   := '0';                 -- Choose between the output of the CSR register file or the RS1 output of the register file
+        arg2_sel :      out     std_logic                                   := '0';                 -- Choose between the output of the controller or the RS2 output of the register file
 
         -- Alu controls
         alu_cmd :       out     commands                                    := c_ADD;               -- ALU controls signals
-        alu_out_en :    out     std_logic                                   := '1';                 -- Enable output (output bus is shared with memory)
-        alu_zero :      in      std_logic;                                                          -- ALU produced a zero output                                                      
-        alu_overflow :  in      std_logic;                                                          -- ALU overflow
-        alu_beq :       in      std_logic                                   := '0';                 -- Indicate that the BEQ  condition is valid for jump
-        alu_bne :       in      std_logic                                   := '0';                 -- Indicate that the BNE  condition is valid for jump
-        alu_blt :       in      std_logic                                   := '0';                 -- Indicate that the BLT  condition is valid for jump
-        alu_bge :       in      std_logic                                   := '0';                 -- Indicate that the BGE  condition is valid for jump
-        alu_bltu :      in      std_logic                                   := '0';                 -- Indicate that the BLTU condition is valid for jump
-        alu_bgeu :      in      std_logic                                   := '0';                 -- Indicate that the BGEU condition is valid for jump
+        alu_status :    in      alu_feedback;                                                       -- Alu feedback signals for jumps and other statuses.
 
         -- Generics inputs :
         if_err :        in      std_logic;
@@ -142,7 +149,7 @@ architecture behavioral of core_controller is
             elsif   (dec_illegal = '1') or 
                     (mem_addrerr = '1') or 
                     (pc_overflow = '1') or 
-                    (alu_overflow = '1') then
+                    (alu_status.overflow = '1') then
                 next_state <= ERR;
 
             -- Handle potential interrupts
