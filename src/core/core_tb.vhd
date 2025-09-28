@@ -12,6 +12,7 @@ architecture behavioral of core_tb is
 
         signal clk_t :                  std_logic                       := '0';
         signal nRST_t :                 std_logic                       := '0';
+        signal RST_t :                  std_logic                       := '0';
         signal irq_t :                  std_logic                       := '0';
         signal halt_t :                 std_logic                       := '0';
         signal exception_t :            std_logic                       := '0';
@@ -29,6 +30,9 @@ architecture behavioral of core_tb is
         signal core_trap_t :            std_logic                       := '0';
 
     begin
+
+        RST_t <= not nRST_t;
+
 
         CORE : entity work.core(behavioral)
             generic map ( 
@@ -64,7 +68,7 @@ architecture behavioral of core_tb is
         RAM : entity work.ram(SYN)
             port map 
             (
-                aclr                =>  not nRST_t,
+                aclr                =>  RST_t,
                 address             =>  mem_addr_t(14 downto 2), -- To correct : write a memory address translator that match the different addres spaces. 
                 byteena             =>  mem_byten_t,
                 clock               =>  clk_t,
@@ -76,9 +80,9 @@ architecture behavioral of core_tb is
         ROM : entity work.rom(SYN)
             port map 
             (
-                aclr                =>  not nRST_t,
+                aclr                =>  '0',                    -- Never reset the ROM. Since RAM based, we don't want to clear it.
                 address_a           =>  if_addr_t(15 downto 2),
-                address_b           =>  mem_addr_t(15 downto 2),
+                address_b           =>  mem_addr_t(15 downto 2),-- To correct : write a memory address translator that match the different addres spaces.
                 clock               =>  clk_t,
                 q_a                 =>  if_rdata_t,
                 q_b                 =>  mem_rdata_t
