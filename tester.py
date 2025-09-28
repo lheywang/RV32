@@ -102,18 +102,26 @@ linker_script = (
     if config["config"]["linker_script"] != ""
     else ""
 )
-print(linker_script)
+
+linker_args = f"-T {linker_script} " if linker_script else ""
+
 
 # Now, we can compile the needed files into the intel hex format
 cmd1 = (
     COMPILER
     + CCFLAGS
     + f"{config["config"]["flags"]} "  # Custom passed flags
+    + f"{linker_args}"
     + f"-o {WORKIR}/program.elf "
     + f"{str(source)} "
 )
 
 cmd2 = OBJCOPY + OBJFLAGS + f"{WORKIR}/program.elf " + f"{WORKIR}/program.hex "
+
+
+print("=" * 100)
+print(f" Compiling the program and building the hex init file to {HEX_DEST} ! ")
+print("=" * 100)
 
 try:
     # Compile
@@ -163,6 +171,9 @@ except subprocess.CalledProcessError as e:
 # Finally, copy files into the right folder, for the simulator to find it
 hex_source = pathlib.Path(f"{WORKIR}/program.hex")
 hex_dest = pathlib.Path(HEX_DEST)
+print(f"Running cp {WORKIR}/program.hex {HEX_DEST}")
+
+# We use the low level Python interface rather than calling another shell...
 shutil.copy(hex_source, hex_dest)
 
 # Now, running the simulation :
