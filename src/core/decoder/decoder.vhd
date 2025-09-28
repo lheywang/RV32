@@ -88,6 +88,7 @@ architecture behavioral of decoder is
         -- Combinantional decoder, select the wanted decoder
         -- Using this not synced to clock enable to split the logic in half, and reduce the critical path
         -- Before, we've got Fmax = ~100 MHz because of it's too long logic.
+        -- After, quartus report Fmax = ~230 MHz, because of the middle registering process.
         P1 : process(nRST, i_instruction) 
             begin
 
@@ -240,40 +241,6 @@ architecture behavioral of decoder is
 
                                     end case;
 
-                                -- when "0000001" => -- RV32M extension
-
-                                --     case i_instruction(14 downto 12) is
-
-                                --         when "000" =>
-                                --             opcode <= i_MUL;
-                                --             illegal_internal2 <= '0';
-                                --         when "001" =>
-                                --             opcode <= i_MULH;
-                                --             illegal_internal2 <= '0';
-                                --         when "010" =>
-                                --             opcode <= i_MULHSU;
-                                --             illegal_internal2 <= '0';
-                                --         when "011" =>
-                                --             opcode <= i_MULHU;
-                                --             illegal_internal2 <= '0';
-                                --         when "100" =>
-                                --             opcode <= i_DIV;
-                                --             illegal_internal2 <= '0';
-                                --         when "101" =>
-                                --             opcode <= i_DIVU;
-                                --             illegal_internal2 <= '0';
-                                --         when "110" => 
-                                --             opcode <= i_REM;
-                                --             illegal_internal2 <= '0';
-                                --         when "111" =>
-                                --             opcode <= i_REMU; 
-                                --             illegal_internal2 <= '0';
-                                --         when others =>
-                                --             opcode <= i_NOP;
-                                --             illegal_internal2 <= '1';
-
-                                --   end case;
-
                                 when others => 
                                     opcode <= i_NOP;
                                     illegal_internal2 <= '1';
@@ -370,13 +337,51 @@ architecture behavioral of decoder is
                                     end if;
 
                                 when "11100" =>
-                                    if (i_instruction(20) = '1') then
-                                        opcode <= i_ECALL; 
-                                        illegal_internal2 <= '0';      
-                                    else
-                                        opcode <= i_EBREAK; 
-                                        illegal_internal2 <= '0';
-                                    end if;
+
+                                    case i_instruction(14 downto 12) is
+
+                                        when "001" =>
+                                            opcode <= i_CSRRW;
+                                            illegal_internal2 <= '0';
+                                        when "010" =>
+                                            opcode <= i_CSRRS;
+                                            illegal_internal2 <= '0';
+                                        when "011" =>
+                                            opcode <= i_CSRRC;
+                                            illegal_internal2 <= '0';
+                                        when "101" =>
+                                            opcode <= i_CSRRWI;
+                                            illegal_internal2 <= '0';
+                                        when "110" =>
+                                            opcode <= i_CSRRSI;
+                                            illegal_internal2 <= '0';
+                                        when "111" =>
+                                            opcode <= i_CSRRCI;
+                                            illegal_internal2 <= '0';
+                                        when "000" =>
+
+                                            case i_instruction(31 downto 20) is
+
+                                                when X"000" =>
+                                                    opcode <= i_ECALL;
+                                                    illegal_internal2 <= '0';
+                                                when X"001" =>
+                                                    opcode <= i_EBREAK;
+                                                    illegal_internal2 <= '0';
+                                                when X"302" =>
+                                                    opcode <= i_MRET;
+                                                    illegal_internal2 <= '0';
+                                                when others =>
+                                                    opcode <= i_NOP;
+                                                    illegal_internal2 <= '1';
+
+                                            end case;
+
+                                        when others =>
+                                            opcode <= i_NOP; 
+                                            illegal_internal2 <= '1';
+
+                                    end case;
 
                                 when others => 
                                     opcode <= i_NOP;

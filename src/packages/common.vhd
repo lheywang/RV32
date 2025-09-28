@@ -23,7 +23,10 @@ package common is
 
         i_JAL,      i_JALR,
 
-        i_ECALL,    i_EBREAK
+        i_ECALL,    i_EBREAK,   i_MRET,
+
+        i_CSRRW,    i_CSRRS,    i_CSRRC,    i_CSRRWI,
+        i_CSRRSI,   i_CSRRCI
     );
 
     type commands is (

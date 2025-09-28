@@ -182,7 +182,7 @@ architecture behavioral of core is
             reg_rs2_out     =>  reg_rdata2,
             csr_we          =>  csr_we,
             csr_wa          =>  csr_wa,
-            csr_ra1         =>  csr_ra1
+            csr_ra1         =>  csr_ra1,
             alu_cmd         =>  alu_cmd,
             alu_status      =>  alu_status,
             if_err          =>  if_err,
