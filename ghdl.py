@@ -189,6 +189,7 @@ GHDL_ANALYSIS = (
 GHDL_ELABORATE = (
     GHDL_CMD
     + "-m "
+    + "-Wno-hide "
     + f"--workdir={WORKDIR} "
     + f"-P{WORKDIR} "
     + "-fexplicit "
@@ -241,8 +242,10 @@ while True:
 
         # Check if prints are needed :
         if result.stdout:
+            print("------ STDOUT ------")
             print(result.stdout)
         if result.stderr:
+            print("------ STDERR ------")
             print(result.stderr)
 
         # Incrementing counter

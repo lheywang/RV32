@@ -18,6 +18,7 @@
 *.hex
 *.bin
 *.o
+*.mif
 
 # Altera simulations models (not open source)
 *altera_mf*
