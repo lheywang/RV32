@@ -177,6 +177,7 @@ for file in source_files:
 GHDL_DEPENDENCIES = (
     GHDL_CMD
     + "-i "
+    + "-Wno-hide "
     + "--work=altera_mf "
     + f"--workdir={WORKDIR} "
     + "src/memory/behavioral/altera_mf.vhd "
