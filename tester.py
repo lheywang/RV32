@@ -22,13 +22,15 @@ import shutil
 # Paths
 BASE_PATH = "tests"
 WORKIR = "build"
-HEX_DEST = "src/memory/rom/rom.hex"
+HEX_DEST = "src/memory/rom/rom.mif"
 
 # Tools
 COMPILER = "riscv32-unknown-elf-gcc "
 OBJCOPY = "riscv32-unknown-elf-objcopy "
+BIN2MIF = "./utils/bin2mif.py "
+
 CCFLAGS = "-march=rv32i -mabi=ilp32 "
-OBJFLAGS = "-O ihex "
+OBJFLAGS = "-O binary "
 
 # ---------------------------------------------------------------------------------
 # Helper functions
@@ -74,9 +76,41 @@ def set_test(tests: list[pathlib.Path]):
         except ValueError:
             print("Please enter an integer !")
 
-    global TOP
     return pathlib.Path(tests[file_id - 1])
 
+def call(cmd: str):
+
+    try : 
+        print(f"Running {cmd}")
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            check=True,
+            shell=True,
+            cwd=".",
+        )
+
+        # Check if prints are needed :
+        if result.stdout:
+            print("------ STDOUT ------")
+            print(result.stdout)
+        if result.stderr:
+            print("------ STDERR ------")
+            print(result.stderr)
+
+        return
+
+    except subprocess.CalledProcessError as e:
+        # The 'e' object is a CalledProcessError and has stdout/stderr attributes.
+        # Show here the erro from the CLI
+        print(f"\n--- ERROR ---")
+        print(f"Command failed: {''.join(e.cmd)}")
+        print(f"Return code: {e.returncode}")
+        print(f"Stdout:\n{e.stdout}")
+        print(f"Stderr:\n{e.stderr}")
+        print("----------------\n")
+        return
 
 # ---------------------------------------------------------------------------------
 # Main script
@@ -116,62 +150,23 @@ cmd1 = (
     + f"{str(source)} "
 )
 
-cmd2 = OBJCOPY + OBJFLAGS + f"{WORKIR}/program.elf " + f"{WORKIR}/program.hex "
+cmd2 = OBJCOPY + OBJFLAGS + f"{WORKIR}/program.elf " + f"{WORKIR}/program.bin "
+
+cmd3 = BIN2MIF + f"{WORKIR}/program.bin " + f"{WORKIR}/program.mif "
 
 
 print("=" * 100)
 print(f" Compiling the program and building the hex init file to {HEX_DEST} ! ")
 print("=" * 100)
 
-try:
-    # Compile
-    print(f"Running {cmd1}")
-    result = subprocess.run(
-        cmd1,
-        capture_output=True,
-        text=True,
-        check=True,
-        shell=True,
-        cwd=".",
-    )
-
-    # Check if prints are needed :
-    if result.stdout:
-        print(result.stdout)
-    if result.stderr:
-        print(result.stderr)
-
-    # Build intel hex file
-    print(f"Running {cmd2}")
-    result = subprocess.run(
-        cmd2,
-        capture_output=True,
-        text=True,
-        check=True,
-        shell=True,
-        cwd=".",
-    )
-
-    # Check if prints are needed :
-    if result.stdout:
-        print(result.stdout)
-    if result.stderr:
-        print(result.stderr)
-
-except subprocess.CalledProcessError as e:
-    # The 'e' object is a CalledProcessError and has stdout/stderr attributes.
-    # Show here the erro from the CLI
-    print(f"\n--- ERROR ---")
-    print(f"Command failed: {' '.join(e.cmd)}")
-    print(f"Return code: {e.returncode}")
-    print(f"Stdout:\n{e.stdout}")
-    print(f"Stderr:\n{e.stderr}")
-    print("----------------\n")
-
+call(cmd1)
+call(cmd2)
+call(cmd3)
+    
 # Finally, copy files into the right folder, for the simulator to find it
-hex_source = pathlib.Path(f"{WORKIR}/program.hex")
+hex_source = pathlib.Path(f"{WORKIR}/program.mif")
 hex_dest = pathlib.Path(HEX_DEST)
-print(f"Running cp {WORKIR}/program.hex {HEX_DEST}")
+print(f"Running cp {WORKIR}/program.mif {HEX_DEST}")
 
 # We use the low level Python interface rather than calling another shell...
 shutil.copy(hex_source, hex_dest)
