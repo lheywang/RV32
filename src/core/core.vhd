@@ -61,6 +61,7 @@ architecture behavioral of core is
         signal csr_we :             std_logic;
         signal csr_ra1 :            integer range 0 to (CSR_NB - 1);
         signal csr_rdata1 :         std_logic_vector((XLEN - 1) downto 0);
+        signal csr_mie :            std_logic;
 
         -- Signals for choosing the input elements
         signal arg1_sel :           std_logic;
@@ -183,6 +184,7 @@ architecture behavioral of core is
             csr_we          =>  csr_we,
             csr_wa          =>  csr_wa,
             csr_ra1         =>  csr_ra1,
+            csr_mie         =>  csr_mie,
             alu_cmd         =>  alu_cmd,
             alu_status      =>  alu_status,
             if_err          =>  if_err,
