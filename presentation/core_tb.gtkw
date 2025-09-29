@@ -1,25 +1,26 @@
 [*]
 [*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
-[*] Sun Sep 28 15:36:00 2025
+[*] Mon Sep 29 19:29:03 2025
 [*]
 [dumpfile] "/home/user/RV32/build/wave.ghw"
-[dumpfile_mtime] "Sun Sep 28 15:32:05 2025"
-[dumpfile_size] 23166
+[dumpfile_mtime] "Mon Sep 29 19:22:47 2025"
+[dumpfile_size] 29379
 [savefile] "/home/user/RV32/presentation/core_tb.gtkw"
 [timestart] 0
 [size] 2560 985
-[pos] -27 -24
-*-25.725098 105000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -1 -1
+*-25.976868 165000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.core_tb.
 [treeopen] top.core_tb.core.
 [treeopen] top.core_tb.core.alu1.
 [treeopen] top.core_tb.core.dec1.
+[treeopen] top.core_tb.core.fsm1.
 [treeopen] top.core_tb.core.regs1.
 [sst_width] 273
 [signals_width] 261
 [sst_expanded] 1
-[sst_vpaned_height] 220
+[sst_vpaned_height] 341
 @200
 -clocks
 @28
@@ -47,7 +48,7 @@ top.core_tb.core.pc_wen
 @200
 -
 -decoder
-@23
+@22
 #{top.core_tb.core.dec1.i_instruction[31:0]} top.core_tb.core.dec1.i_instruction[31] top.core_tb.core.dec1.i_instruction[30] top.core_tb.core.dec1.i_instruction[29] top.core_tb.core.dec1.i_instruction[28] top.core_tb.core.dec1.i_instruction[27] top.core_tb.core.dec1.i_instruction[26] top.core_tb.core.dec1.i_instruction[25] top.core_tb.core.dec1.i_instruction[24] top.core_tb.core.dec1.i_instruction[23] top.core_tb.core.dec1.i_instruction[22] top.core_tb.core.dec1.i_instruction[21] top.core_tb.core.dec1.i_instruction[20] top.core_tb.core.dec1.i_instruction[19] top.core_tb.core.dec1.i_instruction[18] top.core_tb.core.dec1.i_instruction[17] top.core_tb.core.dec1.i_instruction[16] top.core_tb.core.dec1.i_instruction[15] top.core_tb.core.dec1.i_instruction[14] top.core_tb.core.dec1.i_instruction[13] top.core_tb.core.dec1.i_instruction[12] top.core_tb.core.dec1.i_instruction[11] top.core_tb.core.dec1.i_instruction[10] top.core_tb.core.dec1.i_instruction[9] top.core_tb.core.dec1.i_instruction[8] top.core_tb.core.dec1.i_instruction[7] top.core_tb.core.dec1.i_instruction[6] top.core_tb.core.dec1.i_instruction[5] top.core_tb.core.dec1.i_instruction[4] top.core_tb.core.dec1.i_instruction[3] top.core_tb.core.dec1.i_instruction[2] top.core_tb.core.dec1.i_instruction[1] top.core_tb.core.dec1.i_instruction[0]
 @420
 top.core_tb.core.dec1.selected_decoder
@@ -80,15 +81,6 @@ top.core_tb.core.regs1.ra2
 top.core_tb.core.alu1.command
 @22
 #{top.core_tb.core.alu1.result[31:0]} top.core_tb.core.alu1.result[31] top.core_tb.core.alu1.result[30] top.core_tb.core.alu1.result[29] top.core_tb.core.alu1.result[28] top.core_tb.core.alu1.result[27] top.core_tb.core.alu1.result[26] top.core_tb.core.alu1.result[25] top.core_tb.core.alu1.result[24] top.core_tb.core.alu1.result[23] top.core_tb.core.alu1.result[22] top.core_tb.core.alu1.result[21] top.core_tb.core.alu1.result[20] top.core_tb.core.alu1.result[19] top.core_tb.core.alu1.result[18] top.core_tb.core.alu1.result[17] top.core_tb.core.alu1.result[16] top.core_tb.core.alu1.result[15] top.core_tb.core.alu1.result[14] top.core_tb.core.alu1.result[13] top.core_tb.core.alu1.result[12] top.core_tb.core.alu1.result[11] top.core_tb.core.alu1.result[10] top.core_tb.core.alu1.result[9] top.core_tb.core.alu1.result[8] top.core_tb.core.alu1.result[7] top.core_tb.core.alu1.result[6] top.core_tb.core.alu1.result[5] top.core_tb.core.alu1.result[4] top.core_tb.core.alu1.result[3] top.core_tb.core.alu1.result[2] top.core_tb.core.alu1.result[1] top.core_tb.core.alu1.result[0]
-@28
-top.core_tb.core.alu1.zero
-top.core_tb.core.alu1.overflow
-top.core_tb.core.alu1.beq
-top.core_tb.core.alu1.bne
-top.core_tb.core.alu1.blt
-top.core_tb.core.alu1.bge
-top.core_tb.core.alu1.bltu
-top.core_tb.core.alu1.bgeu
 @200
 -
 -memory
@@ -103,5 +95,24 @@ top.core_tb.mem_we_t
 @200
 -
 -controller
+@420
+top.core_tb.core.fsm1.cycles_count
+top.core_tb.core.fsm1.r2_cycles_count
+top.core_tb.core.fsm1.r1_dec_opcode
+top.core_tb.core.fsm1.r2_dec_opcode
+@28
+top.core_tb.core.fsm1.is_req_data1
+top.core_tb.core.fsm1.r2_is_req_data1
+top.core_tb.core.fsm1.is_req_data2
+top.core_tb.core.fsm1.r2_is_req_data2
+top.core_tb.core.fsm1.is_req_store
+top.core_tb.core.fsm1.r2_is_req_store
+top.core_tb.core.fsm1.is_req_alu
+top.core_tb.core.fsm1.r2_is_req_alu
+top.core_tb.core.fsm1.is_req_csr
+top.core_tb.core.fsm1.r2_is_req_csr
+top.core_tb.core.fsm1.is_req_mem
+top.core_tb.core.fsm1.r2_is_req_mem
+top.core_tb.core.fsm1.r2_is_req_mem
 [pattern_trace] 1
 [pattern_trace] 0
