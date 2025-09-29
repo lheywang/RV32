@@ -39,6 +39,7 @@ architecture behavioral of pcounter is
             begin
                 if (nRST = '0') then
                     internal_address <= to_unsigned(RESET_ADDR, internal_address'length);
+                    address_maxval   <= (others => '1');
                     internal_nOVER <= '0';
                 
                 elsif rising_edge(clock) and (clock_en = '1') then
@@ -62,6 +63,6 @@ architecture behavioral of pcounter is
 
         -- Output assignement, in any time.
         address <= std_logic_vector(internal_address); 
-        nOVER <= not internal_nOVER;
+        nOVER <= internal_nOVER;
 
     end architecture;
