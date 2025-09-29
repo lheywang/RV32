@@ -59,6 +59,7 @@ entity core_controller is
         csr_wa :        out     integer range 0 to (CSR_NB - 1)             := 0;                   -- Written CSR register address
         csr_ra1 :       out     integer range 0 to (CSR_NB - 1)             := 0;                   -- Readen CSR register address 
                                                                                                     -- There's no CSR RA2 because we'll never need the second output port
+        csr_mie :       in      std_logic;                                                          -- Mie bit status
 
         -- Regs muxes
         arg1_sel :      out     std_logic                                   := '0';                 -- Choose between the output of the CSR register file or the RS1 output of the register file
@@ -80,444 +81,519 @@ entity core_controller is
     );
 end entity;
 
--- Ideas for V2, because that seems too repetive to be optimized :
--- 
--- Cycle 1 : copy data and identify how many cycle the operation will need. 
--- Cycles jumps can be thinked about to optimize branches (we don't wait for an useless cycle...).
--- 
--- Cycle 2 : we mount a tree of signals :
--- Is an immediate involved ? --> arg2sel to 1, and out to immediate 
--- Is Rd involved ?
--- Is RS2 involed ?
--- Is memory ? --> arg1sel to 1, and mem signals
-
 architecture behavioral of core_controller is
 
-        -- function to convert a 5 bit register ID (0 to 31) into it's correct representation for control
-        function f_regID_to_ctrl (
-            inp : in std_logic_vector(4 downto 0))
-            return std_logic_vector is
-                variable retval : std_logic_vector(31 downto 0) := (others => '0');
-                variable pos_int    : integer range 0 to 31;
-                begin
-                    retval(to_integer(unsigned(inp))) := '1';
-                return retval;
-            end function;
-
-        type FSM_state is (
-            ANY,                -- Handle most opcodes (ADD, ADDI, LUI...) and even memory (since memory runs at twice the core clock !)
-            JMP1, JMP2,         -- Handle jumps (JMP1 : Compute addresses, write control signals + stop pipeline. JMP2 : Now, values are saved, so clear pipeline and wait for valid instruction.)
-            BRANCH1, BRANCH2,   -- Handle branches (BRANCH1 : Compute addresses, evaluates signals + stop pipeline. BRANCH2 : compare values, outputs signals)
-            WAITING,            -- Handle wait states
-            IRQ,                -- IRQ handler (compared as a BRANCH)
-            ERR                 -- Exception handler (compared as a BRANCH)
+        -- Custom type definition
+        type FSM_states is (
+            T0,
+            T1_0, T1_1,
+            T2_0, T2_1, T2_2,
+            T4_0, T4_1, T4_2, T4_3, T4_4
         );
 
-        -- Storing FSM states
-        signal state :          FSM_state := ANY;
-        signal next_state :     FSM_state := ANY;
+        -- registered signals for stage 1
+        signal r1_dec_rs1 :         std_logic_vector((XLEN / 8) downto 0);
+        signal r1_dec_rs2 :         std_logic_vector((XLEN / 8) downto 0);
+        signal r1_dec_rd :          std_logic_vector((XLEN / 8) downto 0);
+        signal r1_dec_imm :         std_logic_vector((XLEN - 1) downto 0);
+        signal r1_dec_opcode :      instructions;
 
-        -- Storing data between cycle to ensure pipeline operation
-        signal save_rs1, next_rs1 :       std_logic_vector((REG_NB - 1) downto 0);
-        signal save_rs2, next_rs2 :       std_logic_vector((REG_NB - 1) downto 0);
-        signal save_rd, next_rd :         std_logic_vector((REG_NB - 1) downto 0);
-        signal save_imm, next_imm :       std_logic_vector((XLEN - 1) downto 0);
-        signal save_opcode, next_opcode : instructions;
+        signal r1_mem_addrerr :     std_logic;
+        signal r1_dec_illegal :     std_logic; 
+        signal r1_pc_overflow :     std_logic;
+        signal r1_if_err :          std_logic;
+        signal r1_ctl_interrupt :   std_logic;
+        signal r1_ctl_exception :   std_logic;
+        signal r1_ctl_halt :        std_logic;
+        signal r1_csr_mie :         std_logic;
 
-        -- Internal controls signals
-        signal pipe_stop :                std_logic                         := '1';                 -- Stop the pipeline (0 active)
-        signal pipe_stall :               std_logic                         := '1';                 -- Clear the pipeline
+        signal r1_pc_value :        std_logic_vector((XLEN - 1) downto 0);
+
+        -- Combinational output signals.
+        signal cycles_count :       FSM_states; -- Show how many cycles will be needed for this instruction.
+        signal is_immediate :       std_logic;
+        signal is_req_data1 :       std_logic;
+        signal is_req_data2 :       std_logic;
+        signal is_req_store :       std_logic;
+        signal is_req_alu :         std_logic;
+        signal is_req_csr :         std_logic;
+        signal is_req_mem :         std_logic;
+        signal alu_opcode :         commands;
+        signal irq_err :            std_logic;
+
+        -- Registered signals for stage 2 (r1 + new signals!)
+        signal r2_dec_rs1 :         std_logic_vector((XLEN / 8) downto 0);
+        signal r2_dec_rs2 :         std_logic_vector((XLEN / 8) downto 0);
+        signal r2_dec_rd :          std_logic_vector((XLEN / 8) downto 0);
+        signal r2_dec_imm :         std_logic_vector((XLEN - 1) downto 0);
+        signal r2_dec_opcode :      instructions;
+        signal r2_mem_addrerr :     std_logic;
+        signal r2_dec_illegal :     std_logic;
+        signal r2_pc_value :        std_logic_vector((XLEN - 1) downto 0);
+        signal r2_pc_overflow :     std_logic;
+        signal r2_if_err :          std_logic;
+        signal r2_ctl_interrupt :   std_logic;
+        signal r2_ctl_exception :   std_logic;
+        signal r2_ctl_halt :        std_logic;
+        signal r2_cycles_count :    FSM_states;
+        signal r2_is_immediate :    std_logic;
+        signal r2_is_req_data1 :    std_logic;
+        signal r2_is_req_data2 :    std_logic;
+        signal r2_is_req_store :    std_logic;
+        signal r2_is_req_alu :      std_logic;
+        signal r2_is_req_csr :      std_logic;
+        signal r2_is_req_mem :      std_logic;
+        signal r2_alu_opcode :      commands;
 
     begin
 
-        -- Process that handle reset, and clocks evolutions
-        P1 : process(clock, nRST)
+        -- Registering the signals on each cycle. This ensure stability
+        -- and higher performance (way higher clock frequency is possible)
+        P0 : process(clock, nRST)
         begin
             if (nRST = '0') then
-                state <= ANY;
-            
-            elsif rising_edge(clock) and (clock_en = '1') then
-                -- Updating state
-                state <= next_state;
+                r1_dec_rs1          <=  (others => '0');
+                r1_dec_rs2          <=  (others => '0');
+                r1_dec_rd           <=  (others => '0');
+                r1_dec_imm          <=  (others => '0');
+                r1_dec_opcode       <=  i_NOP;
 
-                -- Updating save values
-                save_rs1 <= next_rs1;
-                save_rs2 <= next_rs2;
-                save_rd <= next_rd;
-                save_imm <= next_imm;
-                save_opcode <= next_opcode;
-            
+                r1_pc_value         <=  (others => '0');
+
+                r1_dec_illegal      <=  '0';
+                r1_mem_addrerr      <=  '0';
+                r1_pc_overflow      <=  '0';
+                r1_if_err           <=  '0';
+                r1_ctl_interrupt    <=  '0';
+                r1_ctl_exception    <=  '0';
+                r1_ctl_halt         <=  '0';
+
+            elsif rising_edge(clock) and (clock_en = '1') then
+                r1_dec_rs1          <=  dec_rs1;
+                r1_dec_rs2          <=  dec_rs2;
+                r1_dec_rd           <=  dec_rd;
+                r1_dec_imm          <=  dec_imm;
+                r1_dec_opcode       <=  dec_opcode;
+
+                r1_pc_value         <=  pc_value;
+
+                r1_dec_illegal      <=  dec_illegal;
+                r1_mem_addrerr      <=  mem_addrerr;
+                r1_pc_overflow      <=  pc_overflow;
+                r1_if_err           <=  if_err;
+                r1_ctl_interrupt    <=  ctl_interrupt;
+                r1_ctl_exception    <=  ctl_exception;
+                r1_ctl_halt         <=  ctl_halt;
+
             end if;
+
         end process;
 
-        -- Process that handle states evolutions
-        P2 : process(nRST, state)
-        begin
-            if (nRST = '0') then
-                next_state <= ANY;
+        -- Analyzing status, and creating requirement signals for the specified instruction.
+        -- This will be used on the second combinational part, for the more advanced IOs.
+        --
+        -- We're forced to make the process sensitive to a bunch of signals to ensure
+        -- it WILL react to any new instructions.
+        P1 : process(   nRST,               r1_dec_rs1,         r1_dec_rs2,         r1_dec_rd,          
+                        r1_dec_imm,         r1_dec_opcode,      r1_pc_value,        r1_dec_illegal,     
+                        r1_mem_addrerr,     r1_pc_overflow,     r1_if_err,          r1_ctl_interrupt,   
+                        r1_ctl_exception,   r1_ctl_halt)     
+            begin
+                if  (nRST = '0') then
+                    cycles_count    <= T0;
+                    is_immediate    <= '0';
+                    is_req_data1    <= '0';
+                    is_req_data2    <= '0';
+                    is_req_store    <= '0';
+                    is_req_alu      <= '0';
+                    is_req_csr      <= '0';
+                    is_req_mem      <= '0';
+                    irq_err         <= '0';
 
-            -- Handle potential exceptions
-            elsif   (dec_illegal = '1') or 
-                    (mem_addrerr = '1') or 
-                    (pc_overflow = '1') or 
-                    (alu_status.overflow = '1') then
-                next_state <= ERR;
+                elsif   (r1_dec_illegal = '1')  or (r1_mem_addrerr = '1')   or (r1_pc_overflow = '1')   or
+                        (r1_if_err = '1')       or (r1_ctl_interrupt = '1') or (r1_ctl_exception = '1') or
+                        (r1_ctl_halt = '1')     then
 
-            -- Handle potential interrupts
-            elsif (ctl_interrupt = '1') then
-                next_state <= IRQ;
+                    -- Check if we're already interrupting, and if we have the right to do it...
+                    if (irq_err = '0') and (r1_csr_mie = '1') then
 
-            else
+                        cycles_count    <= T4_0;
 
-                case state is 
-                    when JMP1 =>
-                        next_state <= JMP2;
+                        -- We don't really care about theses signals, since
+                        -- there's, in fact a single handler for all of theses cases.
+                        is_immediate    <= '0';
+                        is_req_data1    <= '0';
+                        is_req_data2    <= '0';
+                        is_req_store    <= '0';
+                        is_req_alu      <= '0';
+                        is_req_csr      <= '0';
+                        is_req_mem      <= '0';
 
-                    when BRANCH1 => 
-                        next_state <= BRANCH2;
+                        -- Inhibit the next irq / err
+                        irq_err         <= '1';   
+                    
+                    end if;
 
-                    when others =>
+                -- Try to deduce the next cycle ONLY if we're on the last opcode cycle
+                elsif   (r2_cycles_count = T0)   or (r2_cycles_count = T1_1)  or (r2_cycles_count = T2_2)   or
+                        (r2_cycles_count = T4_4) then
 
-                        next_rs1 <= dec_rs1;
-                        next_rs2 <= dec_rs2;
-                        next_rd <= dec_rd;
-                        next_imm <= dec_imm;
-                        next_opcode <= dec_opcode;
+                    case r1_dec_opcode is
 
-                        case dec_opcode is
+                        ------------------------------------------------------------------
+                        when    i_NOP       |   i_FENCE =>
+                                
+                            cycles_count    <= T0;
+                            is_immediate    <= '0';
+                            is_req_data1    <= '0';
+                            is_req_data2    <= '0';
+                            is_req_store    <= '0';
+                            is_req_alu      <= '0';
+                            is_req_csr      <= '0';
+                            is_req_mem      <= '0';
 
-                            when    i_BEQ   |               -- Theses opcodes require some special operations : 
-                                    i_BNE   |               -- First, evaluate the branching condition, and 
-                                    i_BLT   |               -- then, we decide if we take a branch, or not.
-                                    i_BGE   |               --
-                                    i_BLTU  |               -- if yes, we need to flush the decoder and pipelines to 
-                                    i_BGEU  =>              -- to ensure data coherency.
-                                next_state <= BRANCH1;      -- else, we just continue as before.
+                            alu_opcode      <= c_NONE;
 
-                            when    i_JAL   |               -- Theses opcodes require some special operations : 
-                                    i_JALR  |               -- address computations and THEN, jump.
-                                    i_MRET  |               -- The operations linked to ZICSR instructions are very
-                                    i_ECALL |               -- similar, but target different registers, and may require
-                                    i_EBREAK|               --
-                                    i_AUIPC =>              -- 
-                                next_state <= JMP1;
+                        ------------------------------------------------------------------
+                        when    i_ADDI      |   i_SLTI  |   i_SLTIU     |   i_XORI      |
+                                i_ANDI      |   i_SLLI  |   i_SRLI      |   i_SRAI      |
+                                i_ORI       |   i_LUI   =>
 
-                            when    i_FENCE =>              -- This instruction is implemented as a NOP, since the
-                                next_state <= WAITING;      -- memory and buses are running at twice the core clock.
+                            cycles_count    <= T0;
+                            is_immediate    <= '1';
+                            is_req_data1    <= '1';
+                            is_req_data2    <= '0';
+                            is_req_store    <= '1';
+                            is_req_alu      <= '1';
+                            is_req_csr      <= '0';
+                            is_req_mem      <= '0';
 
-                            when others => -- list here can be quite long, but there's really any instructions.
-                                next_state <= ANY;
+                            case r1_dec_opcode is
+                                when i_ADDI | i_LUI=>
+                                    alu_opcode <= c_ADD;
+                                when i_SLTI =>
+                                    alu_opcode <= c_SLT;
+                                when i_SLTIU =>
+                                    alu_opcode <= c_SLTU;
+                                when i_XORI =>
+                                    alu_opcode <= c_XOR;
+                                when i_ANDI =>
+                                    alu_opcode <= c_AND;
+                                when i_SLLI =>
+                                    alu_opcode <= c_SLL;
+                                when i_SRLI =>
+                                    alu_opcode <= c_SRL;
+                                when i_SRAI =>
+                                    alu_opcode <= c_SRA;
+                                when i_ORI =>
+                                    alu_opcode <= c_OR;
+                                -- useless case, already covered, but otherwise design won't compile
+                                when others =>
+                                    alu_opcode <= c_NONE;
+                            end case;
 
-                        end case;
+                        ------------------------------------------------------------------
+                        when    i_CSRRWI    | i_CSRRSI  |   i_CSRRCI =>
+
+                            cycles_count    <= T0;
+                            is_immediate    <= '1';
+                            is_req_data1    <= '1';
+                            is_req_data2    <= '0';
+                            is_req_store    <= '1';
+                            is_req_alu      <= '1';
+                            is_req_csr      <= '0';
+                            is_req_mem      <= '0';
+
+                            case r1_dec_opcode is
+                                when i_CSRRWI =>
+                                    alu_opcode <= c_ADD;
+                                when i_CSRRSI =>
+                                    alu_opcode <= c_OR;
+                                when i_CSRRCI =>
+                                    alu_opcode <= c_AND;
+                                -- useless case, already covered, but otherwise design won't compile
+                                when others =>
+                                    alu_opcode <= c_NONE;
+                            end case;
+
+                        ------------------------------------------------------------------
+                        when    i_ADD       |   i_SUB   |   i_SLL       |   i_SLT       |
+                                i_SLTU      |   i_XOR   |   i_SRL       |   i_SRA       |
+                                i_OR        |   i_AND   =>
+
+                            cycles_count    <= T0;
+                            is_immediate    <= '0';
+                            is_req_data1    <= '1';
+                            is_req_data2    <= '1';
+                            is_req_store    <= '1';
+                            is_req_alu      <= '1';
+                            is_req_csr      <= '0';
+                            is_req_mem      <= '0';   
+
+                            case r1_dec_opcode is
+                                when i_ADD =>
+                                    alu_opcode <= c_ADD;
+                                when i_SUB =>
+                                    alu_opcode <= c_SUB;
+                                when i_SLT =>
+                                    alu_opcode <= c_SLT;
+                                when i_SLTU =>
+                                    alu_opcode <= c_SLTU;
+                                when i_XOR =>
+                                    alu_opcode <= c_XOR;
+                                when i_AND =>
+                                    alu_opcode <= c_AND;
+                                when i_SLL =>
+                                    alu_opcode <= c_SLL;
+                                when i_SRL =>
+                                    alu_opcode <= c_SRL;
+                                when i_SRA =>
+                                    alu_opcode <= c_SRA;
+                                when i_OR =>
+                                    alu_opcode <= c_OR;
+                                -- useless case, already covered, but otherwise design won't compile
+                                when others =>
+                                    alu_opcode <= c_NONE;
+                            end case;
+
+                        ------------------------------------------------------------------
+                        when     i_CSRRW    |   i_CSRRS |   i_CSRRC =>
+                            
+                            cycles_count    <= T1_0;
+                            is_immediate    <= '0';
+                            is_req_data1    <= '1';
+                            is_req_data2    <= '1';
+                            is_req_store    <= '1';
+                            is_req_alu      <= '1';
+                            is_req_csr      <= '1';
+                            is_req_mem      <= '0'; 
+                            
+                            case r1_dec_opcode is
+                                when i_CSRRW =>
+                                    alu_opcode <= c_ADD;
+                                when i_CSRRS =>
+                                    alu_opcode <= C_OR;
+                                when i_CSRRC =>
+                                    alu_opcode <= C_AND;
+                                -- useless case, already covered, but otherwise design won't compile
+                                when others =>
+                                    alu_opcode <= c_NONE;
+                            end case;
+
+                        ------------------------------------------------------------------
+                        when    i_SB        |   i_SH    |   i_SW        |   i_LB        |
+                                i_LH        |   i_LW    |   i_LBU       |   i_LHU       =>
+                                                            
+                            cycles_count    <= T0;
+                            is_immediate    <= '0';
+                            is_req_data1    <= '0';
+                            is_req_data2    <= '1';
+                            is_req_store    <= '1';
+                            is_req_alu      <= '0';
+                            is_req_csr      <= '0';
+                            is_req_mem      <= '1';
+                            
+                            alu_opcode      <= c_NONE;
+
+                        ------------------------------------------------------------------
+                        when    i_BEQ       |   i_BNE   |   i_BLT       |   i_BGE       |
+                                i_BLTu      |   i_BGEU  =>
+                        
+                            cycles_count    <= T2_0;
+                            is_immediate    <= '0';
+                            is_req_data1    <= '1';
+                            is_req_data2    <= '1';
+                            is_req_store    <= '0';
+                            is_req_alu      <= '0';
+                            is_req_csr      <= '0';
+                            is_req_mem      <= '0';
+                            
+                            alu_opcode      <= c_NONE;
+
+                        ------------------------------------------------------------------
+                        when    i_AUIPC     |   i_JAL   |   i_JALR      |   i_ECALL     |
+                                i_EBREAK    |   i_MRET  =>
+
+                            cycles_count    <= T1_0;
+                            is_immediate    <= '1';
+                            is_req_data1    <= '1';
+                            is_req_data2    <= '0';
+                            is_req_store    <= '0';
+                            is_req_alu      <= '0';
+                            is_req_csr      <= '1';
+                            is_req_mem      <= '0'; 
+
+                            alu_opcode      <= c_NONE;
+
+                            -- If we took an special handler route, unlock the future interrupts.
+                            if (r1_dec_opcode = i_MRET) then
+                                irq_err <= '0';
+                            end if;
+
                     end case;
 
+                -- Update the case to the next cycle
+                else 
+                    
+                    case r2_cycles_count is
+                        -- T1_x
+                        when T1_0 =>
+                            cycles_count <= T1_1;
+
+                        -- T2_x
+                        when T2_0 =>
+                            cycles_count <= T2_1;
+                        when T2_1 =>
+                            cycles_count <= T2_2;
+
+                        -- T4_x
+                        when T4_0 =>
+                            cycles_count <= T4_1;
+                        when T4_1 =>
+                            cycles_count <= T4_2;
+                        when T4_2 =>
+                            cycles_count <= T4_3;
+                        when T4_3 =>
+                            cycles_count <= T4_4;
+
+                        -- Default to make quartus happy (but, we'll never get here since the if ... else)
+                        when others =>
+                            cycles_count <= T0;
+
+                    end case;
+                    
+                end if;
+                
+            end process;
+
+        -- Registering the signals on each cycle. This ensure stability
+        -- and higher performance (way higher clock frequency is possible)
+        P2 : process(nRST, clock)
+        begin
+            if (nRST = '0') then
+
+                r2_dec_rs1          <= (others => '0');
+                r2_dec_rs2          <= (others => '0');
+                r2_dec_rd           <= (others => '0');
+                r2_dec_imm          <= (others => '0');
+                r2_dec_opcode       <= i_NOP;
+                r2_dec_illegal      <= '0';
+                r2_mem_addrerr      <= '0';
+                r2_pc_value         <= (others => '0');
+                r2_pc_overflow      <= '0';
+                r2_if_err           <= '0';
+                r2_ctl_interrupt    <= '0';
+                r2_ctl_exception    <= '0';
+                r2_ctl_halt         <= '0';
+                r2_cycles_count      <= T0;
+
+                r2_is_immediate     <= '0';
+                r2_is_req_data1     <= '0';
+                r2_is_req_data2     <= '0';
+                r2_is_req_store     <= '0';
+                r2_is_req_alu       <= '0';
+                r2_is_req_csr       <= '0';
+                r2_is_req_mem       <= '0';
+
+                r2_alu_opcode       <= c_NONE;
+
+            elsif rising_edge(clock) and (clock_en = '1') then
+
+                r2_dec_rs1          <= r1_dec_rs1;
+                r2_dec_rs2          <= r1_dec_rs2;
+                r2_dec_rd           <= r1_dec_rd;
+                r2_dec_imm          <= r1_dec_imm;
+                r2_dec_opcode       <= r1_dec_opcode;
+                r2_dec_illegal      <= r1_dec_illegal;
+                r2_mem_addrerr      <= r1_mem_addrerr;
+                r2_pc_value         <= r1_pc_value;
+                r2_pc_overflow      <= r1_pc_overflow;
+                r2_if_err           <= r1_if_err;
+                r2_ctl_interrupt    <= r1_ctl_interrupt;
+                r2_ctl_exception    <= r1_ctl_exception;
+                r2_ctl_halt         <= r1_ctl_halt;
+                r2_cycles_count      <= T0;
+
+                r2_is_immediate     <= is_immediate;
+                r2_is_req_data1     <= is_req_data1;
+                r2_is_req_data2     <= is_req_data2;
+                r2_is_req_store     <= is_req_store;
+                r2_is_req_alu       <= is_req_alu;
+                r2_is_req_csr       <= is_req_csr;
+                r2_is_req_mem       <= is_req_mem;
+
+                r2_alu_opcode       <= alu_opcode;
+
             end if;
 
         end process;
 
+        -- Second combinational process, it output the control signals according the right
+        -- parsed signals.
+        P3 : process(   nRST,               r2_dec_rs1,         r2_dec_rs2,         r2_dec_rd,          
+                        r2_dec_imm,         r2_dec_opcode,      r2_pc_value,        r2_dec_illegal,     
+                        r2_mem_addrerr,     r2_pc_overflow,     r2_if_err,          r2_ctl_interrupt,   
+                        r2_ctl_exception,   r2_ctl_halt,        r2_cycles_count,    r2_is_immediate,
+                        r2_is_req_data1,    r2_is_req_data2,    r2_is_req_store,    r2_is_req_alu,
+                        r2_is_req_csr,      r2_is_req_mem,      r2_alu_opcode)
 
-        P3 : process(state)
-        begin
+            begin
 
-            case state is
-                
-                    when ANY =>
+                if (nRST = '0') then
 
-                        case save_opcode is
+                    mem_addr        <= (others => '0');
+                    mem_byteen      <= (others => '1');
+                    mem_we          <= '0';
+                    mem_req         <= '0';
+                    pc_enable       <= '1';
+                    pc_wren         <= '0';
+                    pc_loadvalue    <= (others => '0');
+                    reg_we          <= '0';
+                    reg_wa          <= 0;
+                    reg_ra1         <= 0;
+                    reg_ra2         <= 0;
+                    csr_we          <= '0';
+                    csr_wa          <= 0;
+                    csr_ra1         <= 0;
+                    arg1_sel        <= '0';
+                    arg2_sel        <= '0';
+                    alu_cmd         <= c_NONE;
+                    excep_occured   <= '0';
+                    core_halt       <= '0';
 
-                            when i_NOP =>
-                                reg_we      <= '0';
-                                reg_wa      <= 0;
-                                reg_ra1     <= 0;
-                                reg_ra2     <= 0;
-                                reg_rs2_out <= (others => '0');
-                                arg2_sel    <= '0';
-                                arg1_sel    <= '0';
-                                alu_cmd     <= c_NONE;
-
-                            when i_LUI =>
-                                reg_we      <= '1';
-                                reg_wa      <= to_integer(unsigned(save_rd));
-                                reg_ra1     <= 0;
-                                reg_ra2     <= 0;
-                                reg_rs2_out <= save_imm;
-                                arg2_sel    <= '1';
-                                arg1_sel    <= '0';
-                                alu_cmd     <= c_ADD;
-
-                            when i_ADDI =>
-                                reg_we      <= '1';
-                                reg_wa      <= to_integer(unsigned(save_rd));
-                                reg_ra1     <= to_integer(unsigned(save_rs1));
-                                reg_ra2     <= 0;
-                                reg_rs2_out <= save_imm;
-                                arg2_sel    <= '1';
-                                arg1_sel    <= '0';
-                                alu_cmd     <= c_ADD;
-
-                            when i_SLTI =>
-                                reg_we      <= '1';
-                                reg_wa      <= to_integer(unsigned(save_rd));
-                                reg_ra1     <= to_integer(unsigned(save_rs1));
-                                reg_ra2     <= 0;
-                                reg_rs2_out <= save_imm;
-                                arg2_sel    <= '1';
-                                arg1_sel    <= '0';
-                                alu_cmd     <= c_SLT;
-
-                            when i_SLTIU =>
-                                reg_we      <= '1';
-                                reg_wa      <= to_integer(unsigned(save_rd));
-                                reg_ra1     <= to_integer(unsigned(save_rs1));
-                                reg_ra2     <= 0;
-                                reg_rs2_out <= save_imm;
-                                arg2_sel    <= '1';
-                                arg1_sel    <= '0';
-                                alu_cmd     <= c_SLTU;
-
-                            when i_XORI =>
-                                reg_we      <= '1';
-                                reg_wa      <= to_integer(unsigned(save_rd));
-                                reg_ra1     <= to_integer(unsigned(save_rs1));
-                                reg_ra2     <= 0;
-                                reg_rs2_out <= save_imm;
-                                arg2_sel    <= '1';
-                                arg1_sel    <= '0';
-                                alu_cmd     <= c_XOR;
-
-                            when i_ANDI =>
-                                reg_we      <= '0';
-                                reg_wa      <= 0;
-                                reg_ra1     <= 0;
-                                reg_ra2     <= 0;
-                                reg_rs2_out <= (others => '0');
-                                arg2_sel    <= '0';
-                                arg1_sel    <= '0';
-                                alu_cmd     <= c_NONE;
-
-                            when i_SLLI =>
-                                reg_we      <= '0';
-                                reg_wa      <= 0;
-                                reg_ra1     <= 0;
-                                reg_ra2     <= 0;
-                                reg_rs2_out <= (others => '0');
-                                arg2_sel    <= '0';
-                                arg1_sel    <= '0';
-                                alu_cmd     <= c_NONE;
-
-                            when i_SRLI =>
-                                reg_we      <= '0';
-                                reg_wa      <= 0;
-                                reg_ra1     <= 0;
-                                reg_ra2     <= 0;
-                                reg_rs2_out <= (others => '0');
-                                arg2_sel    <= '0';
-                                arg1_sel    <= '0';
-                                alu_cmd     <= c_NONE;
-
-                            when i_SRAI =>
-                                reg_we      <= '0';
-                                reg_wa      <= 0;
-                                reg_ra1     <= 0;
-                                reg_ra2     <= 0;
-                                reg_rs2_out <= (others => '0');
-                                arg2_sel    <= '0';
-                                arg1_sel    <= '0';
-                                alu_cmd     <= c_NONE;
-
-                            when i_ORI =>
-                                reg_we      <= '0';
-                                reg_wa      <= 0;
-                                reg_ra1     <= 0;
-                                reg_ra2     <= 0;
-                                reg_rs2_out <= (others => '0');
-                                arg2_sel    <= '0';
-                                arg1_sel    <= '0';
-                                alu_cmd     <= c_NONE;
-
-                            when i_ADD =>
-                                reg_we      <= '0';
-                                reg_wa      <= 0;
-                                reg_ra1     <= 0;
-                                reg_ra2     <= 0;
-                                reg_rs2_out <= (others => '0');
-                                arg2_sel    <= '0';
-                                arg1_sel    <= '0';
-                                alu_cmd     <= c_NONE;
-
-                            when i_SUB =>
-                                reg_we      <= '0';
-                                reg_wa      <= 0;
-                                reg_ra1     <= 0;
-                                reg_ra2     <= 0;
-                                reg_rs2_out <= (others => '0');
-                                arg2_sel    <= '0';
-                                arg1_sel    <= '0';
-                                alu_cmd     <= c_NONE;
-
-                            when i_SLL =>
-                                reg_we      <= '0';
-                                reg_wa      <= 0;
-                                reg_ra1     <= 0;
-                                reg_ra2     <= 0;
-                                reg_rs2_out <= (others => '0');
-                                arg2_sel    <= '0';
-                                arg1_sel    <= '0';
-                                alu_cmd     <= c_NONE;
-
-                            when i_SLT =>
-                                reg_we      <= '0';
-                                reg_wa      <= 0;
-                                reg_ra1     <= 0;
-                                reg_ra2     <= 0;
-                                reg_rs2_out <= (others => '0');
-                                arg2_sel    <= '0';
-                                arg1_sel    <= '0';
-                                alu_cmd     <= c_NONE;
-
-                            when i_SLTU =>
-                                reg_we      <= '0';
-                                reg_wa      <= 0;
-                                reg_ra1     <= 0;
-                                reg_ra2     <= 0;
-                                reg_rs2_out <= (others => '0');
-                                arg2_sel    <= '0';
-                                arg1_sel    <= '0';
-                                alu_cmd     <= c_NONE;
-
-                            when i_XOR =>
-                                reg_we      <= '0';
-                                reg_wa      <= 0;
-                                reg_ra1     <= 0;
-                                reg_ra2     <= 0;
-                                reg_rs2_out <= (others => '0');
-                                arg2_sel    <= '0';
-                                arg1_sel    <= '0';
-                                alu_cmd     <= c_NONE;
-
-                            when i_SRL =>
-                                reg_we      <= '0';
-                                reg_wa      <= 0;
-                                reg_ra1     <= 0;
-                                reg_ra2     <= 0;
-                                reg_rs2_out <= (others => '0');
-                                arg2_sel    <= '0';
-                                arg1_sel    <= '0';
-                                alu_cmd     <= c_NONE;
-
-                            when i_SRA =>
-                                reg_we      <= '0';
-                                reg_wa      <= 0;
-                                reg_ra1     <= 0;
-                                reg_ra2     <= 0;
-                                reg_rs2_out <= (others => '0');
-                                arg2_sel    <= '0';
-                                arg1_sel    <= '0';
-                                alu_cmd     <= c_NONE;
-
-                            when i_OR =>
-                                reg_we      <= '0';
-                                reg_wa      <= 0;
-                                reg_ra1     <= 0;
-                                reg_ra2     <= 0;
-                                reg_rs2_out <= (others => '0');
-                                arg2_sel    <= '0';
-                                arg1_sel    <= '0';
-                                alu_cmd     <= c_NONE;
-
-                            when i_AND =>
-                                reg_we      <= '0';
-                                reg_wa      <= 0;
-                                reg_ra1     <= 0;
-                                reg_ra2     <= 0;
-                                reg_rs2_out <= (others => '0');
-                                arg2_sel    <= '0';
-                                arg1_sel    <= '0';
-                                alu_cmd     <= c_NONE;
-
-                            when i_SB =>
-
-                            when i_SH =>
-
-                            when i_SW =>
-
-                            when i_LB =>
-
-                            when i_LH =>
-
-                            when i_LW =>
-
-                            when i_LBU =>
-
-                            when i_LHU =>
-
-                            when i_CSRRW =>
-
-                            when i_CSRRS =>
-
-                            when i_CSRRC =>
-
-                            when i_CSRRWI =>
-
-                            when i_CSRRSI =>
-
-                            when i_CSRRCI =>
-
-                            when others =>
-
-                        end case;
-
-                    when JMP1 =>
-
-                        case save_opcode is 
-
-                            when i_AUIPC =>
-
-                            when i_JAL =>
-
-                            when i_JALR =>
-
-                            when i_ECALL =>
-
-                            when i_EBREAK =>
-
-                            when i_MRET =>
-
-                            when others =>
-
-                        end case;
-
-                    when JMP2 =>
-
-                    when BRANCH1 => 
+                else
                     
-                        case save_opcode is 
+                    case r2_cycles_count is
 
-                            when i_BEQ =>
+                        -----------------------------------------------------------
+                        when T0 =>
 
-                            when i_BNE =>
+                        -----------------------------------------------------------
+                        when T1_0 =>
 
-                            when i_BLT =>
+                        when T1_1 =>
 
-                            when i_BGE =>
+                        -----------------------------------------------------------
+                        when T2_0 =>
 
-                            when i_BLTU =>
+                        when T2_1 =>
 
-                            when i_BGEU =>
+                        when T2_2 =>
 
-                            when others =>
+                        -----------------------------------------------------------
+                        when T4_0 =>
 
-                        end case;
+                        when T4_1 =>
 
-                    when BRANCH2 =>
+                        when T4_2 =>
 
-                    when WAITING => -- i_FENCE
+                        when T4_3 =>
 
-                    when ERR => -- In fact, this is a jump. It's case is different, because there's an special MCAUSE value to be written.
+                        when T4_4 =>
 
-                    when IRQ => -- In fact, this is a jump. It's case is different, because there's an special MCAUSE value to be written.
-
-                end case;
+                    end case;
+                    
+                end if;
 
         end process;
         
