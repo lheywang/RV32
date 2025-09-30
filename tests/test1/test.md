@@ -1,4 +1,4 @@
-# Test 1 : Operationes
+# Test 1 : Operations
 
 A very small assembly code, to just perform basic arthimetic operations.
 
