@@ -181,7 +181,7 @@ architecture behavioral of core is
             reg_wa          =>  reg_wa,
             reg_ra1         =>  reg_ra1,
             reg_ra2         =>  reg_ra2,
-            reg_rs1_in      =>  alu_arg1,
+            reg_rs1_in      =>  reg_rdata2,
             reg_rs2_out     =>  ctl_rdata2,
             arg1_sel        =>  arg1_sel,
             arg2_sel        =>  arg2_sel,
