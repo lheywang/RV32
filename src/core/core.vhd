@@ -68,7 +68,7 @@ architecture behavioral of core is
         signal arg2_sel :           std_logic;
         
         -- Controller data IO
-        signal ctl_rdata1 :         std_logic_vector((XLEN - 1) downto 0);
+        signal ctl_rdata2 :         std_logic_vector((XLEN - 1) downto 0);
 
         -- alu signals
         signal alu_cmd :            commands;
@@ -95,6 +95,8 @@ architecture behavioral of core is
         -- Memory
         signal mem_request :        std_logic;
         signal mem_rw :             std_logic;
+
+        signal tmp :                std_logic_vector((XLEN - 1) downto 0);
 
     begin
 
@@ -179,8 +181,10 @@ architecture behavioral of core is
             reg_wa          =>  reg_wa,
             reg_ra1         =>  reg_ra1,
             reg_ra2         =>  reg_ra2,
-            reg_rs1_in      =>  reg_rdata1,
-            reg_rs2_out     =>  reg_rdata2,
+            reg_rs1_in      =>  alu_arg1,
+            reg_rs2_out     =>  ctl_rdata2,
+            arg1_sel        =>  arg1_sel,
+            arg2_sel        =>  arg2_sel,
             csr_we          =>  csr_we,
             csr_wa          =>  csr_wa,
             csr_ra1         =>  csr_ra1,
@@ -241,7 +245,7 @@ architecture behavioral of core is
         )
         port map (
             arg1            =>  alu_arg1,
-            arg2            =>  alu_arg1,
+            arg2            =>  alu_arg2,
             result          =>  alu_out,
             command         =>  alu_cmd,
             status          =>  alu_status
@@ -253,13 +257,10 @@ architecture behavioral of core is
         mem_we              <=  mem_rw;
 
         -- Muxes
-        reg_wdata           <= mem_rdata when (mem_request = '1') and (mem_rw = '0') else 
-                               alu_out;
-        mem_wdata           <= alu_arg1 when (mem_request = '1') and (mem_rw = '1') else
-                               (others => '0');
-        alu_arg1            <= csr_rdata1 when (arg1_sel = '1') else
-                               reg_rdata1;
-        alu_arg2            <= ctl_rdata1 when (arg2_sel = '1') else
-                               reg_rdata2;  
+        reg_wdata           <= mem_rdata when (mem_request = '1') and (mem_rw = '0') else alu_out;
+        mem_wdata           <= alu_arg1 when (mem_request = '1') and (mem_rw = '1') else (others => '0');
+
+        alu_arg1            <= csr_rdata1 when (arg1_sel = '1') else reg_rdata1;
+        alu_arg2            <= ctl_rdata2 when (arg2_sel = '1') else reg_rdata2;  
 
     end architecture;

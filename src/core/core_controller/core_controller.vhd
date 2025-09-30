@@ -552,6 +552,7 @@ architecture behavioral of core_controller is
                     reg_wa          <= 0;
                     reg_ra1         <= 0;
                     reg_ra2         <= 0;
+                    reg_rs2_out     <= (others => '0');
                     csr_we          <= '0';
                     csr_wa          <= 0;
                     csr_ra1         <= 0;
@@ -564,15 +565,61 @@ architecture behavioral of core_controller is
                 else
                     
                     case r2_cycles_count is
-
+                        -----------------------------------------------------------
+                        -- STANDARDS INSTRUCTIONS
                         -----------------------------------------------------------
                         when T0 =>
 
+                            if (r2_is_immediate = '1') then
+                                arg2_sel        <= '1';
+                                reg_rs2_out     <= r2_dec_imm;
+                            else
+                                reg_rs2_out     <= (others => '0');
+                            end if;
+
+                            if (r2_is_req_data1 = '1') then
+                                arg1_sel        <= '0';
+                                reg_ra1         <= to_integer(unsigned(r2_dec_rs1));
+                            end if;
+
+                            if (r2_is_req_data2 = '1') then
+                                arg2_sel        <= '0';
+                                reg_ra2         <= to_integer(unsigned(r2_dec_rs2));
+                            end if;
+
+                            if (r2_is_req_store = '1') then
+                                mem_req         <= '0';
+                                reg_we          <= '1';
+                                reg_wa          <= to_integer(unsigned(r2_dec_rd));
+                            else
+                                reg_we          <= '0';
+                            end if;
+
+                            if (r2_is_req_alu = '1') then
+                                alu_cmd         <= r2_alu_opcode;
+                            end if;
+
+                            if (r2_is_req_csr = '1') then
+                                arg1_sel        <= '1';
+                                csr_ra1         <= 0;                   -- Need to change that line
+                            end if;
+
+                            if (r2_is_req_mem = '1') then
+                                mem_req         <= '1';
+                                mem_we          <= '0';                 -- Need to change that line
+                                mem_addr        <= (others => '0');     -- Need to change that line
+                                mem_byteen      <= (others => '1');     -- Need to change that line
+                            end if;
+
+                        -----------------------------------------------------------
+                        -- JUMPS
                         -----------------------------------------------------------
                         when T1_0 =>
 
                         when T1_1 =>
 
+                        -----------------------------------------------------------
+                        -- BRANCHES
                         -----------------------------------------------------------
                         when T2_0 =>
 
@@ -580,6 +627,8 @@ architecture behavioral of core_controller is
 
                         when T2_2 =>
 
+                        -----------------------------------------------------------
+                        -- IRQ / ERR HANDLING
                         -----------------------------------------------------------
                         when T4_0 =>
 
