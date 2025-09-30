@@ -28,10 +28,11 @@ architecture behavioral of core_tb is
         signal mem_err_t :              std_logic                       := '0';
         signal core_halt_t :            std_logic                       := '0';
         signal core_trap_t :            std_logic                       := '0';
+        signal if_aclr_t :              std_logic                       := '0';
 
     begin
 
-        RST_t <= not nRST_t;
+        RST_t <= (not nRST_t) or if_aclr_t;
 
 
         CORE : entity work.core(behavioral)
@@ -52,6 +53,7 @@ architecture behavioral of core_tb is
                 if_addr             =>  if_addr_t,
                 if_rdata            =>  if_rdata_t,
                 if_err              =>  if_err_t,
+                if_aclr             =>  if_aclr_t,
                 mem_addr            =>  mem_addr_t,
                 mem_we              =>  mem_we_t,
                 mem_req             =>  mem_req_t,
@@ -80,7 +82,7 @@ architecture behavioral of core_tb is
         ROM : entity work.rom(SYN)
             port map 
             (
-                aclr                =>  '0',                    -- Never reset the ROM. Since RAM based, we don't want to clear it.
+                aclr                =>  RST_t,                    -- Never reset the ROM. Since RAM based, we don't want to clear it.
                 address_a           =>  if_addr_t(15 downto 2),
                 address_b           =>  mem_addr_t(15 downto 2),-- To correct : write a memory address translator that match the different addres spaces.
                 clock               =>  clk_t,

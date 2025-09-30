@@ -31,6 +31,7 @@ entity core_controller is
         dec_imm :       in      std_logic_vector((XLEN - 1) downto 0);                              -- Immediate value, already signed extended
         dec_opcode :    in      instructions;                                                       -- Opcode, custom type
         dec_illegal :   in      std_logic;                                                          -- Illegal instruction exception handler
+        dec_reset :     out     std_logic;                                                          -- Decoder reset force. Used to flush the buffer when jumping.
 
         -- Memory signals : 
         mem_addr :      out     std_logic_vector((XLEN - 1) downto 0)       := (others => '0');     -- Memory address
@@ -69,6 +70,9 @@ entity core_controller is
         alu_cmd :       out     commands                                    := c_ADD;               -- ALU controls signals
         alu_status :    in      alu_feedback;                                                       -- Alu feedback signals for jumps and other statuses.
 
+        -- Instruction fetch register clear signal
+        if_aclr :       out     std_logic                                   := '0';                 -- ACLR for the two M9K memories IP (ROM and RAM).
+
         -- Generics inputs :
         if_err :        in      std_logic;
         ctl_interrupt : in      std_logic;                                                          -- Interrupt flag
@@ -90,6 +94,14 @@ architecture behavioral of core_controller is
             T2_0, T2_1, T2_2,
             T4_0, T4_1, T4_2, T4_3, T4_4
         );
+
+        -- Static logic for making jumps really jumps
+        signal r1_flush_needed :    std_logic;
+
+        -- PC Value registration
+        signal r01_pc_value :       std_logic_vector((XLEN - 1) downto 0);
+        signal r02_pc_value :       std_logic_vector((XLEN - 1) downto 0);
+        signal r03_pc_value :       std_logic_vector((XLEN - 1) downto 0);
 
         -- registered signals for stage 1
         signal r1_dec_rs1 :         std_logic_vector((XLEN / 8) downto 0);
@@ -145,13 +157,52 @@ architecture behavioral of core_controller is
         signal r2_is_req_mem :      std_logic;
         signal r2_alu_opcode :      commands;
 
+        -- Registered signals for later stages.
+        -- Since theses only concern the instructions that require more than one cycle,
+        -- all of the data may not be needed.
+        signal r3_dec_opcode :      instructions;
+        signal r4_dec_opcode :      instructions;
+        signal r5_dec_opcode :      instructions;
+        signal r6_dec_opcode :      instructions;
+
+        signal r3_reg_rs1_in :      std_logic_vector((XLEN - 1) downto 0);
+        signal r3_pc_value :        std_logic_vector((XLEN - 1) downto 0);
+        signal r3_dec_imm :         std_logic_vector((XLEN - 1) downto 0);
+
     begin
 
-        -- Registering the signals on each cycle. This ensure stability
-        -- and higher performance (way higher clock frequency is possible)
+        --=========================================================================
+        -- Due to the decoder latency, we need to register 3 mores times the
+        -- program counter value.
+        -- Otherwise, an offset would occur when jumping.
+        --=========================================================================
         P0 : process(clock, nRST)
         begin
             if (nRST = '0') then
+
+                r01_pc_value        <= (others => '0');
+                r02_pc_value        <=  (others => '0');
+                r03_pc_value        <=  (others => '0');
+
+            elsif rising_edge(clock) and (clock_en = '1') then
+
+                r01_pc_value        <=  pc_value;
+                r02_pc_value        <=  r01_pc_value;
+                r03_pc_value        <=  r02_pc_value;
+
+            end if;
+
+        end process;
+
+        --=========================================================================
+        -- Registering the signals on each cycle. This ensure stability
+        -- and higher performance (way higher clock frequency is possible)
+        -- May be flushed if a branch is taken to prevent the execution of
+        -- unwanted instructions.
+        --=========================================================================
+        P1 : process(clock, nRST, r1_flush_needed)
+        begin
+            if (nRST = '0') or (r1_flush_needed = '1') then
                 r1_dec_rs1          <=  (others => '0');
                 r1_dec_rs2          <=  (others => '0');
                 r1_dec_rd           <=  (others => '0');
@@ -175,7 +226,8 @@ architecture behavioral of core_controller is
                 r1_dec_imm          <=  dec_imm;
                 r1_dec_opcode       <=  dec_opcode;
 
-                r1_pc_value         <=  pc_value;
+                -- r1_pc_value         <=  pc_value;
+                r1_pc_value         <=  r03_pc_value;
 
                 r1_dec_illegal      <=  dec_illegal;
                 r1_mem_addrerr      <=  mem_addrerr;
@@ -189,12 +241,14 @@ architecture behavioral of core_controller is
 
         end process;
 
+        --=========================================================================
         -- Analyzing status, and creating requirement signals for the specified instruction.
         -- This will be used on the second combinational part, for the more advanced IOs.
         --
         -- We're forced to make the process sensitive to a bunch of signals to ensure
         -- it WILL react to any new instructions.
-        P1 : process(   nRST,               r1_dec_rs1,         r1_dec_rs2,         r1_dec_rd,          
+        --=========================================================================
+        P2 : process(   nRST,               r1_dec_rs1,         r1_dec_rs2,         r1_dec_rd,          
                         r1_dec_imm,         r1_dec_opcode,      r1_pc_value,        r1_dec_illegal,     
                         r1_mem_addrerr,     r1_pc_overflow,     r1_if_err,          r1_ctl_interrupt,   
                         r1_ctl_exception,   r1_ctl_halt)     
@@ -257,7 +311,7 @@ architecture behavioral of core_controller is
                         ------------------------------------------------------------------
                         when    i_ADDI      |   i_SLTI  |   i_SLTIU     |   i_XORI      |
                                 i_ANDI      |   i_SLLI  |   i_SRLI      |   i_SRAI      |
-                                i_ORI       |   i_LUI   =>
+                                i_ORI       |   i_LUI   |   i_AUIPC     =>
 
                             cycles_count    <= T0;
                             is_immediate    <= '1';
@@ -285,7 +339,7 @@ architecture behavioral of core_controller is
                                     alu_opcode <= c_SRL;
                                 when i_SRAI =>
                                     alu_opcode <= c_SRA;
-                                when i_ORI =>
+                                when i_ORI | i_AUIPC => -- Rd = imm | 0x00 result in imm for i_AUIPC
                                     alu_opcode <= c_OR;
                                 -- useless case, already covered, but otherwise design won't compile
                                 when others =>
@@ -411,8 +465,8 @@ architecture behavioral of core_controller is
                             alu_opcode      <= c_NONE;
 
                         ------------------------------------------------------------------
-                        when    i_AUIPC     |   i_JAL   |   i_JALR      |   i_ECALL     |
-                                i_EBREAK    |   i_MRET  =>
+                        when    i_JAL       |   i_JALR      |   i_ECALL |   i_EBREAK    |   
+                                i_MRET  =>
 
                             cycles_count    <= T1_0;
                             is_immediate    <= '1';
@@ -466,9 +520,11 @@ architecture behavioral of core_controller is
                 
             end process;
 
+        --=========================================================================
         -- Registering the signals on each cycle. This ensure stability
         -- and higher performance (way higher clock frequency is possible)
-        P2 : process(nRST, clock)
+        --=========================================================================
+        P3 : process(nRST, clock)
         begin
             if (nRST = '0') then
 
@@ -512,8 +568,8 @@ architecture behavioral of core_controller is
                 r2_ctl_interrupt    <= r1_ctl_interrupt;
                 r2_ctl_exception    <= r1_ctl_exception;
                 r2_ctl_halt         <= r1_ctl_halt;
-                r2_cycles_count      <= T0;
 
+                r2_cycles_count     <= cycles_count;
                 r2_is_immediate     <= is_immediate;
                 r2_is_req_data1     <= is_req_data1;
                 r2_is_req_data2     <= is_req_data2;
@@ -528,9 +584,11 @@ architecture behavioral of core_controller is
 
         end process;
 
+        --=========================================================================
         -- Second combinational process, it output the control signals according the right
         -- parsed signals.
-        P3 : process(   nRST,               r2_dec_rs1,         r2_dec_rs2,         r2_dec_rd,          
+        --=========================================================================
+        P4 : process(   nRST,               r2_dec_rs1,         r2_dec_rs2,         r2_dec_rd,          
                         r2_dec_imm,         r2_dec_opcode,      r2_pc_value,        r2_dec_illegal,     
                         r2_mem_addrerr,     r2_pc_overflow,     r2_if_err,          r2_ctl_interrupt,   
                         r2_ctl_exception,   r2_ctl_halt,        r2_cycles_count,    r2_is_immediate,
@@ -561,6 +619,9 @@ architecture behavioral of core_controller is
                     alu_cmd         <= c_NONE;
                     excep_occured   <= '0';
                     core_halt       <= '0';
+                    dec_reset       <= '1'; -- by default, enable the decoder reset.
+                    r1_flush_needed <= '0'; -- Do not flush the r1 registers.
+                    if_aclr         <= '0'; -- Do not clear the output buffers.
 
                 else
                     
@@ -570,9 +631,28 @@ architecture behavioral of core_controller is
                         -----------------------------------------------------------
                         when T0 =>
 
+                            -- Stop the program counter from loading value. This enable faster jumps
+                            -- by saving one CPU cycle, since the pc_wren is set on the latest branch / jump cycle.
+                            pc_wren     <= '0';
+
+                            -- Enabling memory output registers.
+                            -- A reset for two cycles is required, otherwise the first reading would anyway be wrong.
+                            -- Failing to do that insert a wrong instruction right after a jump.
+                            if_aclr     <= '0';
+
+                            -- Apply the outputs depending on the previous computed requirements.
                             if (r2_is_immediate = '1') then
                                 arg2_sel        <= '1';
-                                reg_rs2_out     <= r2_dec_imm;
+                                
+                                -- Handle the AUIPC case
+                                if (r2_dec_opcode = i_AUIPC) then
+                                    reg_rs2_out <= std_logic_vector(signed(r2_pc_value) + signed(r2_dec_imm));  -- Can't use the ALU because
+                                                                                                                -- both would require imm port.
+                                                                                                                -- Thus, we make the addition
+                                                                                                                -- internally.
+                                else
+                                    reg_rs2_out <= r2_dec_imm;
+                                end if;
                             else
                                 reg_rs2_out     <= (others => '0');
                             end if;
@@ -580,11 +660,15 @@ architecture behavioral of core_controller is
                             if (r2_is_req_data1 = '1') then
                                 arg1_sel        <= '0';
                                 reg_ra1         <= to_integer(unsigned(r2_dec_rs1));
+                            else
+                                reg_ra1         <= 0;
                             end if;
 
                             if (r2_is_req_data2 = '1') then
                                 arg2_sel        <= '0';
                                 reg_ra2         <= to_integer(unsigned(r2_dec_rs2));
+                            else
+                                reg_ra2         <= 0;
                             end if;
 
                             if (r2_is_req_store = '1') then
@@ -593,30 +677,119 @@ architecture behavioral of core_controller is
                                 reg_wa          <= to_integer(unsigned(r2_dec_rd));
                             else
                                 reg_we          <= '0';
+                                reg_wa          <= 0;
                             end if;
 
                             if (r2_is_req_alu = '1') then
                                 alu_cmd         <= r2_alu_opcode;
+                            else
+                                alu_cmd         <= c_NONE;
                             end if;
 
                             if (r2_is_req_csr = '1') then
                                 arg1_sel        <= '1';
                                 csr_ra1         <= 0;                   -- Need to change that line
+                            else
+                                csr_ra1         <= 0;
                             end if;
 
                             if (r2_is_req_mem = '1') then
                                 mem_req         <= '1';
-                                mem_we          <= '0';                 -- Need to change that line
+                                mem_we          <= '1';                 -- Need to change that line
                                 mem_addr        <= (others => '0');     -- Need to change that line
                                 mem_byteen      <= (others => '1');     -- Need to change that line
+                            else
+                                mem_req         <= '0';
+                                mem_we          <= '0';
+                                mem_addr        <= (others => '0');
+                                mem_byteen      <= (others => '1');
                             end if;
 
                         -----------------------------------------------------------
-                        -- JUMPS
+                        -- JUMPS / CSR instructions
                         -----------------------------------------------------------
                         when T1_0 =>
 
+                            -- First, stop the program counter. We won't need it until the next cycle.
+                            pc_enable <= '0';
+
+                            case r2_dec_opcode is
+
+                                -----------------------------------------------------------
+                                -- Handle JUMPS instructions
+                                -----------------------------------------------------------
+                                when i_JAL | i_JALR =>
+
+                                    -- This first section implement the rd = pc + 4.
+                                    -- We only need to copy the **next** program counter value, already incremented by four,
+                                    -- into RD. To do this, we simulate this instruction : 
+                                    --
+                                    -- ADDI, RD, R0, IMM, where R0 is ALWAYS 0 (hardwired).
+                                    --
+                                    reg_rs2_out <= r1_pc_value;
+                                    alu_cmd     <= c_ADD;
+                                    arg2_sel    <= '1';
+                                    arg1_sel    <= '0';
+                                    reg_ra1     <= 0;
+                                    reg_we      <= '1';
+                                    reg_wa      <= to_integer(unsigned(r2_dec_rd));
+                                    reg_ra2     <= to_integer(unsigned(r2_dec_rs1));
+
+                                    -- Reset the decoder, since we're going to jump
+                                    dec_reset       <= '0';
+                                    r1_flush_needed <= '1';
+                                    if_aclr         <= '1';
+                                
+                                -----------------------------------------------------------
+                                -- Handle CSRR instructions.
+                                -----------------------------------------------------------
+                                when others =>
+                                    
+                            end case;
+
                         when T1_1 =>
+
+                            -- Then, restart the program counter operation, to load the next values.
+                            pc_enable <= '1';
+
+                            case r3_dec_opcode is
+
+                                when i_JAL | i_JALR =>
+
+                                    -- Basically reset the global 
+                                    reg_rs2_out     <= (others => '0');
+                                    alu_cmd         <= c_NONE;
+                                    arg2_sel        <= '0';
+                                    arg1_sel        <= '0';
+                                    reg_ra1         <= 0;
+                                    reg_ra2         <= 0;
+                                    reg_we          <= '0';
+                                    reg_wa          <= 0;
+
+                                    -- This second section implement the proper jump logic for the PC value.
+                                    -- Thus, it depends from the called instruction.
+
+                                    if (r3_dec_opcode = i_JAL) then
+                                        
+                                        pc_loadvalue    <= std_logic_vector(signed(r3_pc_value) + signed(r3_dec_imm));
+
+                                    elsif (r3_dec_opcode = i_JALR) then
+
+                                        pc_loadvalue    <= std_logic_vector(signed(r3_reg_rs1_in) + signed(r3_dec_imm));
+
+                                    end if;
+
+                                    -- Finally, ask the program counter to jump to the new address
+                                    -- Since the loading is done on the next cycle, we'll be computing the address next
+                                    pc_wren         <= '1';
+
+                                    -- Re-enabling decoder operation.
+                                    dec_reset       <= '1';
+                                    r1_flush_needed <= '0';
+
+                                when others =>
+
+                            end case;
 
                         -----------------------------------------------------------
                         -- BRANCHES
@@ -645,5 +818,88 @@ architecture behavioral of core_controller is
                 end if;
 
         end process;
-        
+
+        --=========================================================================
+        -- Registering the signals for the Tx_1 stages
+        --=========================================================================
+        P10 : process(nRST, clock)
+        begin
+
+            if (nRST = '0') then
+
+                r3_dec_opcode       <= i_NOP;
+                r3_reg_rs1_in       <= (others => '0');
+                r3_pc_value         <= (others => '0');
+                r3_dec_imm          <= (others => '0');
+
+            elsif rising_edge(clock) and (clock_en = '1') then
+
+                r3_dec_opcode       <= r2_dec_opcode;
+                r3_pc_value         <= r2_pc_value;
+                r3_dec_imm          <= r2_dec_imm;
+
+                r3_reg_rs1_in       <= reg_rs1_in;
+
+            end if;
+
+        end process;
+
+        --=========================================================================
+        -- Register the signals for the Tx_2 stages
+        --=========================================================================
+        P11 : process(nRST, clock)
+        begin
+
+            if (nRST = '0') then
+
+                r4_dec_opcode       <= i_NOP;
+
+            elsif rising_edge(clock) and (clock_en = '1') then
+
+                r4_dec_opcode       <= r3_dec_opcode;
+
+            end if;
+
+        end process;
+
+        --=========================================================================
+        -- Register the signals for the Tx_3 stages
+        --=========================================================================
+        P12 : process(nRST, clock)
+        begin
+
+            if (nRST = '0') then
+
+                r5_dec_opcode       <= i_NOP;
+
+            elsif rising_edge(clock) and (clock_en = '1') then
+
+                r5_dec_opcode       <= r4_dec_opcode;
+
+            end if;
+
+        end process;
+
+        --=========================================================================
+        -- Register the signals for the Tx_4 stages
+        --=========================================================================
+        P13 : process(nRST, clock)
+        begin
+
+            if (nRST = '0') then
+
+                r6_dec_opcode       <= i_NOP;
+
+            elsif rising_edge(clock) and (clock_en = '1') then
+
+                r6_dec_opcode       <= r5_dec_opcode;
+
+            end if;
+
+        end process;
+
+        --=========================================================================
+        -- END OF FILE
+        --=========================================================================
+
     end architecture;

@@ -26,6 +26,7 @@ entity core is
         if_addr :   out             std_logic_vector((XLEN - 1) downto 0);
         if_rdata :  in              std_logic_vector((XLEN - 1) downto 0);
         if_err :    in              std_logic;  
+        if_aclr :   out             std_logic;
 
         -- external memory
         mem_addr :  out             std_logic_vector((XLEN - 1) downto 0);
@@ -84,6 +85,8 @@ architecture behavioral of core is
         signal dec_imm :            std_logic_vector((XLEN - 1) downto 0);
         signal dec_opcode :         instructions;
         signal dec_illegal :        std_logic;
+        signal dec_reset_cmd :      std_logic;
+        signal dec_reset :          std_logic;
 
         -- program counter
         signal pc_waddr :           std_logic_vector((XLEN - 1) downto 0);
@@ -99,6 +102,10 @@ architecture behavioral of core is
         signal tmp :                std_logic_vector((XLEN - 1) downto 0);
 
     begin
+
+        -- Combinational logic
+        -- Reset
+        dec_reset           <= nRST and dec_reset_cmd;
 
         -- Clock generator
         CLK1 : entity work.clock(behavioral)
@@ -146,7 +153,7 @@ architecture behavioral of core is
             illegal         =>  dec_illegal,
             clock           =>  clk,
             clock_en        =>  clk_en,
-            nRST            =>  nRST
+            nRST            =>  dec_reset
         );
 
         -- Controller / FSM
@@ -167,6 +174,7 @@ architecture behavioral of core is
             dec_imm         =>  dec_imm,
             dec_opcode      =>  dec_opcode,
             dec_illegal     =>  dec_illegal,
+            dec_reset       =>  dec_reset_cmd,
             mem_addr        =>  mem_addr,
             mem_byteen      =>  mem_byten,
             mem_we          =>  mem_rw,
@@ -192,6 +200,7 @@ architecture behavioral of core is
             alu_cmd         =>  alu_cmd,
             alu_status      =>  alu_status,
             if_err          =>  if_err,
+            if_aclr         =>  if_aclr,
             ctl_interrupt   =>  irq,
             ctl_exception   =>  exception,
             ctl_halt        =>  halt,

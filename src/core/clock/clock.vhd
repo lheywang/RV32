@@ -33,10 +33,6 @@ architecture behavioral of clock is
                 count <= 0;
                 clk_en <= '0';
 
-                -- Build logs
-                report integer'image(maxval);
-                report integer'image(threshold);
-
             elsif rising_edge(clk) then
                 
                 if (count >= maxval) then
