@@ -6,8 +6,8 @@ There's a script used to generate the memory, simulate the code, and read-back t
 | Test nr : | Description                                                                 | Status |
 | --------- | --------------------------------------------------------------------------- | ------ |
 | test 1    | A very small program, just to ensure toolchain is working                   |        |
-| test 2    | A small fibbonacci calculation program (use a series of addition).          |        |
-| test 3    | A small fibbonacci calculation program (use loops to get to the max value). |        |
+| test 2    | A small fibbonacci calculation program (use loops to get to the max value). |        |
+| test 3    |                                                                             |        |
 | test 4    |                                                                             |        |
 | test 5    |                                                                             |        |
 | test 6    |                                                                             |        |
