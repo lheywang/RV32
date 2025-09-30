@@ -1,22 +1,22 @@
 <mxfile host="65bd71144e">
     <diagram name="Page-1" id="RnoSN_UY9LIXPHD4EfgN">
-        <mxGraphModel dx="1163" dy="1422" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="1575" dy="1992" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="LVgz9WwHuPlELS2RrGbi-1" value="Controller" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                <mxCell id="LVgz9WwHuPlELS2RrGbi-1" value="Controller&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;(2 cycle pipeline)&lt;br&gt;&lt;/font&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
                     <mxGeometry x="240" y="240" width="480" height="240" as="geometry"/>
                 </mxCell>
-                <mxCell id="LVgz9WwHuPlELS2RrGbi-2" value="Decoder" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+                <mxCell id="LVgz9WwHuPlELS2RrGbi-2" value="Decoder&lt;div&gt;(2 cycle pipeline)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
                     <mxGeometry x="-160" y="520" width="120" height="360" as="geometry"/>
                 </mxCell>
-                <mxCell id="LVgz9WwHuPlELS2RrGbi-3" value="Register file" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+                <mxCell id="LVgz9WwHuPlELS2RrGbi-3" value="Register file&lt;div&gt;(synchronous R/W)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
                     <mxGeometry x="960" y="240" width="280" height="240" as="geometry"/>
                 </mxCell>
-                <mxCell id="LVgz9WwHuPlELS2RrGbi-4" value="CSR Register file" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="1" vertex="1">
+                <mxCell id="LVgz9WwHuPlELS2RrGbi-4" value="CSR Register file&lt;div&gt;(Synchronous R/W)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="1" vertex="1">
                     <mxGeometry x="960" y="-40" width="280" height="240" as="geometry"/>
                 </mxCell>
-                <mxCell id="LVgz9WwHuPlELS2RrGbi-5" value="ALU" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+                <mxCell id="LVgz9WwHuPlELS2RrGbi-5" value="ALU&lt;div&gt;(combinational logic)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
                     <mxGeometry x="960" y="520" width="280" height="360" as="geometry"/>
                 </mxCell>
                 <mxCell id="LVgz9WwHuPlELS2RrGbi-6" value="Program counter" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
