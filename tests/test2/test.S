@@ -27,3 +27,11 @@ _loop:
     add     x2, x3, x0              // R2 	<- 	R3
     jal     x11, _loop              // jump to _loop
 
+__not_reached:
+    // Theses instructions shall NEVER be executed, because we jumped.
+    li      x20, 10                 // R20 	<- 	10
+    li      x21, 10                 // R21 	<- 	10
+    li      x22, 10                 // R22 	<- 	10
+    li      x23, 10                 // R23 	<- 	10
+    li      x24, 10                 // R24 	<- 	10
+
