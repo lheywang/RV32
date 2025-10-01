@@ -57,10 +57,11 @@ entity core_controller is
 
         -- CSR regs controls
         csr_we :        out     std_logic                                   := '0';                 -- CSR write enable of the register file
-        csr_wa :        out     csr_register                                := r_MSTATUS;           -- Written CSR register address
-        csr_ra1 :       out     csr_register                                := r_MSTATUS;           -- Readen CSR register address 
+        csr_wa :        out     csr_register                                := r_MTVAL;           -- Written CSR register address
+        csr_ra1 :       out     csr_register                                := r_MTVAL;           -- Readen CSR register address 
                                                                                                     -- There's no CSR RA2 because we'll never need the second output port
         csr_mie :       in      std_logic;                                                          -- Mie bit status
+        csr_mip :       in      std_logic;                                                          -- MIP bit status
 
         -- Regs muxes
         arg1_sel :      out     std_logic                                   := '0';                 -- Choose between the output of the CSR register file or the RS1 output of the register file
@@ -75,7 +76,6 @@ entity core_controller is
 
         -- Generics inputs :
         if_err :        in      std_logic;
-        ctl_interrupt : in      std_logic;                                                          -- Interrupt flag
         ctl_exception : in      std_logic;                                                          -- Generic exception handler
         ctl_halt :      in      std_logic;
 
@@ -114,10 +114,10 @@ architecture behavioral of core_controller is
         signal r1_dec_illegal :     std_logic; 
         signal r1_pc_overflow :     std_logic;
         signal r1_if_err :          std_logic;
-        signal r1_ctl_interrupt :   std_logic;
         signal r1_ctl_exception :   std_logic;
         signal r1_ctl_halt :        std_logic;
         signal r1_csr_mie :         std_logic;
+        signal r1_csr_mip :         std_logic;
 
         signal r1_pc_value :        std_logic_vector((XLEN - 1) downto 0);
 
@@ -132,6 +132,7 @@ architecture behavioral of core_controller is
         signal is_req_mem :         std_logic;
         signal alu_opcode :         commands;
         signal irq_err :            std_logic;
+        signal csr_reg :            csr_register;
 
         -- Registered signals for stage 2 (r1 + new signals!)
         signal r2_dec_rs1 :         std_logic_vector((XLEN / 8) downto 0);
@@ -144,7 +145,6 @@ architecture behavioral of core_controller is
         signal r2_pc_value :        std_logic_vector((XLEN - 1) downto 0);
         signal r2_pc_overflow :     std_logic;
         signal r2_if_err :          std_logic;
-        signal r2_ctl_interrupt :   std_logic;
         signal r2_ctl_exception :   std_logic;
         signal r2_ctl_halt :        std_logic;
         signal r2_cycles_count :    FSM_states;
@@ -156,6 +156,7 @@ architecture behavioral of core_controller is
         signal r2_is_req_csr :      std_logic;
         signal r2_is_req_mem :      std_logic;
         signal r2_alu_opcode :      commands;
+        signal r2_reg_csr :         csr_register;
 
         -- Registered signals for later stages.
         -- Since theses only concern the instructions that require more than one cycle,
@@ -168,6 +169,7 @@ architecture behavioral of core_controller is
         signal r3_reg_rs1_in :      std_logic_vector((XLEN - 1) downto 0);
         signal r3_pc_value :        std_logic_vector((XLEN - 1) downto 0);
         signal r3_dec_imm :         std_logic_vector((XLEN - 1) downto 0);
+        signal r3_reg_csr :         csr_register;
 
     begin
 
@@ -215,9 +217,11 @@ architecture behavioral of core_controller is
                 r1_mem_addrerr      <=  '0';
                 r1_pc_overflow      <=  '0';
                 r1_if_err           <=  '0';
-                r1_ctl_interrupt    <=  '0';
                 r1_ctl_exception    <=  '0';
                 r1_ctl_halt         <=  '0';
+
+                r1_csr_mip          <=  '0';
+                r1_csr_mie          <=  '0';
 
             elsif rising_edge(clock) and (clock_en = '1') then
                 r1_dec_rs1          <=  dec_rs1;
@@ -233,9 +237,11 @@ architecture behavioral of core_controller is
                 r1_mem_addrerr      <=  mem_addrerr;
                 r1_pc_overflow      <=  pc_overflow;
                 r1_if_err           <=  if_err;
-                r1_ctl_interrupt    <=  ctl_interrupt;
                 r1_ctl_exception    <=  ctl_exception;
                 r1_ctl_halt         <=  ctl_halt;
+
+                r1_csr_mip          <=  csr_mip;
+                r1_csr_mie          <=  csr_mie;
 
             end if;
 
@@ -250,8 +256,11 @@ architecture behavioral of core_controller is
         --=========================================================================
         P2 : process(   nRST,               r1_dec_rs1,         r1_dec_rs2,         r1_dec_rd,          
                         r1_dec_imm,         r1_dec_opcode,      r1_pc_value,        r1_dec_illegal,     
-                        r1_mem_addrerr,     r1_pc_overflow,     r1_if_err,          r1_ctl_interrupt,   
-                        r1_ctl_exception,   r1_ctl_halt)     
+                        r1_mem_addrerr,     r1_pc_overflow,     r1_if_err,          r1_ctl_exception,   
+                        r1_ctl_halt)
+                        
+                variable tmp :      std_logic_vector(11 downto 0);
+
             begin
                 if  (nRST = '0') then
                     cycles_count    <= T0;
@@ -263,10 +272,11 @@ architecture behavioral of core_controller is
                     is_req_csr      <= '0';
                     is_req_mem      <= '0';
                     irq_err         <= '0';
+                    csr_reg         <= r_MTVAL;
 
                 elsif   (r1_dec_illegal = '1')  or (r1_mem_addrerr = '1')   or (r1_pc_overflow = '1')   or
-                        (r1_if_err = '1')       or (r1_ctl_interrupt = '1') or (r1_ctl_exception = '1') or
-                        (r1_ctl_halt = '1')     then
+                        (r1_if_err = '1')       or (r1_ctl_exception = '1') or (r1_ctl_halt = '1')      or
+                        (r1_csr_mip = '1')      then
 
                     -- Check if we're already interrupting, and if we have the right to do it...
                     if (irq_err = '0') and (r1_csr_mie = '1') then
@@ -307,6 +317,7 @@ architecture behavioral of core_controller is
                             is_req_mem      <= '0';
 
                             alu_opcode      <= c_NONE;
+                            csr_reg         <= r_MTVAL;
 
                         ------------------------------------------------------------------
                         when    i_ADDI      |   i_SLTI  |   i_SLTIU     |   i_XORI      |
@@ -321,6 +332,8 @@ architecture behavioral of core_controller is
                             is_req_alu      <= '1';
                             is_req_csr      <= '0';
                             is_req_mem      <= '0';
+
+                            csr_reg         <= r_MTVAL;
 
                             case r1_dec_opcode is
                                 when i_ADDI | i_LUI=>
@@ -347,30 +360,6 @@ architecture behavioral of core_controller is
                             end case;
 
                         ------------------------------------------------------------------
-                        when    i_CSRRWI    | i_CSRRSI  |   i_CSRRCI =>
-
-                            cycles_count    <= T0;
-                            is_immediate    <= '1';
-                            is_req_data1    <= '1';
-                            is_req_data2    <= '0';
-                            is_req_store    <= '1';
-                            is_req_alu      <= '1';
-                            is_req_csr      <= '0';
-                            is_req_mem      <= '0';
-
-                            case r1_dec_opcode is
-                                when i_CSRRWI =>
-                                    alu_opcode <= c_ADD;
-                                when i_CSRRSI =>
-                                    alu_opcode <= c_OR;
-                                when i_CSRRCI =>
-                                    alu_opcode <= c_AND;
-                                -- useless case, already covered, but otherwise design won't compile
-                                when others =>
-                                    alu_opcode <= c_NONE;
-                            end case;
-
-                        ------------------------------------------------------------------
                         when    i_ADD       |   i_SUB   |   i_SLL       |   i_SLT       |
                                 i_SLTU      |   i_XOR   |   i_SRL       |   i_SRA       |
                                 i_OR        |   i_AND   =>
@@ -382,7 +371,9 @@ architecture behavioral of core_controller is
                             is_req_store    <= '1';
                             is_req_alu      <= '1';
                             is_req_csr      <= '0';
-                            is_req_mem      <= '0';   
+                            is_req_mem      <= '0';
+                            
+                            csr_reg         <= r_MTVAL;
 
                             case r1_dec_opcode is
                                 when i_ADD =>
@@ -411,27 +402,44 @@ architecture behavioral of core_controller is
                             end case;
 
                         ------------------------------------------------------------------
-                        when     i_CSRRW    |   i_CSRRS |   i_CSRRC =>
+                        when    i_CSRRW     |   i_CSRRS |   i_CSRRC     |   i_CSRRWI    | 
+                                i_CSRRSI    |   i_CSRRCI =>
                             
                             cycles_count    <= T1_0;
+
+                            -- We don't really care about theses since we're on a 2 cycles instruction.
                             is_immediate    <= '0';
-                            is_req_data1    <= '1';
-                            is_req_data2    <= '1';
-                            is_req_store    <= '1';
-                            is_req_alu      <= '1';
-                            is_req_csr      <= '1';
-                            is_req_mem      <= '0'; 
-                            
-                            case r1_dec_opcode is
-                                when i_CSRRW =>
-                                    alu_opcode <= c_ADD;
-                                when i_CSRRS =>
-                                    alu_opcode <= C_OR;
-                                when i_CSRRC =>
-                                    alu_opcode <= C_AND;
-                                -- useless case, already covered, but otherwise design won't compile
+                            is_req_data1    <= '0';
+                            is_req_data2    <= '0';
+                            is_req_store    <= '0';
+                            is_req_alu      <= '0';
+                            is_req_csr      <= '0';
+                            is_req_mem      <= '0';
+                            alu_opcode      <= c_NONE;
+
+                            tmp             := r1_dec_imm(11 downto 0);
+                            report "tmp : " & integer'image(to_integer(unsigned(tmp)));
+                            case tmp is
+                                when X"300" =>
+                                    csr_reg <= r_MSTATUS;
+                                when X"301" =>
+                                    csr_reg <= r_MISA;
+                                when X"304" =>  
+                                    csr_reg <= r_MIE;
+                                when X"305" =>
+                                    csr_reg <= r_MTVEC;
+                                when X"340" =>
+                                    csr_reg <= r_MSCRATCH;
+                                when X"341" =>
+                                    csr_reg <= r_MEPC;
+                                when X"342" =>
+                                    csr_reg <=r_MCAUSE;
+                                when X"343" =>
+                                    csr_reg <= r_MTVAL;
+                                when X"344" =>
+                                    csr_reg <= r_MIP;
                                 when others =>
-                                    alu_opcode <= c_NONE;
+                                    csr_reg <= r_MTVAL;
                             end case;
 
                         ------------------------------------------------------------------
@@ -448,36 +456,43 @@ architecture behavioral of core_controller is
                             is_req_mem      <= '1';
                             
                             alu_opcode      <= c_NONE;
+                            csr_reg         <= r_MTVAL;
 
                         ------------------------------------------------------------------
                         when    i_BEQ       |   i_BNE   |   i_BLT       |   i_BGE       |
-                                i_BLTu      |   i_BGEU  =>
+                                i_BLTU      |   i_BGEU  =>
                         
                             cycles_count    <= T2_0;
+
+                            -- We don't really care about theses since we're on a 3 cycles instruction.
                             is_immediate    <= '0';
-                            is_req_data1    <= '1';
-                            is_req_data2    <= '1';
+                            is_req_data1    <= '0';
+                            is_req_data2    <= '0';
                             is_req_store    <= '0';
                             is_req_alu      <= '0';
                             is_req_csr      <= '0';
                             is_req_mem      <= '0';
                             
                             alu_opcode      <= c_NONE;
+                            csr_reg         <= r_MTVAL;
 
                         ------------------------------------------------------------------
                         when    i_JAL       |   i_JALR      |   i_ECALL |   i_EBREAK    |   
                                 i_MRET  =>
 
                             cycles_count    <= T1_0;
-                            is_immediate    <= '1';
-                            is_req_data1    <= '1';
+
+                            -- We don't really care about theses since we're on a 2 cycles instruction.
+                            is_immediate    <= '0';
+                            is_req_data1    <= '0';
                             is_req_data2    <= '0';
                             is_req_store    <= '0';
                             is_req_alu      <= '0';
-                            is_req_csr      <= '1';
+                            is_req_csr      <= '0';
                             is_req_mem      <= '0'; 
 
                             alu_opcode      <= c_NONE;
+                            csr_reg         <= r_MTVAL;
 
                             -- If we took an special handler route, unlock the future interrupts.
                             if (r1_dec_opcode = i_MRET) then
@@ -538,7 +553,6 @@ architecture behavioral of core_controller is
                 r2_pc_value         <= (others => '0');
                 r2_pc_overflow      <= '0';
                 r2_if_err           <= '0';
-                r2_ctl_interrupt    <= '0';
                 r2_ctl_exception    <= '0';
                 r2_ctl_halt         <= '0';
                 r2_cycles_count      <= T0;
@@ -552,6 +566,7 @@ architecture behavioral of core_controller is
                 r2_is_req_mem       <= '0';
 
                 r2_alu_opcode       <= c_NONE;
+                r2_reg_csr          <= r_MTVAL;
 
             elsif rising_edge(clock) and (clock_en = '1') then
 
@@ -565,7 +580,6 @@ architecture behavioral of core_controller is
                 r2_pc_value         <= r1_pc_value;
                 r2_pc_overflow      <= r1_pc_overflow;
                 r2_if_err           <= r1_if_err;
-                r2_ctl_interrupt    <= r1_ctl_interrupt;
                 r2_ctl_exception    <= r1_ctl_exception;
                 r2_ctl_halt         <= r1_ctl_halt;
 
@@ -579,6 +593,7 @@ architecture behavioral of core_controller is
                 r2_is_req_mem       <= is_req_mem;
 
                 r2_alu_opcode       <= alu_opcode;
+                r2_reg_csr          <= csr_reg;
 
             end if;
 
@@ -590,10 +605,10 @@ architecture behavioral of core_controller is
         --=========================================================================
         P4 : process(   nRST,               r2_dec_rs1,         r2_dec_rs2,         r2_dec_rd,          
                         r2_dec_imm,         r2_dec_opcode,      r2_pc_value,        r2_dec_illegal,     
-                        r2_mem_addrerr,     r2_pc_overflow,     r2_if_err,          r2_ctl_interrupt,   
+                        r2_mem_addrerr,     r2_pc_overflow,     r2_if_err,          r2_alu_opcode,   
                         r2_ctl_exception,   r2_ctl_halt,        r2_cycles_count,    r2_is_immediate,
                         r2_is_req_data1,    r2_is_req_data2,    r2_is_req_store,    r2_is_req_alu,
-                        r2_is_req_csr,      r2_is_req_mem,      r2_alu_opcode)
+                        r2_is_req_csr,      r2_is_req_mem)
 
             begin
 
@@ -612,8 +627,8 @@ architecture behavioral of core_controller is
                     reg_ra2         <= 0;
                     reg_rs2_out     <= (others => '0');
                     csr_we          <= '0';
-                    csr_wa          <= r_MSTATUS;
-                    csr_ra1         <= r_MSTATUS;
+                    csr_wa          <= r_MTVAL;
+                    csr_ra1         <= r_MTVAL;
                     arg1_sel        <= '0';
                     arg2_sel        <= '0';
                     alu_cmd         <= c_NONE;
@@ -674,6 +689,7 @@ architecture behavioral of core_controller is
                             if (r2_is_req_store = '1') then
                                 mem_req         <= '0';
                                 reg_we          <= '1';
+                                csr_we          <= '0';
                                 reg_wa          <= to_integer(unsigned(r2_dec_rd));
                             else
                                 reg_we          <= '0';
@@ -688,9 +704,9 @@ architecture behavioral of core_controller is
 
                             if (r2_is_req_csr = '1') then
                                 arg1_sel        <= '1';
-                                csr_ra1         <= r_MSTATUS;                   -- Need to change that line
+                                csr_ra1         <= r_MTVAL;                   -- Need to change that line
                             else
-                                csr_ra1         <= r_MSTATUS;
+                                csr_ra1         <= r_MTVAL;
                             end if;
 
                             if (r2_is_req_mem = '1') then
@@ -726,14 +742,15 @@ architecture behavioral of core_controller is
                                     --
                                     -- ADDI, RD, R0, IMM, where R0 is ALWAYS 0 (hardwired).
                                     --
-                                    reg_rs2_out <= r1_pc_value;
-                                    alu_cmd     <= c_ADD;
-                                    arg2_sel    <= '1';
-                                    arg1_sel    <= '0';
-                                    reg_ra1     <= 0;
-                                    reg_we      <= '1';
-                                    reg_wa      <= to_integer(unsigned(r2_dec_rd));
-                                    reg_ra2     <= to_integer(unsigned(r2_dec_rs1));
+                                    reg_rs2_out     <= r1_pc_value;
+                                    alu_cmd         <= c_ADD;
+                                    arg2_sel        <= '1';
+                                    arg1_sel        <= '0';
+                                    reg_ra1         <= 0;
+                                    reg_we          <= '1';
+                                    csr_we          <= '0';
+                                    reg_wa          <= to_integer(unsigned(r2_dec_rd));
+                                    reg_ra2         <= to_integer(unsigned(r2_dec_rs1));
 
                                     -- Reset the decoder, since we're going to jump
                                     dec_reset       <= '0';
@@ -744,7 +761,25 @@ architecture behavioral of core_controller is
                                 -- Handle CSRR instructions.
                                 -----------------------------------------------------------
                                 when others =>
-                                    
+
+                                    -- First, handle the copy of CSR into the RD register
+                                    -- To do this, we simulate this instruction : 
+                                    --
+                                    -- ADDI, RD, R0, IMM, where R0 is ALWAYS 0 (hardwired).
+                                    --
+                                    csr_ra1             <= r2_reg_csr;
+                                    arg1_sel            <= '1';
+                                    reg_rs2_out         <= (others => '0'); -- Doing this enable the read-back of ra2 for step 2, ra2 which would be used by x0.
+                                    arg2_sel            <= '1';
+                                    reg_we              <= '1';
+                                    reg_wa              <= to_integer(unsigned(r2_dec_rd));
+                                    alu_cmd             <= c_ADD;
+
+                                    -- The the meanwhile, read back the ra2 value for the next step
+                                    -- The value will be stored into the rs3_reg_rs1_in signal.
+                                    reg_ra2             <= to_integer(unsigned(r2_dec_rs1));
+                                    reg_ra1             <= 0;
+
                             end case;
 
                         when T1_1 =>
@@ -764,6 +799,7 @@ architecture behavioral of core_controller is
                                     reg_ra1         <= 0;
                                     reg_ra2         <= 0;
                                     reg_we          <= '0';
+                                    csr_we          <= '0';
                                     reg_wa          <= 0;
 
                                     -- This second section implement the proper jump logic for the PC value.
@@ -788,6 +824,50 @@ architecture behavioral of core_controller is
                                     r1_flush_needed <= '0';
 
                                 when others =>
+
+                                    -- First, define global signals to store the future result into the CSR register file
+                                    csr_we          <= '1';
+                                    reg_we          <= '0';
+                                    csr_wa          <= r3_reg_csr;
+                                    csr_ra1         <= r3_reg_csr;
+                                    reg_ra1         <= 0;
+                                    arg2_sel        <= '1';
+                                    
+                                    -- Some logic is shared by the two static assignments
+                                    if      (r3_dec_opcode = i_CSRRW)   then
+                                        alu_cmd                 <= c_ADD;
+                                        arg1_sel                <= '0';
+                                        reg_rs2_out             <= r3_reg_rs1_in;
+
+                                    elsif   (r3_dec_opcode = i_CSRRWI)  then
+                                        alu_cmd                 <= c_ADD;
+                                        arg1_sel                <= '0';
+                                        reg_rs2_out             <= (others=>'0');
+                                        reg_rs2_out(4 downto 0) <= r3_dec_imm(19 downto 15);
+
+                                    elsif   (r3_dec_opcode = i_CSRRS)   then
+                                        alu_cmd                 <= c_OR;
+                                        arg1_sel                <= '1';
+                                        reg_rs2_out             <= r3_reg_rs1_in;
+
+                                    elsif   (r3_dec_opcode = i_CSRRSI)  then
+                                        alu_cmd                 <= c_OR;
+                                        arg1_sel                <= '1';
+                                        reg_rs2_out             <= (others=>'0');
+                                        reg_rs2_out(4 downto 0) <= r3_dec_imm(19 downto 15);
+
+                                    elsif   (r3_dec_opcode = i_CSRRC)   then
+                                        alu_cmd                 <= c_AND;
+                                        arg1_sel                <= '1';
+                                        reg_rs2_out             <= not r3_reg_rs1_in;
+
+                                    elsif   (r3_dec_opcode = i_CSRRCI) then
+                                        alu_cmd                 <= c_AND;
+                                        arg1_sel                <= '1';
+                                        reg_rs2_out             <= (others=>'1');
+                                        reg_rs2_out(4 downto 0) <= not r3_reg_rs1_in(19 downto 15);
+
+                                    end if;
 
                             end case;
 
@@ -831,6 +911,7 @@ architecture behavioral of core_controller is
                 r3_reg_rs1_in       <= (others => '0');
                 r3_pc_value         <= (others => '0');
                 r3_dec_imm          <= (others => '0');
+                r3_reg_csr          <= r_MTVAL;
 
             elsif rising_edge(clock) and (clock_en = '1') then
 
@@ -839,6 +920,8 @@ architecture behavioral of core_controller is
                 r3_dec_imm          <= r2_dec_imm;
 
                 r3_reg_rs1_in       <= reg_rs1_in;
+
+                r3_reg_csr          <= r2_reg_csr;
 
             end if;
 

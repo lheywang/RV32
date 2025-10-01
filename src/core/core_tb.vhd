@@ -13,7 +13,6 @@ architecture behavioral of core_tb is
         signal clk_t :                  std_logic                       := '0';
         signal nRST_t :                 std_logic                       := '0';
         signal RST_t :                  std_logic                       := '0';
-        signal irq_t :                  std_logic                       := '0';
         signal halt_t :                 std_logic                       := '0';
         signal exception_t :            std_logic                       := '0';
         signal if_addr_t :              std_logic_vector(31 downto 0)   := (others => '0');
@@ -48,7 +47,6 @@ architecture behavioral of core_tb is
             port map (
                 clk                 =>  clk_t,
                 nRST                =>  nRST_t,
-                irq                 =>  irq_t,
                 halt                =>  halt_t,
                 exception           =>  exception_t,
                 if_addr             =>  if_addr_t,

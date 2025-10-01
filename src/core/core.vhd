@@ -17,7 +17,6 @@ entity core is
         -- global IOs
         clk :       in              std_logic;
         nRST :      in              std_logic;
-        irq :       in              std_logic;
         halt :      in              std_logic;
         exception : in              std_logic;
 
@@ -65,6 +64,7 @@ architecture behavioral of core is
         signal csr_ra1 :            csr_register;
         signal csr_rdata1 :         std_logic_vector((XLEN - 1) downto 0);
         signal csr_mie :            std_logic;
+        signal csr_mip :            std_logic;
 
         -- Signals for choosing the input elements
         signal arg1_sel :           std_logic;
@@ -199,11 +199,11 @@ architecture behavioral of core is
             csr_wa          =>  csr_wa,
             csr_ra1         =>  csr_ra1,
             csr_mie         =>  csr_mie,
+            csr_mip         =>  csr_mip,
             alu_cmd         =>  alu_cmd,
             alu_status      =>  alu_status,
             if_err          =>  if_err,
             if_aclr         =>  if_aclr,
-            ctl_interrupt   =>  irq,
             ctl_exception   =>  exception,
             ctl_halt        =>  halt,
             excep_occured   =>  core_trap,
@@ -245,7 +245,8 @@ architecture behavioral of core is
             ra1             =>  csr_ra1,
             rd1             =>  csr_rdata1,
             int_vec         =>  int_vec,
-            int_out         =>  csr_mie
+            int_en          =>  csr_mie,
+            int_out         =>  csr_mip
         );
 
         -- Arithmetic and Logic unit

@@ -23,7 +23,8 @@ entity csr_registers is
 
         -- Interrupt specific IOs
         int_vec : in  std_logic_vector((XLEN - 1) downto 0);
-        int_out : out std_logic
+        int_out : out std_logic;
+        int_en :  out std_logic
     );
 end entity;
 
@@ -133,5 +134,6 @@ begin
 
     -- always read the MIP port.
     int_out <=  mip(11);
+    int_en  <=  mstatus(3);
 
 end architecture;
