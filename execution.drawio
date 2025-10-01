@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram name="Page-1" id="MUY_kHoX3STjlGwm7zHz">
-        <mxGraphModel dx="1858" dy="878" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1595" dy="613" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -149,7 +149,7 @@
                 <mxCell id="urG9fmMTGDwK2hdQi71t-11" value="T4_2" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
                     <mxGeometry x="680" y="640" width="80" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="22" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="urG9fmMTGDwK2hdQi71t-22" target="21">
+                <mxCell id="22" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="urG9fmMTGDwK2hdQi71t-22" target="21" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="urG9fmMTGDwK2hdQi71t-22" value="T4_3" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
@@ -177,13 +177,13 @@
                 <mxCell id="urG9fmMTGDwK2hdQi71t-42" value="Sub steps :&amp;nbsp;&lt;div&gt;- IMMEDIATE -&amp;gt; arg2sel = &#39;1&#39;, out = imm&lt;/div&gt;&lt;div&gt;- REQ. DATA1 -&amp;gt; arg1sel = &#39;0&#39;, ra1,&lt;/div&gt;&lt;div&gt;- REQ. DATA2 -&amp;gt; arg2sel = &#39;0&#39;, ra2&lt;/div&gt;&lt;div&gt;- OPCODE -&amp;gt; opcode&lt;/div&gt;&lt;div&gt;- STORE NEEDED -&amp;gt; we, wa&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
                     <mxGeometry x="285" y="80" width="230" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="2" value="First, expose expressions to the ALU&amp;nbsp;&lt;div&gt;+ stop PC&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                <mxCell id="2" value="First, expose expressions to the ALU&amp;nbsp;&lt;div&gt;+ stop PC&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
                     <mxGeometry x="330" y="580" width="135" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="3" value="Read status and think if we need to jumps. If needed, apply jump signals" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                <mxCell id="3" value="Read status and think if we need to jumps. If needed, apply jump signals" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
                     <mxGeometry x="490" y="580" width="152.5" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="4" value="" style="endArrow=classic;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;rounded=0;curved=0;" edge="1" parent="1" target="urG9fmMTGDwK2hdQi71t-1">
+                <mxCell id="4" value="" style="endArrow=classic;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;rounded=0;curved=0;" parent="1" target="urG9fmMTGDwK2hdQi71t-1" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="560" y="480" as="sourcePoint"/>
                         <mxPoint x="610" y="430" as="targetPoint"/>
@@ -196,40 +196,40 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="8" value="Jump needed" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                <mxCell id="8" value="Jump needed" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
                     <mxGeometry x="587.5" y="480" width="60" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="9" value="Jump NOT needed" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                <mxCell id="9" value="Jump NOT needed" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
                     <mxGeometry x="490" y="450" width="70" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="10" value="Wait for jump to finish (&amp;gt;&amp;gt;&amp;gt; 1 cycle, just reset)&lt;div&gt;+ start PC&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                <mxCell id="10" value="Wait for jump to finish (&amp;gt;&amp;gt;&amp;gt; 1 cycle, just reset)&lt;div&gt;+ start PC&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
                     <mxGeometry x="655" y="580" width="130" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="13" value="Wait for jump to finish (&amp;gt;&amp;gt;&amp;gt; 1 cycle, just reset)&lt;div&gt;+ start PC&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                <mxCell id="13" value="Wait for jump to finish (&amp;gt;&amp;gt;&amp;gt; 1 cycle, just reset)&lt;div&gt;+ start PC&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
                     <mxGeometry x="495" y="400" width="130" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="14" value="Apply jumps signals&lt;div&gt;+ stop PC&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                <mxCell id="14" value="Apply jumps signals&lt;div&gt;+ stop PC&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
                     <mxGeometry x="335" y="400" width="130" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="15" value="Apply signals" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                <mxCell id="15" value="Apply signals" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
                     <mxGeometry x="335" y="240" width="130" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="16" value="Write MEPC&lt;div&gt;+ stop PC&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                <mxCell id="16" value="Write MEPC&lt;div&gt;+ stop PC&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
                     <mxGeometry x="335" y="720" width="130" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="17" value="Write MCAUSE" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                <mxCell id="17" value="Write MCAUSE" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
                     <mxGeometry x="495" y="720" width="130" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="18" value="Write MSTATUS&lt;div&gt;+ Apply jump signals (target = MVTEC)&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                <mxCell id="18" value="Write MSTATUS&lt;div&gt;+ Apply jump signals (target = MVTEC)&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
                     <mxGeometry x="815" y="730" width="130" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="19" value="Write MSTATUS&lt;div&gt;+ Apply jump signals&lt;/div&gt;&lt;div&gt;+ start PC&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                <mxCell id="19" value="Write MSTATUS&lt;div&gt;+ Apply jump signals&lt;/div&gt;&lt;div&gt;+ start PC&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
                     <mxGeometry x="970" y="730" width="130" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="21" value="T4_4" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+                <mxCell id="21" value="T4_4" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
                     <mxGeometry x="1000" y="640" width="80" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="23" value="Write MEPC" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                <mxCell id="23" value="Write MEPC&lt;div&gt;+ read MVTEC&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
                     <mxGeometry x="655" y="720" width="130" height="30" as="geometry"/>
                 </mxCell>
             </root>
