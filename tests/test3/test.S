@@ -3,7 +3,7 @@
 
 _start:
     # Load some value in x1
-    li      x1, 0x1234
+    li      x1, 0xFFFFFFFF
 
     # --- CSRRW (atomic swap) ---
     # Write x1 into mstatus, read old mstatus into x2
@@ -29,4 +29,5 @@ _start:
     csrrci  x7, mstatus, 1
 
     # End loop
-    j .
+_infty:
+    j _infty

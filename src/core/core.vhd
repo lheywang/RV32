@@ -168,7 +168,7 @@ architecture behavioral of core is
         FIFO1 : entity work.fifo(rtl)
         generic map (
             XLEN            => XLEN,
-            DEPTH           => 8 -- arbitrary value to 8, which shall be more than enough
+            DEPTH           => 4 -- arbitrary value to 4, which shall be more than enough
         )
         port map (
             clk             => clk,

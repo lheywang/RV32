@@ -57,8 +57,8 @@ entity core_controller is
 
         -- CSR regs controls
         csr_we :        out     std_logic                                   := '0';                 -- CSR write enable of the register file
-        csr_wa :        out     csr_register                                := r_MTVAL;           -- Written CSR register address
-        csr_ra1 :       out     csr_register                                := r_MTVAL;           -- Readen CSR register address 
+        csr_wa :        out     csr_register                                := r_MTVAL;             -- Written CSR register address
+        csr_ra1 :       out     csr_register                                := r_MTVAL;             -- Readen CSR register address 
                                                                                                     -- There's no CSR RA2 because we'll never need the second output port
         csr_mie :       in      std_logic;                                                          -- Mie bit status
         csr_mip :       in      std_logic;                                                          -- MIP bit status
@@ -307,6 +307,9 @@ architecture behavioral of core_controller is
                 elsif   (r2_cycles_count = T0)   or (r2_cycles_count = T1_1)  or (r2_cycles_count = T2_2)   or
                         (r2_cycles_count = T4_4) then
 
+                    -- Enable the program counter, regardless of the future instruction.
+                    pc_enable <= '1';
+
                     case r1_dec_opcode is
 
                         ------------------------------------------------------------------
@@ -421,7 +424,6 @@ architecture behavioral of core_controller is
                             is_req_csr      <= '0';
                             is_req_mem      <= '0';
                             alu_opcode      <= c_NONE;
-                            pc_enable       <= '0';
 
                             tmp             := r1_dec_imm(11 downto 0);
                             case tmp is
@@ -495,7 +497,6 @@ architecture behavioral of core_controller is
                             is_req_alu      <= '0';
                             is_req_csr      <= '0';
                             is_req_mem      <= '0'; 
-                            pc_enable       <= '0';
 
                             alu_opcode      <= c_NONE;
                             csr_reg         <= r_MTVAL;
@@ -507,21 +508,21 @@ architecture behavioral of core_controller is
 
                     end case;
 
-                -- Update the case to the next cycle
+                -- Update the case to the next cycle, and selectively disable the program counter, if needed.
                 else 
                     
                     case r2_cycles_count is
                         -- T1_x
                         when T1_0 =>
                             cycles_count <= T1_1;
-                            pc_enable    <= '1';
+                            pc_enable    <= '0';
 
                         -- T2_x
                         when T2_0 =>
                             cycles_count <= T2_1;
                         when T2_1 =>
                             cycles_count <= T2_2;
-                            pc_enable    <= '1';
+                            pc_enable    <= '0';
 
                         -- T4_x
                         when T4_0 =>
@@ -532,12 +533,11 @@ architecture behavioral of core_controller is
                             cycles_count <= T4_3;
                         when T4_3 =>
                             cycles_count <= T4_4;
-                            pc_enable    <= '1';
+                            pc_enable    <= '0';
 
                         -- Default to make quartus happy (but, we'll never get here since the if ... else)
                         when others =>
                             cycles_count <= T0;
-                            pc_enable    <= '1';
 
                     end case;
                     
@@ -772,22 +772,25 @@ architecture behavioral of core_controller is
                                 -----------------------------------------------------------
                                 when others =>
 
+                                    report "We're on CSR T1_0 !";
                                     -- First, handle the copy of CSR into the RD register
                                     -- To do this, we simulate this instruction : 
                                     --
                                     -- ADDI, RD, R0, IMM, where R0 is ALWAYS 0 (hardwired).
                                     --
-                                    csr_ra1             <= r2_reg_csr;
+                                    csr_ra1             <= csr_reg;
                                     arg1_sel            <= '1';
                                     reg_rs2_out         <= (others => '0'); -- Doing this enable the read-back of ra2 for step 2, ra2 which would be used by x0.
                                     arg2_sel            <= '1';
                                     reg_we              <= '1';
-                                    reg_wa              <= to_integer(unsigned(r2_dec_rd));
+                                    reg_wa              <= to_integer(unsigned(r1_dec_rd));
                                     alu_cmd             <= c_ADD;
+                                    csr_wa              <= r_MTVAL;
+                                    csr_ra1             <= r_MTVAL;
 
                                     -- The the meanwhile, read back the ra2 value for the next step
                                     -- The value will be stored into the rs3_reg_rs1_in signal.
-                                    reg_ra2             <= to_integer(unsigned(r2_dec_rs1));
+                                    reg_ra2             <= to_integer(unsigned(r1_dec_rs1));
                                     reg_ra1             <= 0;
 
                             end case;
@@ -838,8 +841,8 @@ architecture behavioral of core_controller is
                                     -- First, define global signals to store the future result into the CSR register file
                                     csr_we          <= '1';
                                     reg_we          <= '0';
-                                    csr_wa          <= r3_reg_csr;
-                                    csr_ra1         <= r3_reg_csr;
+                                    csr_wa          <= r2_reg_csr;
+                                    csr_ra1         <= r2_reg_csr;
                                     reg_ra1         <= 0;
                                     arg2_sel        <= '1';
                                     
@@ -847,35 +850,35 @@ architecture behavioral of core_controller is
                                     if      (r3_dec_opcode = i_CSRRW)   then
                                         alu_cmd                 <= c_ADD;
                                         arg1_sel                <= '0';
-                                        reg_rs2_out             <= r3_reg_rs1_in;
+                                        reg_rs2_out             <= reg_rs1_in;
 
                                     elsif   (r3_dec_opcode = i_CSRRWI)  then
                                         alu_cmd                 <= c_ADD;
                                         arg1_sel                <= '0';
                                         reg_rs2_out             <= (others=>'0');
-                                        reg_rs2_out(4 downto 0) <= r3_dec_imm(19 downto 15);
+                                        reg_rs2_out(4 downto 0) <= r2_dec_imm(19 downto 15);
 
                                     elsif   (r3_dec_opcode = i_CSRRS)   then
                                         alu_cmd                 <= c_OR;
                                         arg1_sel                <= '1';
-                                        reg_rs2_out             <= r3_reg_rs1_in;
+                                        reg_rs2_out             <= reg_rs1_in;
 
                                     elsif   (r3_dec_opcode = i_CSRRSI)  then
                                         alu_cmd                 <= c_OR;
                                         arg1_sel                <= '1';
                                         reg_rs2_out             <= (others=>'0');
-                                        reg_rs2_out(4 downto 0) <= r3_dec_imm(19 downto 15);
+                                        reg_rs2_out(4 downto 0) <= r2_dec_imm(19 downto 15);
 
                                     elsif   (r3_dec_opcode = i_CSRRC)   then
                                         alu_cmd                 <= c_AND;
                                         arg1_sel                <= '1';
-                                        reg_rs2_out             <= not r3_reg_rs1_in;
+                                        reg_rs2_out             <= not reg_rs1_in;
 
                                     elsif   (r3_dec_opcode = i_CSRRCI) then
                                         alu_cmd                 <= c_AND;
                                         arg1_sel                <= '1';
                                         reg_rs2_out             <= (others=>'1');
-                                        reg_rs2_out(4 downto 0) <= not r3_reg_rs1_in(19 downto 15);
+                                        reg_rs2_out(4 downto 0) <= not reg_rs1_in(19 downto 15);
 
                                     end if;
 
