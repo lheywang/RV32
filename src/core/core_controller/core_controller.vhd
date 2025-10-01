@@ -418,7 +418,6 @@ architecture behavioral of core_controller is
                             alu_opcode      <= c_NONE;
 
                             tmp             := r1_dec_imm(11 downto 0);
-                            report "tmp : " & integer'image(to_integer(unsigned(tmp)));
                             case tmp is
                                 when X"300" =>
                                     csr_reg <= r_MSTATUS;
