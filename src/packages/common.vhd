@@ -1,5 +1,7 @@
 package common is
     
+    -- Defining each parsed instructions.
+    -- This is the output of the decoder.
     type instructions is (
         i_NOP,
 
@@ -29,6 +31,10 @@ package common is
         i_CSRRSI,   i_CSRRCI
     );
 
+    -- Defining ALU commands.
+    -- Theses only define the commands the ALU will execute, so there's
+    -- much less than opcodes.
+    -- Data paths are handled by the controller.
     type commands is (
         c_ADD,      c_SUB,
 
@@ -39,6 +45,20 @@ package common is
         c_AND,      c_OR,       c_XOR,
 
         c_NONE
+    );
+
+    -- Defining the CSR register names rather than relying on something
+    -- custom defined.
+    type csr_register is (
+        r_MSTATUS,
+        r_MISA,
+        r_MIE,
+        r_MTVEC,
+        r_MSCRATCH,
+        r_MEPC,
+        r_MCAUSE,
+        r_MTVAL,
+        r_MIP
     );
 
 end common;
