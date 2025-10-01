@@ -29,7 +29,7 @@ COMPILER = "riscv32-unknown-elf-gcc "
 OBJCOPY = "riscv32-unknown-elf-objcopy "
 BIN2MIF = "./utils/bin2mif.py "
 
-CCFLAGS = "-march=rv32i -mabi=ilp32 "
+CCFLAGS = "-march=rv32i_zicsr -mabi=ilp32 "
 OBJFLAGS = "-O binary "
 
 # ---------------------------------------------------------------------------------
@@ -78,9 +78,10 @@ def set_test(tests: list[pathlib.Path]):
 
     return pathlib.Path(tests[file_id - 1])
 
+
 def call(cmd: str):
 
-    try : 
+    try:
         print(f"Running {cmd}")
         result = subprocess.run(
             cmd,
@@ -111,6 +112,7 @@ def call(cmd: str):
         print(f"Stderr:\n{e.stderr}")
         print("----------------\n")
         return
+
 
 # ---------------------------------------------------------------------------------
 # Main script
@@ -162,7 +164,7 @@ print("=" * 100)
 call(cmd1)
 call(cmd2)
 call(cmd3)
-    
+
 # Finally, copy files into the right folder, for the simulator to find it
 hex_source = pathlib.Path(f"{WORKIR}/program.mif")
 hex_dest = pathlib.Path(HEX_DEST)
