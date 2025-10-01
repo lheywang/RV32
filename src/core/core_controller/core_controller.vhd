@@ -275,6 +275,8 @@ architecture behavioral of core_controller is
                     irq_err         <= '0';
                     csr_reg         <= r_MTVAL;
 
+                    pc_enable       <= '1';
+
                 elsif   (r1_dec_illegal = '1')  or (r1_mem_addrerr = '1')   or (r1_pc_overflow = '1')   or
                         (r1_if_err = '1')       or (r1_ctl_exception = '1') or (r1_ctl_halt = '1')      or
                         (r1_csr_mip = '1')      then
@@ -296,6 +298,8 @@ architecture behavioral of core_controller is
 
                         -- Inhibit the next irq / err
                         irq_err         <= '1';   
+
+                        pc_enable       <= '0';
                     
                     end if;
 
@@ -417,6 +421,7 @@ architecture behavioral of core_controller is
                             is_req_csr      <= '0';
                             is_req_mem      <= '0';
                             alu_opcode      <= c_NONE;
+                            pc_enable       <= '0';
 
                             tmp             := r1_dec_imm(11 downto 0);
                             case tmp is
@@ -490,6 +495,7 @@ architecture behavioral of core_controller is
                             is_req_alu      <= '0';
                             is_req_csr      <= '0';
                             is_req_mem      <= '0'; 
+                            pc_enable       <= '0';
 
                             alu_opcode      <= c_NONE;
                             csr_reg         <= r_MTVAL;
@@ -508,12 +514,14 @@ architecture behavioral of core_controller is
                         -- T1_x
                         when T1_0 =>
                             cycles_count <= T1_1;
+                            pc_enable    <= '1';
 
                         -- T2_x
                         when T2_0 =>
                             cycles_count <= T2_1;
                         when T2_1 =>
                             cycles_count <= T2_2;
+                            pc_enable    <= '1';
 
                         -- T4_x
                         when T4_0 =>
@@ -524,10 +532,12 @@ architecture behavioral of core_controller is
                             cycles_count <= T4_3;
                         when T4_3 =>
                             cycles_count <= T4_4;
+                            pc_enable    <= '1';
 
                         -- Default to make quartus happy (but, we'll never get here since the if ... else)
                         when others =>
                             cycles_count <= T0;
+                            pc_enable    <= '1';
 
                     end case;
                     
@@ -618,7 +628,6 @@ architecture behavioral of core_controller is
                     mem_byteen      <= (others => '1');
                     mem_we          <= '0';
                     mem_req         <= '0';
-                    pc_enable       <= '1';
                     pc_wren         <= '0';
                     pc_loadvalue    <= (others => '0');
                     reg_we          <= '0';
@@ -728,7 +737,6 @@ architecture behavioral of core_controller is
                         when T1_0 =>
 
                             -- First, stop the program counter. We won't need it until the next cycle.
-                            pc_enable       <= '0';
                             regs_shift_en   <= '0';
 
                             case r2_dec_opcode is
@@ -787,7 +795,6 @@ architecture behavioral of core_controller is
                         when T1_1 =>
 
                             -- Then, restart the program counter operation, to load the next values.
-                            pc_enable       <= '1';
                             regs_shift_en   <= '1';
 
                             case r3_dec_opcode is
