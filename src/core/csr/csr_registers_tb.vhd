@@ -62,60 +62,60 @@ architecture behavioral of csr_registers_tb is
         P3 : process
         begin
             wait for 15 ns;
-            wait for 100 ns;
+            wait for 200 ns;
             wa_t    <= r_MSTATUS;
             we_t    <= '1';
-            wait for 10 ns;
+            wait for 20 ns;
             wa_t    <= r_MISA;
-            wait for 10 ns;
+            wait for 20 ns;
             wa_t    <= r_MIE;
-            wait for 10 ns;
+            wait for 20 ns;
             wa_t    <= r_MTVEC;
-            wait for 10 ns;
+            wait for 20 ns;
             wa_t    <= r_MSCRATCH;
-            wait for 10 ns;
+            wait for 20 ns;
             wa_t    <= r_MEPC;
-            wait for 10 ns;
+            wait for 20 ns;
             wa_t    <= r_MCAUSE;
-            wait for 10 ns;
+            wait for 20 ns;
             wa_t    <= r_MTVAL;
-            wait for 10 ns;
+            wait for 20 ns;
             wa_t    <= r_MIP;
-            wait for 10 ns;
+            wait for 20 ns;
             we_t    <= '0';
             wd_t    <= X"0000_0000";
-            wait for 100 ns;
+            wait for 200 ns;
         end process;
         
         -- Read data
         P4 : process
         begin
-            wait for 10 ns;
+            wait for 20 ns;
             ra1_t   <= r_MSTATUS;
-            wait for 10 ns;
+            wait for 20 ns;
             ra1_t   <= r_MISA;
-            wait for 10 ns;
+            wait for 20 ns;
             ra1_t   <= r_MIE;
-            wait for 10 ns;
+            wait for 20 ns;
             ra1_t   <= r_MTVEC;
-            wait for 10 ns;
+            wait for 20 ns;
             ra1_t   <= r_MSCRATCH;
-            wait for 10 ns;
+            wait for 20 ns;
             ra1_t   <= r_MEPC;
-            wait for 10 ns;
+            wait for 20 ns;
             ra1_t   <= r_MCAUSE;
-            wait for 10 ns;
+            wait for 20 ns;
             ra1_t   <= r_MTVAL;
-            wait for 10 ns;
+            wait for 20 ns;
             ra1_t   <= r_MIP;
-            wait for 10 ns;
+            wait for 20 ns;
         end process;
 
         -- Emulate interrupt
         P5 : process
         begin
             wait for 15 ns;
-            wait for 100 ns;
+            wait for 600 ns;
             wait for 18 ns;
             int_vec_t <= X"FFFF_FFFF";
             wait;

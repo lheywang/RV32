@@ -83,42 +83,42 @@ begin
         -- Handle standard writes
         elsif rising_edge(clock) and (clock_en = '1') then
 
+            -- Synchronizing the MIP register
+            mip   <=  int_vec and mie; 
+
             if (we = '1') then
 
                 case wa is
                     when r_MSTATUS =>
                         mstatus     <= update_bits(wd, MSTATUS_W_MASK,  mstatus);
-                    when r_MISA =>
-                        misa        <= update_bits(wd, MISA_W_MASK,     misa);
+                    -- when r_MISA =>
+                    --     misa        <= update_bits(wd, MISA_W_MASK,     misa); -- Mask is 0
                     when r_MIE =>
                         mie         <= update_bits(wd, MIE_W_MASK,      mie);
                     when r_MTVEC =>
                         mtvec       <= update_bits(wd, MTVEC_W_MASK,    mtvec);
                     when r_MSCRATCH =>
-                        mscratch    <= update_bits(wd, MSCRATCH_W_MASK, mscratch);
+                    --    mscratch    <= update_bits(wd, MSCRATCH_W_MASK, mscratch);
+                        mscratch    <= wd;                                        -- Mask is FFFF_FFFF, so direct copy           
                     when r_MEPC =>
                         mepc        <= update_bits(wd, MEPC_W_MASK,     mepc);
                     when r_MCAUSE =>
                         mcause      <= update_bits(wd, MCAUSE_W_MASK,   mcause);
-                    when r_MTVAL =>
-                        mtval       <= update_bits(wd, MTVAL_W_MASK,    mtval);
-                    when r_MIP =>
-                        mip         <= update_bits(wd, MIP_W_MASK,      mip);
+                    -- when r_MTVAL =>
+                    --     mtval       <= update_bits(wd, MTVAL_W_MASK,    mtval); -- Mask is 0
+                    -- when r_MIP    =>
+                    --     mip         <= update_bits(wd, MIP_W_MASK,   mcause);  -- Mask is 0
                     when others =>
                         -- do nothing
                 end case;
+                     
             
             end if;
-
-        -- Handle the interrupt pending bits.
-        else
-
-            mip   <=  int_vec and mie; 
-
+                
         end if;
 
     end process;
-
+    
     -- asynchronous reads (combinational muxes)
     rd1 <=      mstatus     when (ra1 = r_MSTATUS)  else
                 misa        when (ra1 = r_MISA)     else
