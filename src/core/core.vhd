@@ -8,7 +8,6 @@ entity core is
     generic ( 
         XLEN :                      integer := 32;
         REG_NB :                    integer := 32;
-        CSR_NB :                    integer := 9;
         INPUT_FREQ :                integer := 200_000_000;
         RESET_ADDR :                integer := 0;
         INT_ADDR :                  integer := 0;
@@ -37,6 +36,9 @@ entity core is
         mem_rdata : in              std_logic_vector((XLEN - 1) downto 0);
         mem_err :   in              std_logic;
 
+        -- Interruptions
+        int_vec :   in              std_logic_vector((XLEN - 1) downto 0);
+
         -- debug / control
         core_halt : out             std_logic;
         core_trap : out             std_logic
@@ -58,9 +60,9 @@ architecture behavioral of core is
         signal reg_ra2 :            integer range 0 to (REG_NB-1);
 
         -- Internals signals linked to CSR registers data IO and selection
-        signal csr_wa :             integer range 0 to (CSR_NB - 1);
+        signal csr_wa :             csr_register;
         signal csr_we :             std_logic;
-        signal csr_ra1 :            integer range 0 to (CSR_NB - 1);
+        signal csr_ra1 :            csr_register;
         signal csr_rdata1 :         std_logic_vector((XLEN - 1) downto 0);
         signal csr_mie :            std_logic;
 
@@ -229,10 +231,9 @@ architecture behavioral of core is
 
         -- CSR file
         -- Register file
-        CSR1 : entity work.register_file(rtl)
+        CSR1 : entity work.csr_registers(rtl)
         generic map (
-            XLEN            =>  XLEN,
-            REG_NB          =>  CSR_NB
+            XLEN            =>  XLEN
         )
         port map (
             clock           =>  clk,
@@ -242,9 +243,9 @@ architecture behavioral of core is
             wa              =>  csr_wa,
             wd              =>  reg_wdata,      -- Shared output bus with the ALU output
             ra1             =>  csr_ra1,
-            ra2             =>  0,              -- Stuck read port to 0...
             rd1             =>  csr_rdata1,
-            rd2             =>  open            -- Don't care about second read port...
+            int_vec         =>  int_vec,
+            int_out         =>  csr_mie
         );
 
         -- Arithmetic and Logic unit

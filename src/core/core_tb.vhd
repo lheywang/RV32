@@ -29,6 +29,7 @@ architecture behavioral of core_tb is
         signal core_halt_t :            std_logic                       := '0';
         signal core_trap_t :            std_logic                       := '0';
         signal if_aclr_t :              std_logic                       := '0';
+        signal int_vec_t :              std_logic_vector(31 downto 0)   := (others => '0');
 
     begin
 
@@ -62,7 +63,8 @@ architecture behavioral of core_tb is
                 mem_rdata           =>  mem_rdata_t,
                 mem_err             =>  mem_err_t,
                 core_halt           =>  core_halt_t,
-                core_trap           =>  core_trap_t
+                core_trap           =>  core_trap_t,
+                int_vec             =>  int_vec_t
             );
 
         -- The two memory elements depends on the altera_mf library, which, if not available WILL cause compilation issues.
@@ -98,11 +100,20 @@ architecture behavioral of core_tb is
             clk_t <= not clk_t;
         end process;
 
+        -- reset handler
         P2 : process
         begin
             nRST_t <= '0';
             wait for 8 ns;
             nRST_t <= '1';
+            wait;
+        end process;
+        
+        -- Interrupt emulation (command / uncomment if neded)
+        P3 : process
+        begin
+            wait for 228 ns;
+            -- int_vec_t(11) <= '1';
             wait;
         end process;
 

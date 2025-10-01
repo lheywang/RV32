@@ -57,8 +57,8 @@ entity core_controller is
 
         -- CSR regs controls
         csr_we :        out     std_logic                                   := '0';                 -- CSR write enable of the register file
-        csr_wa :        out     integer range 0 to (CSR_NB - 1)             := 0;                   -- Written CSR register address
-        csr_ra1 :       out     integer range 0 to (CSR_NB - 1)             := 0;                   -- Readen CSR register address 
+        csr_wa :        out     csr_register                                := r_MSTATUS;           -- Written CSR register address
+        csr_ra1 :       out     csr_register                                := r_MSTATUS;           -- Readen CSR register address 
                                                                                                     -- There's no CSR RA2 because we'll never need the second output port
         csr_mie :       in      std_logic;                                                          -- Mie bit status
 
@@ -612,8 +612,8 @@ architecture behavioral of core_controller is
                     reg_ra2         <= 0;
                     reg_rs2_out     <= (others => '0');
                     csr_we          <= '0';
-                    csr_wa          <= 0;
-                    csr_ra1         <= 0;
+                    csr_wa          <= r_MSTATUS;
+                    csr_ra1         <= r_MSTATUS;
                     arg1_sel        <= '0';
                     arg2_sel        <= '0';
                     alu_cmd         <= c_NONE;
@@ -688,9 +688,9 @@ architecture behavioral of core_controller is
 
                             if (r2_is_req_csr = '1') then
                                 arg1_sel        <= '1';
-                                csr_ra1         <= 0;                   -- Need to change that line
+                                csr_ra1         <= r_MSTATUS;                   -- Need to change that line
                             else
-                                csr_ra1         <= 0;
+                                csr_ra1         <= r_MSTATUS;
                             end if;
 
                             if (r2_is_req_mem = '1') then
