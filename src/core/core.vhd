@@ -101,13 +101,37 @@ architecture behavioral of core is
         signal mem_request :        std_logic;
         signal mem_rw :             std_logic;
 
-        signal tmp :                std_logic_vector((XLEN - 1) downto 0);
+        -- Fifo output to decoder
+        signal fifo_out :           std_logic_vector((XLEN - 1) downto 0);
+        signal r_fifo_write :       std_logic;
+        signal r0_fifo_read :       std_logic;
+        signal r1_fifo_read :       std_logic;
+        signal r_fifo_read :        std_logic;
 
     begin
+
+        -- registration process
+        P0 : process(clk, nRST)
+        begin
+            if (nRST = '0') then
+
+                r_fifo_write <= '0';
+                r0_fifo_read <= '0';
+                r1_fifo_read <= '0';
+
+            elsif rising_edge(clk) and (clk_en = '1') then
+
+                r_fifo_write <= pc_en;
+                r1_fifo_read <= r0_fifo_read;
+                r0_fifo_read <= '1';
+
+            end if;
+        end process;
 
         -- Combinational logic
         -- Reset
         dec_reset           <= nRST and dec_reset_cmd;
+        r_fifo_read         <= pc_en and r1_fifo_read;
 
         -- Clock generator
         CLK1 : entity work.clock(behavioral)
@@ -140,13 +164,29 @@ architecture behavioral of core is
             enable          =>  pc_en
         );
 
+        -- Instruction FIFO
+        FIFO1 : entity work.fifo(rtl)
+        generic map (
+            XLEN            => XLEN,
+            DEPTH           => 8 -- arbitrary value to 8, which shall be more than enough
+        )
+        port map (
+            clk             => clk,
+            clk_en          => clk_en,
+            nRST            => nRST,
+            wr_en           => r_fifo_write,
+            rd_en           => r_fifo_read,
+            din             => if_rdata,
+            dout            => fifo_out
+        );
+
         -- Decoder
         DEC1 : entity work.decoder(behavioral)
         generic map (
             XLEN            =>  XLEN
         )
         port map (
-            instruction     =>  if_rdata,
+            instruction     =>  fifo_out,
             rs1             =>  dec_rs1,
             rs2             =>  dec_rs2,
             rd              =>  dec_rd,
@@ -155,7 +195,8 @@ architecture behavioral of core is
             illegal         =>  dec_illegal,
             clock           =>  clk,
             clock_en        =>  clk_en,
-            nRST            =>  dec_reset
+            nRST            =>  dec_reset,
+            shift_en        =>  pc_en
         );
 
         -- Controller / FSM

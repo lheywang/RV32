@@ -12,6 +12,9 @@ entity decoder is
         -- instruction input
         instruction :   in      std_logic_vector(31 downto 0);
 
+        -- shift enable
+        shift_en :      in      std_logic;
+
         -- outputs
         -- buses
         rs1 :           out     std_logic_vector((XLEN / 8) downto 0)                   := (others => '0');
@@ -20,7 +23,7 @@ entity decoder is
         imm :           out     std_logic_vector((XLEN - 1) downto 0)                   := (others => '0');
         opcode :        out     instructions;                         
         -- signals
-        illegal :      out     std_logic;
+        illegal :       out     std_logic;
 
         -- Clocks
         clock :         in      std_logic;
@@ -64,7 +67,7 @@ architecture behavioral of decoder is
                 r_instruction <= (others => '0');
                 first_flag <= '0';
 
-            elsif rising_edge(clock) and (clock_en = '1') then
+            elsif rising_edge(clock) and (clock_en = '1') and (shift_en = '1') then
                 if (first_flag = '1') then
                     r_instruction <= instruction;
                 else
@@ -176,7 +179,7 @@ architecture behavioral of decoder is
                     opcode <= i_NOP;
                     illegal_internal2 <= '0';
 
-                elsif rising_edge(clock) and (clock_en = '1') then
+                elsif rising_edge(clock) and (clock_en = '1') and (shift_en = '1') then
 
                     case selected_decoder is 
 

@@ -97,6 +97,7 @@ architecture behavioral of core_controller is
 
         -- Static logic for making jumps really jumps
         signal r1_flush_needed :    std_logic;
+        signal regs_shift_en :      std_logic;
 
         -- PC Value registration
         signal r01_pc_value :       std_logic_vector((XLEN - 1) downto 0);
@@ -186,7 +187,7 @@ architecture behavioral of core_controller is
                 r02_pc_value        <=  (others => '0');
                 r03_pc_value        <=  (others => '0');
 
-            elsif rising_edge(clock) and (clock_en = '1') then
+            elsif rising_edge(clock) and (clock_en = '1') and (regs_shift_en = '1') then
 
                 r01_pc_value        <=  pc_value;
                 r02_pc_value        <=  r01_pc_value;
@@ -223,7 +224,7 @@ architecture behavioral of core_controller is
                 r1_csr_mip          <=  '0';
                 r1_csr_mie          <=  '0';
 
-            elsif rising_edge(clock) and (clock_en = '1') then
+            elsif rising_edge(clock) and (clock_en = '1') and (regs_shift_en = '1') then
                 r1_dec_rs1          <=  dec_rs1;
                 r1_dec_rs2          <=  dec_rs2;
                 r1_dec_rd           <=  dec_rd;
@@ -636,6 +637,7 @@ architecture behavioral of core_controller is
                     dec_reset       <= '1'; -- by default, enable the decoder reset.
                     r1_flush_needed <= '0'; -- Do not flush the r1 registers.
                     if_aclr         <= '0'; -- Do not clear the output buffers.
+                    regs_shift_en   <= '1';
 
                 else
                     
@@ -726,7 +728,8 @@ architecture behavioral of core_controller is
                         when T1_0 =>
 
                             -- First, stop the program counter. We won't need it until the next cycle.
-                            pc_enable <= '0';
+                            pc_enable       <= '0';
+                            regs_shift_en   <= '0';
 
                             case r2_dec_opcode is
 
@@ -784,7 +787,8 @@ architecture behavioral of core_controller is
                         when T1_1 =>
 
                             -- Then, restart the program counter operation, to load the next values.
-                            pc_enable <= '1';
+                            pc_enable       <= '1';
+                            regs_shift_en   <= '1';
 
                             case r3_dec_opcode is
 
