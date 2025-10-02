@@ -98,6 +98,7 @@ architecture behavioral of core_controller is
         -- Static logic for making jumps really jumps
         signal r1_flush_needed :    std_logic;
         signal regs_shift_en :      std_logic;
+        signal r1_regs_shift_en :   std_logic;
 
         -- PC Value registration
         signal r01_pc_value :       std_logic_vector((XLEN - 1) downto 0);
@@ -174,6 +175,11 @@ architecture behavioral of core_controller is
         signal r3_dec_imm :         std_logic_vector((XLEN - 1) downto 0);
         signal r3_reg_csr :         csr_register;
 
+        signal r3_cycles_count :    FSM_states;
+
+        -- Stall cycle number
+        signal stall_cycle_count :  integer range 0 to 7;
+
     begin
 
         --=========================================================================
@@ -191,7 +197,7 @@ architecture behavioral of core_controller is
                 r04_pc_value        <=  (others => '0');
                 r05_pc_value        <=  (others => '0');
 
-            elsif rising_edge(clock) and (clock_en = '1') and (regs_shift_en = '1') then
+            elsif rising_edge(clock) and (clock_en = '1') and (r1_regs_shift_en = '1') then
 
                 r01_pc_value        <=  pc_value;
                 r02_pc_value        <=  r01_pc_value;
@@ -230,7 +236,7 @@ architecture behavioral of core_controller is
                 r1_csr_mip          <=  '0';
                 r1_csr_mie          <=  '0';
 
-            elsif rising_edge(clock) and (clock_en = '1') and (regs_shift_en = '1') then
+            elsif rising_edge(clock) and (clock_en = '1') and (r1_regs_shift_en = '1') then
                 r1_dec_rs1          <=  dec_rs1;
                 r1_dec_rs2          <=  dec_rs2;
                 r1_dec_rd           <=  dec_rd;
@@ -281,8 +287,6 @@ architecture behavioral of core_controller is
                     irq_err         <= '0';
                     csr_reg         <= r_MTVAL;
 
-                    pc_enable       <= '1';
-
                 elsif   (r1_dec_illegal = '1')  or (r1_mem_addrerr = '1')   or (r1_pc_overflow = '1')   or
                         (r1_if_err = '1')       or (r1_ctl_exception = '1') or (r1_ctl_halt = '1')      or
                         (r1_csr_mip = '1')      then
@@ -304,17 +308,12 @@ architecture behavioral of core_controller is
 
                         -- Inhibit the next irq / err
                         irq_err         <= '1';   
-
-                        pc_enable       <= '0';
                     
                     end if;
 
                 -- Try to deduce the next cycle ONLY if we're on the last opcode cycle
                 elsif   (r2_cycles_count = T0)   or (r2_cycles_count = T1_1)  or (r2_cycles_count = T2_2)   or
                         (r2_cycles_count = T4_4) then
-
-                    -- Enable the program counter, regardless of the future instruction.
-                    pc_enable <= '1';
 
                     case r1_dec_opcode is
 
@@ -520,26 +519,23 @@ architecture behavioral of core_controller is
                     case r2_cycles_count is
                         -- T1_x
                         when T1_0 =>
-                            cycles_count <= T1_1;
-                            pc_enable    <= '0';
+                            cycles_count    <= T1_1;
 
                         -- T2_x
                         when T2_0 =>
-                            cycles_count <= T2_1;
+                            cycles_count    <= T2_1;
                         when T2_1 =>
-                            cycles_count <= T2_2;
-                            pc_enable    <= '0';
-
+                            cycles_count    <= T2_2;
+                            
                         -- T4_x
                         when T4_0 =>
-                            cycles_count <= T4_1;
+                            cycles_count    <= T4_1;
                         when T4_1 =>
-                            cycles_count <= T4_2;
+                            cycles_count    <= T4_2;
                         when T4_2 =>
-                            cycles_count <= T4_3;
+                            cycles_count    <= T4_3;
                         when T4_3 =>
-                            cycles_count <= T4_4;
-                            pc_enable    <= '0';
+                            cycles_count    <= T4_4;
 
                         -- Default to make quartus happy (but, we'll never get here since the if ... else)
                         when others =>
@@ -584,7 +580,7 @@ architecture behavioral of core_controller is
                 r2_alu_opcode       <= c_NONE;
                 r2_reg_csr          <= r_MTVAL;
 
-            elsif rising_edge(clock) and (clock_en = '1') then
+            elsif rising_edge(clock) and (clock_en = '1') and (r1_regs_shift_en = '1') then
 
                 r2_dec_rs1          <= r1_dec_rs1;
                 r2_dec_rs2          <= r1_dec_rs2;
@@ -652,7 +648,6 @@ architecture behavioral of core_controller is
                     dec_reset       <= '1'; -- by default, enable the decoder reset.
                     r1_flush_needed <= '0'; -- Do not flush the r1 registers.
                     if_aclr         <= '0'; -- Do not clear the output buffers.
-                    regs_shift_en   <= '1';
 
                 else
                     
@@ -742,9 +737,6 @@ architecture behavioral of core_controller is
                         -----------------------------------------------------------
                         when T1_0 =>
 
-                            -- First, stop the program counter. We won't need it until the next cycle.
-                            regs_shift_en   <= '0';
-
                             case r2_dec_opcode is
 
                                 -----------------------------------------------------------
@@ -802,9 +794,6 @@ architecture behavioral of core_controller is
                             end case;
 
                         when T1_1 =>
-
-                            -- Then, restart the program counter operation, to load the next values.
-                            regs_shift_en   <= '1';
 
                             case r3_dec_opcode is
 
@@ -931,8 +920,9 @@ architecture behavioral of core_controller is
                 r3_pc_value         <= (others => '0');
                 r3_dec_imm          <= (others => '0');
                 r3_reg_csr          <= r_MTVAL;
+                r3_cycles_count     <= T0;
 
-            elsif rising_edge(clock) and (clock_en = '1') then
+            elsif rising_edge(clock) and (clock_en = '1') and (r1_regs_shift_en = '1') then
 
                 r3_dec_opcode       <= r2_dec_opcode;
                 r3_pc_value         <= r2_pc_value;
@@ -941,6 +931,8 @@ architecture behavioral of core_controller is
                 r3_reg_rs1_in       <= reg_rs1_in;
 
                 r3_reg_csr          <= r2_reg_csr;
+
+                r3_cycles_count     <= r2_cycles_count;
 
             end if;
 
@@ -956,7 +948,7 @@ architecture behavioral of core_controller is
 
                 r4_dec_opcode       <= i_NOP;
 
-            elsif rising_edge(clock) and (clock_en = '1') then
+            elsif rising_edge(clock) and (clock_en = '1') and (r1_regs_shift_en = '1') then
 
                 r4_dec_opcode       <= r3_dec_opcode;
 
@@ -974,7 +966,7 @@ architecture behavioral of core_controller is
 
                 r5_dec_opcode       <= i_NOP;
 
-            elsif rising_edge(clock) and (clock_en = '1') then
+            elsif rising_edge(clock) and (clock_en = '1') and (r1_regs_shift_en = '1') then
 
                 r5_dec_opcode       <= r4_dec_opcode;
 
@@ -992,9 +984,58 @@ architecture behavioral of core_controller is
 
                 r6_dec_opcode       <= i_NOP;
 
-            elsif rising_edge(clock) and (clock_en = '1') then
+            elsif rising_edge(clock) and (clock_en = '1') and (r1_regs_shift_en = '1') then
 
                 r6_dec_opcode       <= r5_dec_opcode;
+
+            end if;
+
+        end process;
+
+
+
+        --=========================================================================
+        -- Managing the pipeline stalls / program counter enabling and so on...
+        --=========================================================================
+        P20 : process(nRST, clock)
+        begin
+
+            if (nRST = '0') then
+
+                r1_regs_shift_en    <= '1';
+
+                pc_enable           <= '1';
+                regs_shift_en       <= '1';
+
+                stall_cycle_count   <= 0;
+
+            -- elsif rising_edge(clock) and (clock_en = '1') then
+
+            --     r1_regs_shift_en        <= regs_shift_en;
+
+            --     -- Updating the stall cycle count signal
+            --     if (stall_cycle_count = 0) then
+            --         pc_enable           <= '1';
+            --         regs_shift_en       <= '1';
+            --     else
+            --         pc_enable           <= '0';
+            --         regs_shift_en       <= '0';
+
+            --         stall_cycle_count   <= stall_cycle_count - 1;
+            --     end if;
+                    
+            --     -- Updating the stall cycle needed
+            --     case cycles_count is
+
+            --         when T1_0 =>
+            --             stall_cycle_count <= 1;
+            --         when T2_0 =>
+            --             stall_cycle_count <= 2;
+            --         when T4_0 =>
+            --             stall_cycle_count <= 4;
+            --         when others =>
+
+            --     end case;
 
             end if;
 
