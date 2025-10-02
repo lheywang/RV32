@@ -16,8 +16,6 @@
 --
 -- 23.1std.1 Build 993 05/14/2024 SC Lite Edition
 -- ************************************************************
-
-
 --Copyright (C) 2024  Intel Corporation. All rights reserved.
 --Your use of Intel Corporation's design tools, logic functions 
 --and other software and tools, and any partner logic 
@@ -32,83 +30,78 @@
 --Intel and sold by Intel or its authorized distributors.  Please
 --refer to the applicable agreement for further details, at
 --https://fpgasoftware.intel.com/eula.
-
-
 LIBRARY ieee;
-USE ieee.std_logic_1164.all;
+USE ieee.std_logic_1164.ALL;
 
 LIBRARY altera_mf;
-USE altera_mf.altera_mf_components.all;
+USE altera_mf.altera_mf_components.ALL;
 
 ENTITY rom IS
-	PORT
-	(
-		aclr		: IN STD_LOGIC  := '0';
-		address_a		: IN STD_LOGIC_VECTOR (13 DOWNTO 0);
-		address_b		: IN STD_LOGIC_VECTOR (13 DOWNTO 0);
-		clock		: IN STD_LOGIC  := '1';
-		q_a		: OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
-		q_b		: OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
-	);
+    PORT (
+        aclr : IN STD_LOGIC := '0';
+        address_a : IN STD_LOGIC_VECTOR (13 DOWNTO 0);
+        address_b : IN STD_LOGIC_VECTOR (13 DOWNTO 0);
+        clock : IN STD_LOGIC := '1';
+        enable : IN STD_LOGIC := '1';
+        q_a : OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
+        q_b : OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
+    );
 END rom;
-
-
 ARCHITECTURE SYN OF rom IS
 
-	SIGNAL sub_wire0_bv	: BIT_VECTOR (31 DOWNTO 0);
-	SIGNAL sub_wire0	: STD_LOGIC_VECTOR (31 DOWNTO 0);
-	SIGNAL sub_wire1	: STD_LOGIC ;
-	SIGNAL sub_wire2	: STD_LOGIC_VECTOR (31 DOWNTO 0);
-	SIGNAL sub_wire3	: STD_LOGIC_VECTOR (31 DOWNTO 0);
+    SIGNAL sub_wire0_bv : BIT_VECTOR (31 DOWNTO 0);
+    SIGNAL sub_wire0 : STD_LOGIC_VECTOR (31 DOWNTO 0);
+    SIGNAL sub_wire1 : STD_LOGIC;
+    SIGNAL sub_wire2 : STD_LOGIC_VECTOR (31 DOWNTO 0);
+    SIGNAL sub_wire3 : STD_LOGIC_VECTOR (31 DOWNTO 0);
 
 BEGIN
-	sub_wire0_bv(31 DOWNTO 0) <= "00000000000000000000000000000000";
-	sub_wire0    <= To_stdlogicvector(sub_wire0_bv);
-	sub_wire1    <= '0';
-	q_a    <= sub_wire2(31 DOWNTO 0);
-	q_b    <= sub_wire3(31 DOWNTO 0);
+    sub_wire0_bv(31 DOWNTO 0) <= "00000000000000000000000000000000";
+    sub_wire0 <= To_stdlogicvector(sub_wire0_bv);
+    sub_wire1 <= '0';
+    q_a <= sub_wire2(31 DOWNTO 0);
+    q_b <= sub_wire3(31 DOWNTO 0);
 
-	altsyncram_component : altsyncram
-	GENERIC MAP (
-		address_reg_b => "CLOCK0",
-		clock_enable_input_a => "BYPASS",
-		clock_enable_input_b => "BYPASS",
-		clock_enable_output_a => "BYPASS",
-		clock_enable_output_b => "BYPASS",
-		indata_reg_b => "CLOCK0",
-		init_file => "src/memory/rom/rom.mif",
-		intended_device_family => "MAX 10",
-		lpm_type => "altsyncram",
-		numwords_a => 12288,
-		numwords_b => 12288,
-		operation_mode => "BIDIR_DUAL_PORT",
-		outdata_aclr_a => "CLEAR0",
-		outdata_aclr_b => "CLEAR0",
-		outdata_reg_a => "CLOCK0",
-		outdata_reg_b => "CLOCK0",
-		power_up_uninitialized => "FALSE",
-		widthad_a => 14,
-		widthad_b => 14,
-		width_a => 32,
-		width_b => 32,
-		width_byteena_a => 1,
-		width_byteena_b => 1,
-		wrcontrol_wraddress_reg_b => "CLOCK0"
-	)
-	PORT MAP (
-		aclr0 => aclr,
-		address_a => address_a,
-		address_b => address_b,
-		clock0 => clock,
-		data_a => sub_wire0,
-		data_b => sub_wire0,
-		wren_a => sub_wire1,
-		wren_b => sub_wire1,
-		q_a => sub_wire2,
-		q_b => sub_wire3
-	);
-
-
+    altsyncram_component : altsyncram
+    GENERIC MAP(
+        address_reg_b => "CLOCK0",
+        clock_enable_input_a => "NORMAL",
+        clock_enable_input_b => "NORMAL",
+        clock_enable_output_a => "BYPASS",
+        clock_enable_output_b => "BYPASS",
+        indata_reg_b => "CLOCK0",
+        init_file => "src/memory/rom/rom.mif",
+        intended_device_family => "MAX 10",
+        lpm_type => "altsyncram",
+        numwords_a => 12288,
+        numwords_b => 12288,
+        operation_mode => "BIDIR_DUAL_PORT",
+        outdata_aclr_a => "CLEAR0",
+        outdata_aclr_b => "CLEAR0",
+        outdata_reg_a => "CLOCK0",
+        outdata_reg_b => "CLOCK0",
+        power_up_uninitialized => "FALSE",
+        widthad_a => 14,
+        widthad_b => 14,
+        width_a => 32,
+        width_b => 32,
+        width_byteena_a => 1,
+        width_byteena_b => 1,
+        wrcontrol_wraddress_reg_b => "CLOCK0"
+    )
+    PORT MAP(
+        aclr0 => aclr,
+        address_a => address_a,
+        address_b => address_b,
+        clock0 => clock,
+        clocken0 => enable,
+        data_a => sub_wire0,
+        data_b => sub_wire0,
+        wren_a => sub_wire1,
+        wren_b => sub_wire1,
+        q_a => sub_wire2,
+        q_b => sub_wire3
+    );
 
 END SYN;
 
