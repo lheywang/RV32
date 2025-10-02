@@ -28,6 +28,16 @@ _start:
     # CSRRCI: Clear bit 1 in mstatus, old value -> x7
     csrrci  x7, mstatus, 1
 
+_dead_code:
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop    
+
     # End loop
 _infty:
     j _infty

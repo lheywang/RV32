@@ -103,6 +103,8 @@ architecture behavioral of core_controller is
         signal r01_pc_value :       std_logic_vector((XLEN - 1) downto 0);
         signal r02_pc_value :       std_logic_vector((XLEN - 1) downto 0);
         signal r03_pc_value :       std_logic_vector((XLEN - 1) downto 0);
+        signal r04_pc_value :       std_logic_vector((XLEN - 1) downto 0);
+        signal r05_pc_value :       std_logic_vector((XLEN - 1) downto 0);
 
         -- registered signals for stage 1
         signal r1_dec_rs1 :         std_logic_vector((XLEN / 8) downto 0);
@@ -186,12 +188,16 @@ architecture behavioral of core_controller is
                 r01_pc_value        <= (others => '0');
                 r02_pc_value        <=  (others => '0');
                 r03_pc_value        <=  (others => '0');
+                r04_pc_value        <=  (others => '0');
+                r05_pc_value        <=  (others => '0');
 
             elsif rising_edge(clock) and (clock_en = '1') and (regs_shift_en = '1') then
 
                 r01_pc_value        <=  pc_value;
                 r02_pc_value        <=  r01_pc_value;
                 r03_pc_value        <=  r02_pc_value;
+                r04_pc_value        <=  r03_pc_value;
+                r05_pc_value        <=  r04_pc_value;
 
             end if;
 
@@ -232,7 +238,7 @@ architecture behavioral of core_controller is
                 r1_dec_opcode       <=  dec_opcode;
 
                 -- r1_pc_value         <=  pc_value;
-                r1_pc_value         <=  r03_pc_value;
+                r1_pc_value         <=  r05_pc_value;
 
                 r1_dec_illegal      <=  dec_illegal;
                 r1_mem_addrerr      <=  mem_addrerr;
