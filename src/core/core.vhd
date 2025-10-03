@@ -156,7 +156,7 @@ BEGIN
             clock_en => clk_en,
             nRST => dec_reset,
             shift_en => pc_en,
-            pause => pause
+            pause => if_pause
         );
 
     -- Controller / FSM
