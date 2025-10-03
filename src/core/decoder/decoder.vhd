@@ -53,7 +53,7 @@ ARCHITECTURE behavioral OF decoder IS
     SIGNAL imm_internal : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := (OTHERS => '0');
 
     -- Internal instruction bus, with the right endianess
-    SIGNAL n : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL i_instruction : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0');
     SIGNAL r_instruction : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0');
 
     -- remove the first decoder cycle glitch
