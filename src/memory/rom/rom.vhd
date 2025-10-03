@@ -67,8 +67,8 @@ BEGIN
         address_reg_b => "CLOCK0",
         clock_enable_input_a => "NORMAL",
         clock_enable_input_b => "NORMAL",
-        clock_enable_output_a => "BYPASS",
-        clock_enable_output_b => "BYPASS",
+        clock_enable_output_a => "NORMAL",
+        clock_enable_output_b => "NORMAL",
         indata_reg_b => "CLOCK0",
         init_file => "src/memory/rom/rom.mif",
         intended_device_family => "MAX 10",
@@ -167,10 +167,10 @@ END SYN;
 -- Retrieval info: PRIVATE: rden NUMERIC "0"
 -- Retrieval info: LIBRARY: altera_mf altera_mf.altera_mf_components.all
 -- Retrieval info: CONSTANT: ADDRESS_REG_B STRING "CLOCK0"
--- Retrieval info: CONSTANT: CLOCK_ENABLE_INPUT_A STRING "BYPASS"
--- Retrieval info: CONSTANT: CLOCK_ENABLE_INPUT_B STRING "BYPASS"
--- Retrieval info: CONSTANT: CLOCK_ENABLE_OUTPUT_A STRING "BYPASS"
--- Retrieval info: CONSTANT: CLOCK_ENABLE_OUTPUT_B STRING "BYPASS"
+-- Retrieval info: CONSTANT: CLOCK_ENABLE_INPUT_A STRING "NORMAL"
+-- Retrieval info: CONSTANT: CLOCK_ENABLE_INPUT_B STRING "NORMAL"
+-- Retrieval info: CONSTANT: CLOCK_ENABLE_OUTPUT_A STRING "NORMAL"
+-- Retrieval info: CONSTANT: CLOCK_ENABLE_OUTPUT_B STRING "NORMAL"
 -- Retrieval info: CONSTANT: INDATA_REG_B STRING "CLOCK0"
 -- Retrieval info: CONSTANT: INIT_FILE STRING "./IP/ROM/mem.hex"
 -- Retrieval info: CONSTANT: INTENDED_DEVICE_FAMILY STRING "MAX 10"
