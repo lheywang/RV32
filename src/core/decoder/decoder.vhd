@@ -67,6 +67,7 @@ BEGIN
         IF (nRST = '0') THEN
             r_instruction <= (OTHERS => '0');
             first_flag <= '0';
+            pause <= '1';
 
         ELSIF rising_edge(clock) AND (clock_en = '1') AND (shift_en = '1') THEN
             IF (first_flag = '1') THEN
