@@ -62,28 +62,11 @@ ARCHITECTURE behavioral OF decoder IS
     SIGNAL first_flag : STD_LOGIC := '0';
     SIGNAL req_pause : STD_LOGIC := '0';
     SIGNAL pause_cycles : INTEGER RANGE 0 TO 3 := 0;
-    SIGNAL paused_cycles : INTEGER RANGE 0 TO 3 := 0;
     SIGNAL paused : STD_LOGIC := '0';
 
+    SIGNAL shift_auth : STD_LOGIC := '0';
+
 BEGIN
-
-    -- Register the input, to enable constant delays between decoders outputs
-    P0 : PROCESS (clock, nRST)
-    BEGIN
-        IF (nRST = '0') THEN
-            i_instruction <= (OTHERS => '0');
-            first_flag <= '0';
-
-        ELSIF rising_edge(clock) AND (clock_en = '1') AND (shift_en = '1') THEN
-            IF (first_flag = '1') THEN
-                i_instruction <= r_instruction;
-            ELSE
-                first_flag <= '1';
-            END IF;
-
-        END IF;
-
-    END PROCESS;
 
     -- Endianess correctors
     U1 : ENTITY work.endianess(rtl)
@@ -95,11 +78,34 @@ BEGIN
             dataout => r_instruction
         );
 
-    -- Combinantional decoder, select the wanted decoder
-    -- Using this not synced to clock enable to split the logic in half, and reduce the critical path
-    -- Before, we've got Fmax = ~100 MHz because of it's too long logic.
-    -- After, quartus report Fmax = ~230 MHz, because of the middle registering process.
+    -- Register the input, to ensure a coherency within the logic block.
+    P0 : PROCESS (clock, nRST)
+    BEGIN
+        IF (nRST = '0') THEN
+            i_instruction <= (OTHERS => '0');
+            -- first_flag <= '0';
+
+        ELSIF rising_edge(clock) AND (clock_en = '1') AND (shift_auth = '1') THEN
+            -- IF (first_flag = '1') THEN
+            i_instruction <= r_instruction;
+            -- ELSE
+            --     first_flag <= '1';
+            -- END IF;
+
+        END IF;
+
+    END PROCESS;
+
+    -- This firs decoder stage select the right decoder for the new instruction, and handle the
+    -- stall cycles required for this instruction. 
+    -- Handling that here enable the ability to react extremely fast on the pipeline, and thus, 
+    -- remove complex logic on the core controller.
+    -- The only drawback is that we can't predict the output, so, instructions that could take 2 or 3 cycles will ALWAYS take 3.
+    -- On such a simple core, the performance loss is more than acceptable, but could be quite big if we need higher performances.
     P1 : PROCESS (nRST, clock)
+
+        VARIABLE paused_cycles : INTEGER RANGE 0 TO 3 := 0;
+
     BEGIN
 
         IF (nRST = '0') THEN
@@ -107,7 +113,7 @@ BEGIN
             selected_decoder <= default_t;
             req_pause <= '0';
             pause_cycles <= 0;
-            paused_cycles <= 0;
+            paused_cycles := 0;
             paused <= '0';
 
         ELSIF rising_edge(clock) AND (clock_en = '1') THEN
@@ -205,7 +211,7 @@ BEGIN
 
                     -- Store the state
                     paused <= '1';
-                    paused_cycles <= pause_cycles - 1;
+                    paused_cycles := pause_cycles - 1;
 
                     -- ACK the pause request
                     pause_cycles <= 0;
@@ -214,11 +220,12 @@ BEGIN
                 ELSIF (paused = '1') THEN
 
                     -- Check if we need to unlock the state, or continue to decrement the counter
+                    IF (paused_cycles /= 0) THEN
+                        paused_cycles := paused_cycles - 1;
+                    END IF;
+
                     IF (paused_cycles = 0) THEN
                         paused <= '0';
-                    ELSE
-                        paused_cycles <= paused_cycles - 1;
-
                     END IF;
 
                 END IF;
@@ -229,22 +236,26 @@ BEGIN
 
     END PROCESS;
 
+    -- This process clock the outputs of the first stage into the second stage.
+    -- It enable a quite massive clock increase (+125% !)
     P2 : PROCESS (clock, nRST, clock_en)
     BEGIN
         IF (nRST = '0') THEN
             r_selected_decoder <= default_t;
             i2_instruction <= (OTHERS => '0');
 
-        ELSIF rising_edge(clock) AND (clock_en = '1') THEN
+        ELSIF rising_edge(clock) AND (clock_en = '1') AND (shift_auth = '1') THEN
             r_selected_decoder <= selected_decoder;
             i2_instruction <= i_instruction;
 
         END IF;
     END PROCESS;
 
-    -- Hardware selected_decoder selection logic
-    -- This process is actually clocked, because we need synchronous outputs.
-    P3 : PROCESS (clock, clock_en, nRST)
+    -- This process create the outputs.
+    -- It is not clocked by itself, but triggered on the changes of both r_selected_decoder and i2_instruction, 
+    -- which are registered.
+    -- This enable a latency reduction and a speed-up of the decoder logic.
+    P3 : PROCESS (nRST, r_selected_decoder, i2_instruction)
     BEGIN
         IF (nRST = '0') THEN
             rs1_internal <= (OTHERS => '0');
@@ -254,7 +265,7 @@ BEGIN
             opcode <= i_NOP;
             illegal_internal2 <= '0';
 
-        ELSIF rising_edge(clock) AND (clock_en = '1') AND (shift_en = '1') THEN
+        ELSE
 
             CASE r_selected_decoder IS
 
@@ -614,6 +625,7 @@ BEGIN
         STD_LOGIC_VECTOR(to_unsigned(0, imm'length));
 
     -- Output the pause combinational output
-    pause <= NOT (req_pause OR paused);
+    shift_auth <= NOT (req_pause OR paused);
+    pause <= shift_auth;
 
 END ARCHITECTURE;

@@ -102,6 +102,9 @@ ARCHITECTURE behavioral OF core IS
     SIGNAL mem_request : STD_LOGIC;
     SIGNAL mem_rw : STD_LOGIC;
 
+    -- pause required
+    SIGNAL pause : STD_LOGIC;
+
 BEGIN
 
     -- Combinational logic
@@ -136,7 +139,7 @@ BEGIN
             clock_en => clk_en,
             nRST => nRST,
             load => pc_wen,
-            enable => pc_en
+            enable => pause
         );
 
     -- Decoder
@@ -156,7 +159,7 @@ BEGIN
             clock_en => clk_en,
             nRST => dec_reset,
             shift_en => pc_en,
-            pause => if_pause
+            pause => pause
         );
 
     -- Controller / FSM
@@ -265,6 +268,7 @@ BEGIN
 
     -- Static mappings
     if_addr <= pc_raddr;
+    if_pause <= pause;
     mem_req <= mem_request;
     mem_we <= mem_rw;
 
