@@ -11,6 +11,7 @@ ENTITY decoder IS
     PORT (
         -- instruction input
         instruction : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        act_addr : IN STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
 
         -- shift enable
         shift_en : IN STD_LOGIC;
@@ -21,6 +22,7 @@ ENTITY decoder IS
         rs2 : OUT STD_LOGIC_VECTOR((XLEN / 8) DOWNTO 0) := (OTHERS => '0');
         rd : OUT STD_LOGIC_VECTOR((XLEN / 8) DOWNTO 0) := (OTHERS => '0');
         imm : OUT STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := (OTHERS => '0');
+        addr : OUT STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := (OTHERS => '0');
         opcode : OUT instructions;
         -- signals
         illegal : OUT STD_LOGIC;
@@ -58,6 +60,10 @@ ARCHITECTURE behavioral OF decoder IS
     SIGNAL i2_instruction : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0');
     SIGNAL r_instruction : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0');
 
+    -- Internal address bus, for instruction corrections
+    SIGNAL i0_addr : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := (OTHERS => '0');
+    SIGNAL i1_addr : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := (OTHERS => '0');
+
     -- remove the first decoder cycle glitch
     SIGNAL first_flag : STD_LOGIC := '0';
     SIGNAL req_pause : STD_LOGIC := '0';
@@ -83,9 +89,24 @@ BEGIN
     BEGIN
         IF (nRST = '0') THEN
             i_instruction <= (OTHERS => '0');
+            first_flag <= '1';
+
+            i0_addr <= (OTHERS => '0');
+            i1_addr <= (OTHERS => '0');
+            i_addr <= (OTHERS => '0');
 
         ELSIF rising_edge(clock) AND (clock_en = '1') AND (shift_auth = '1') THEN
-            i_instruction <= r_instruction;
+            IF (first_flag <= '0') THEN
+                i_instruction <= r_instruction;
+
+                -- Registering the address synchronously with the decoder.
+                -- This enable the output of a clean address bus that match with the actual execution code.
+                i0_addr <= act_addr;
+                i1_addr <= i0_addr;
+                addr <= i1_addr;
+            ELSE
+                first_flag <= '0';
+            END IF;
 
         END IF;
 
@@ -269,7 +290,7 @@ BEGIN
 
         ELSE
 
-            CASE r_selected_decoder IS
+            CASE selected_decoder IS
 
                     -- Register to register operation
                 WHEN R =>

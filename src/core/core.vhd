@@ -86,6 +86,7 @@ ARCHITECTURE behavioral OF core IS
     SIGNAL dec_rs2 : STD_LOGIC_VECTOR((XLEN / 8) DOWNTO 0);
     SIGNAL dec_rd : STD_LOGIC_VECTOR((XLEN / 8) DOWNTO 0);
     SIGNAL dec_imm : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    SIGNAL dec_addr : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
     SIGNAL dec_opcode : instructions;
     SIGNAL dec_illegal : STD_LOGIC;
     SIGNAL dec_reset_cmd : STD_LOGIC;
@@ -149,6 +150,7 @@ BEGIN
         )
         PORT MAP(
             instruction => if_rdata,
+            act_addr => pc_raddr,
             rs1 => dec_rs1,
             rs2 => dec_rs2,
             rd => dec_rd,
@@ -159,7 +161,8 @@ BEGIN
             clock_en => clk_en,
             nRST => dec_reset,
             shift_en => pc_en,
-            pause => pause
+            pause => pause,
+            addr => dec_addr
         );
 
     -- Controller / FSM

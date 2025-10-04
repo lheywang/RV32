@@ -103,7 +103,6 @@ ARCHITECTURE behavioral OF core_controller IS
     SIGNAL r02_pc_value : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
     SIGNAL r03_pc_value : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
     SIGNAL r04_pc_value : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
-    SIGNAL r05_pc_value : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
 
     -- registered signals for stage 1
     SIGNAL r1_dec_rs1 : STD_LOGIC_VECTOR((XLEN / 8) DOWNTO 0);
@@ -190,7 +189,6 @@ BEGIN
             r02_pc_value <= (OTHERS => '0');
             r03_pc_value <= (OTHERS => '0');
             r04_pc_value <= (OTHERS => '0');
-            r05_pc_value <= (OTHERS => '0');
 
         ELSIF rising_edge(clock) AND (clock_en = '1') THEN
 
@@ -198,7 +196,6 @@ BEGIN
             r02_pc_value <= r01_pc_value;
             r03_pc_value <= r02_pc_value;
             r04_pc_value <= r03_pc_value;
-            r05_pc_value <= r04_pc_value;
 
         END IF;
 
@@ -238,7 +235,6 @@ BEGIN
             r1_dec_imm <= dec_imm;
             r1_dec_opcode <= dec_opcode;
 
-            -- r1_pc_value         <=  pc_value;
             r1_pc_value <= r04_pc_value;
 
             r1_dec_illegal <= dec_illegal;
@@ -667,6 +663,7 @@ BEGIN
 
                         -- Handle the AUIPC case
                         IF (r2_dec_opcode = i_AUIPC) THEN
+                            REPORT "AUIPC !";
                             reg_rs2_out <= STD_LOGIC_VECTOR(signed(r2_pc_value) + signed(r2_dec_imm)); -- Can't use the ALU because
                             -- both would require imm port.
                             -- Thus, we make the addition
@@ -769,7 +766,6 @@ BEGIN
                             reg_we <= '1';
                             reg_wa <= to_integer(unsigned(r1_dec_rd));
                             alu_cmd <= c_ADD;
-                            csr_wa <= r_MTVAL;
                             csr_ra1 <= csr_reg;
 
                             -- The the meanwhile, read back the ra2 value for the next step

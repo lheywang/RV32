@@ -43,4 +43,4 @@ _dead_code:
 
     # End loop
 _infty:
-    jalr  x10, x11, 0  
+    jalr  x11, x10, 0  
