@@ -83,14 +83,9 @@ BEGIN
     BEGIN
         IF (nRST = '0') THEN
             i_instruction <= (OTHERS => '0');
-            -- first_flag <= '0';
 
         ELSIF rising_edge(clock) AND (clock_en = '1') AND (shift_auth = '1') THEN
-            -- IF (first_flag = '1') THEN
             i_instruction <= r_instruction;
-            -- ELSE
-            --     first_flag <= '1';
-            -- END IF;
 
         END IF;
 
