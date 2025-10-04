@@ -45,6 +45,7 @@ ARCHITECTURE behavioral OF decoder IS
 
     -- Internal states
     SIGNAL selected_decoder : decocders_type := default_t;
+    SIGNAL r_selected_decoder : decocders_type := default_t;
 
     -- Latchs outputs
     SIGNAL rs1_internal : STD_LOGIC_VECTOR(4 DOWNTO 0) := (OTHERS => '0');
@@ -54,10 +55,15 @@ ARCHITECTURE behavioral OF decoder IS
 
     -- Internal instruction bus, with the right endianess
     SIGNAL i_instruction : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL i2_instruction : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0');
     SIGNAL r_instruction : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0');
 
     -- remove the first decoder cycle glitch
     SIGNAL first_flag : STD_LOGIC := '0';
+    SIGNAL req_pause : STD_LOGIC := '0';
+    SIGNAL pause_cycles : INTEGER RANGE 0 TO 3 := 0;
+    SIGNAL paused_cycles : INTEGER RANGE 0 TO 3 := 0;
+    SIGNAL paused : STD_LOGIC := '0';
 
 BEGIN
 
@@ -65,13 +71,12 @@ BEGIN
     P0 : PROCESS (clock, nRST)
     BEGIN
         IF (nRST = '0') THEN
-            r_instruction <= (OTHERS => '0');
+            i_instruction <= (OTHERS => '0');
             first_flag <= '0';
-            pause <= '1';
 
         ELSIF rising_edge(clock) AND (clock_en = '1') AND (shift_en = '1') THEN
             IF (first_flag = '1') THEN
-                r_instruction <= instruction;
+                i_instruction <= r_instruction;
             ELSE
                 first_flag <= '1';
             END IF;
@@ -86,88 +91,156 @@ BEGIN
             XLEN => 32
         )
         PORT MAP(
-            datain => r_instruction,
-            dataout => i_instruction
+            datain => instruction,
+            dataout => r_instruction
         );
 
     -- Combinantional decoder, select the wanted decoder
     -- Using this not synced to clock enable to split the logic in half, and reduce the critical path
     -- Before, we've got Fmax = ~100 MHz because of it's too long logic.
     -- After, quartus report Fmax = ~230 MHz, because of the middle registering process.
-    P1 : PROCESS (nRST, i_instruction)
+    P1 : PROCESS (nRST, clock)
     BEGIN
 
         IF (nRST = '0') THEN
             illegal_internal <= '0';
             selected_decoder <= default_t;
+            req_pause <= '0';
+            pause_cycles <= 0;
+            paused_cycles <= 0;
+            paused <= '0';
 
-        ELSE
+        ELSIF rising_edge(clock) AND (clock_en = '1') THEN
 
-            -- Select the opcode, and perform an instruction size check (last two bits must be "11").
-            CASE i_instruction(6 DOWNTO 0) IS
+            IF (req_pause = '0') AND (paused = '0') THEN
 
-                WHEN "0110111" => -- LUI
-                    selected_decoder <= U;
-                    illegal_internal <= '0';
-                WHEN "0010111" => -- AUIPC
-                    selected_decoder <= U;
-                    illegal_internal <= '0';
+                -- Select the opcode, and perform an instruction size check (last two bits must be "11").
+                CASE i_instruction(6 DOWNTO 0) IS
 
-                WHEN "0010011" => -- Immediates
-                    selected_decoder <= I;
-                    illegal_internal <= '0';
-                WHEN "0001111" => -- FENCE
-                    selected_decoder <= I;
-                    illegal_internal <= '0';
-                WHEN "1100111" => --(JALR)
-                    selected_decoder <= I;
-                    illegal_internal <= '0';
-                WHEN "1110011" => -- Calls
-                    selected_decoder <= I;
-                    illegal_internal <= '0';
-                WHEN "0000011" => -- Store
-                    selected_decoder <= I;
-                    illegal_internal <= '0';
+                    WHEN "0110111" => -- LUI
+                        selected_decoder <= U;
+                        illegal_internal <= '0';
+                        req_pause <= '0';
+                        pause_cycles <= 0;
 
-                WHEN "0110011" => -- Register operations
-                    selected_decoder <= R;
-                    illegal_internal <= '0';
+                    WHEN "0010111" => -- AUIPC
+                        selected_decoder <= U;
+                        illegal_internal <= '0';
+                        req_pause <= '0';
+                        pause_cycles <= 0;
 
-                WHEN "1100011" => -- Branchs
-                    selected_decoder <= B;
-                    illegal_internal <= '0';
+                    WHEN "0010011" => -- Immediates
+                        selected_decoder <= I;
+                        illegal_internal <= '0';
+                        req_pause <= '0';
+                        pause_cycles <= 0;
 
-                WHEN "0100011" => -- Loads
-                    selected_decoder <= S;
-                    illegal_internal <= '0';
+                    WHEN "0001111" => -- FENCE
+                        selected_decoder <= I;
+                        illegal_internal <= '0';
+                        req_pause <= '0';
+                        pause_cycles <= 0;
 
-                WHEN "1101111" => -- Jumps
-                    selected_decoder <= J;
-                    illegal_internal <= '0';
+                    WHEN "1100111" => --(JALR)
+                        selected_decoder <= I;
+                        illegal_internal <= '0';
+                        req_pause <= '1';
+                        pause_cycles <= 1;
 
-                WHEN "0000000" => -- All zero, seen as NOP
-                    selected_decoder <= NOP;
-                    illegal_internal <= '0';
+                    WHEN "1110011" => -- Calls
+                        selected_decoder <= I;
+                        illegal_internal <= '0';
+                        req_pause <= '1';
+                        pause_cycles <= 2;
 
-                WHEN OTHERS =>
-                    selected_decoder <= illegal_t;
-                    illegal_internal <= '1';
+                    WHEN "0000011" => -- Store
+                        selected_decoder <= I;
+                        illegal_internal <= '0';
+                        req_pause <= '0';
+                        pause_cycles <= 0;
 
-            END CASE;
+                    WHEN "0110011" => -- Register operations
+                        selected_decoder <= R;
+                        illegal_internal <= '0';
+                        req_pause <= '0';
+                        pause_cycles <= 0;
+
+                    WHEN "1100011" => -- Branchs
+                        selected_decoder <= B;
+                        illegal_internal <= '0';
+                        req_pause <= '1';
+                        pause_cycles <= 3;
+
+                    WHEN "0100011" => -- Loads
+                        selected_decoder <= S;
+                        illegal_internal <= '0';
+                        req_pause <= '0';
+                        pause_cycles <= 2;
+
+                    WHEN "1101111" => -- Jumps
+                        selected_decoder <= J;
+                        illegal_internal <= '0';
+                        req_pause <= '1';
+                        pause_cycles <= 1;
+
+                    WHEN "0000000" => -- All zero, seen as NOP
+                        selected_decoder <= NOP;
+                        illegal_internal <= '0';
+                        req_pause <= '0';
+                        pause_cycles <= 0;
+
+                    WHEN OTHERS =>
+                        selected_decoder <= illegal_t;
+                        illegal_internal <= '1';
+                        req_pause <= '0';
+                        pause_cycles <= 0;
+
+                END CASE;
+
+                -- Handle the pause system
+            ELSE
+
+                -- First pause request
+                IF (req_pause = '1') THEN
+
+                    -- Store the state
+                    paused <= '1';
+                    paused_cycles <= pause_cycles - 1;
+
+                    -- ACK the pause request
+                    pause_cycles <= 0;
+                    req_pause <= '0';
+
+                ELSIF (paused = '1') THEN
+
+                    -- Check if we need to unlock the state, or continue to decrement the counter
+                    IF (paused_cycles = 0) THEN
+                        paused <= '0';
+                    ELSE
+                        paused_cycles <= paused_cycles - 1;
+
+                    END IF;
+
+                END IF;
+
+            END IF;
+
         END IF;
 
     END PROCESS;
 
-    -- P2 : process(clock, nRST, clock_en)
-    --     begin
-    --         if (nRST = '0') then    
-    --             r_selected_decoder <= default_t;
+    P2 : PROCESS (clock, nRST, clock_en)
+    BEGIN
+        IF (nRST = '0') THEN
+            r_selected_decoder <= default_t;
+            i2_instruction <= (OTHERS => '0');
 
-    --         elsif rising_edge(clock) and (clock_en = '1') then
-    --             r_selected_decoder <= selected_decoder;
+        ELSIF rising_edge(clock) AND (clock_en = '1') THEN
+            r_selected_decoder <= selected_decoder;
+            i2_instruction <= i_instruction;
 
-    --         end if;
-    --     end process;
+        END IF;
+    END PROCESS;
 
     -- Hardware selected_decoder selection logic
     -- This process is actually clocked, because we need synchronous outputs.
@@ -183,22 +256,22 @@ BEGIN
 
         ELSIF rising_edge(clock) AND (clock_en = '1') AND (shift_en = '1') THEN
 
-            CASE selected_decoder IS
+            CASE r_selected_decoder IS
 
                     -- Register to register operation
                 WHEN R =>
-                    rd_internal <= i_instruction(11 DOWNTO 7);
-                    rs1_internal <= i_instruction(19 DOWNTO 15);
+                    rd_internal <= i2_instruction(11 DOWNTO 7);
+                    rs1_internal <= i2_instruction(19 DOWNTO 15);
 
-                    rs2_internal <= i_instruction(24 DOWNTO 20);
+                    rs2_internal <= i2_instruction(24 DOWNTO 20);
                     imm_internal <= (OTHERS => '0');
 
                     -- i_instruction identification
-                    CASE i_instruction(31 DOWNTO 25) IS
+                    CASE i2_instruction(31 DOWNTO 25) IS
 
                         WHEN "0000000" => -- ADD SLL SLT XOR SRL OR AND
 
-                            CASE i_instruction(14 DOWNTO 12) IS
+                            CASE i2_instruction(14 DOWNTO 12) IS
 
                                 WHEN "000" =>
                                     opcode <= i_ADD;
@@ -232,7 +305,7 @@ BEGIN
 
                         WHEN "0100000" => -- SUB SRA
 
-                            CASE i_instruction(14 DOWNTO 12) IS
+                            CASE i2_instruction(14 DOWNTO 12) IS
 
                                 WHEN "000" =>
                                     opcode <= i_SUB;
@@ -254,18 +327,18 @@ BEGIN
 
                     -- Immediate to register operation
                 WHEN I =>
-                    rd_internal <= i_instruction(11 DOWNTO 7);
-                    rs1_internal <= i_instruction(19 DOWNTO 15);
+                    rd_internal <= i2_instruction(11 DOWNTO 7);
+                    rs1_internal <= i2_instruction(19 DOWNTO 15);
                     rs2_internal <= (OTHERS => '0');
-                    imm_internal <= (OTHERS => i_instruction(31));
-                    imm_internal(11 DOWNTO 0) <= i_instruction(31 DOWNTO 20);
+                    imm_internal <= (OTHERS => i2_instruction(31));
+                    imm_internal(11 DOWNTO 0) <= i2_instruction(31 DOWNTO 20);
 
                     -- i_instruction identification
-                    CASE i_instruction(6 DOWNTO 2) IS
+                    CASE i2_instruction(6 DOWNTO 2) IS
 
                         WHEN "00100" =>
 
-                            CASE i_instruction(14 DOWNTO 12) IS
+                            CASE i2_instruction(14 DOWNTO 12) IS
 
                                 WHEN "000" =>
                                     opcode <= i_ADDI;
@@ -286,7 +359,7 @@ BEGIN
                                     opcode <= i_ORI;
                                     illegal_internal2 <= '0';
                                 WHEN "101" =>
-                                    IF (i_instruction(30) = '1') THEN
+                                    IF (i2_instruction(30) = '1') THEN
                                         opcode <= i_SRAI;
                                         illegal_internal2 <= '0';
                                     ELSE
@@ -309,7 +382,7 @@ BEGIN
 
                         WHEN "00000" =>
 
-                            CASE i_instruction(14 DOWNTO 12) IS
+                            CASE i2_instruction(14 DOWNTO 12) IS
 
                                 WHEN "000" =>
                                     opcode <= i_LB;
@@ -333,7 +406,7 @@ BEGIN
                             END CASE;
 
                         WHEN "11001" =>
-                            IF (i_instruction(14 DOWNTO 12) = "000") THEN
+                            IF (i2_instruction(14 DOWNTO 12) = "000") THEN
                                 opcode <= i_JALR;
                                 illegal_internal2 <= '0';
                             ELSE
@@ -343,7 +416,7 @@ BEGIN
 
                         WHEN "11100" =>
 
-                            CASE i_instruction(14 DOWNTO 12) IS
+                            CASE i2_instruction(14 DOWNTO 12) IS
 
                                 WHEN "001" =>
                                     opcode <= i_CSRRW;
@@ -365,7 +438,7 @@ BEGIN
                                     illegal_internal2 <= '0';
                                 WHEN "000" =>
 
-                                    CASE i_instruction(31 DOWNTO 20) IS
+                                    CASE i2_instruction(31 DOWNTO 20) IS
 
                                         WHEN X"000" =>
                                             opcode <= i_ECALL;
@@ -396,14 +469,14 @@ BEGIN
                     -- Memory operation
                 WHEN S =>
                     rd_internal <= (OTHERS => '0');
-                    rs1_internal <= i_instruction(19 DOWNTO 15);
-                    rs2_internal <= i_instruction(24 DOWNTO 20);
-                    imm_internal <= (OTHERS => i_instruction(31));
-                    imm_internal(11 DOWNTO 0) <= i_instruction(31 DOWNTO 25)
-                    & i_instruction(11 DOWNTO 7);
+                    rs1_internal <= i2_instruction(19 DOWNTO 15);
+                    rs2_internal <= i2_instruction(24 DOWNTO 20);
+                    imm_internal <= (OTHERS => i2_instruction(31));
+                    imm_internal(11 DOWNTO 0) <= i2_instruction(31 DOWNTO 25)
+                    & i2_instruction(11 DOWNTO 7);
 
                     -- i_instruction identification
-                    CASE i_instruction(14 DOWNTO 12) IS
+                    CASE i2_instruction(14 DOWNTO 12) IS
 
                         WHEN "000" =>
                             opcode <= i_SB;
@@ -421,16 +494,16 @@ BEGIN
                     -- Branches
                 WHEN B =>
                     rd_internal <= (OTHERS => '0');
-                    rs1_internal <= i_instruction(19 DOWNTO 15);
-                    rs2_internal <= i_instruction(24 DOWNTO 20);
-                    imm_internal <= (OTHERS => i_instruction(31));
-                    imm_internal(11 DOWNTO 0) <= i_instruction(31)
-                    & i_instruction(7)
-                    & i_instruction(30 DOWNTO 25)
-                    & i_instruction(11 DOWNTO 8);
+                    rs1_internal <= i2_instruction(19 DOWNTO 15);
+                    rs2_internal <= i2_instruction(24 DOWNTO 20);
+                    imm_internal <= (OTHERS => i2_instruction(31));
+                    imm_internal(11 DOWNTO 0) <= i2_instruction(31)
+                    & i2_instruction(7)
+                    & i2_instruction(30 DOWNTO 25)
+                    & i2_instruction(11 DOWNTO 8);
 
                     -- i_instruction identification
-                    CASE i_instruction(14 DOWNTO 12) IS
+                    CASE i2_instruction(14 DOWNTO 12) IS
 
                         WHEN "000" =>
                             opcode <= i_BEQ;
@@ -458,14 +531,14 @@ BEGIN
 
                     -- Immediates values loading
                 WHEN U =>
-                    rd_internal <= i_instruction(11 DOWNTO 7);
+                    rd_internal <= i2_instruction(11 DOWNTO 7);
                     rs1_internal <= (OTHERS => '0');
                     rs2_internal <= (OTHERS => '0');
-                    imm_internal <= i_instruction(31 DOWNTO 12)
+                    imm_internal <= i2_instruction(31 DOWNTO 12)
                         & "000000000000";
 
                     -- i_instruction identification
-                    CASE i_instruction(6 DOWNTO 2) IS
+                    CASE i2_instruction(6 DOWNTO 2) IS
 
                         WHEN "01101" =>
                             opcode <= i_LUI;
@@ -482,17 +555,17 @@ BEGIN
                     -- Jumps
                 WHEN J =>
                     rd_internal <= (OTHERS => '0');
-                    rs1_internal <= i_instruction(19 DOWNTO 15);
-                    rs2_internal <= i_instruction(24 DOWNTO 20);
-                    imm_internal <= (OTHERS => i_instruction(31));
-                    imm_internal(20 DOWNTO 1) <= i_instruction(31)
-                    & i_instruction(19 DOWNTO 12)
-                    & i_instruction(20)
-                    & i_instruction(30 DOWNTO 21);
+                    rs1_internal <= i2_instruction(19 DOWNTO 15);
+                    rs2_internal <= i2_instruction(24 DOWNTO 20);
+                    imm_internal <= (OTHERS => i2_instruction(31));
+                    imm_internal(20 DOWNTO 1) <= i2_instruction(31)
+                    & i2_instruction(19 DOWNTO 12)
+                    & i2_instruction(20)
+                    & i2_instruction(30 DOWNTO 21);
                     imm_internal(0) <= '0';
 
                     -- i_instruction identification
-                    CASE i_instruction(6 DOWNTO 2) IS
+                    CASE i2_instruction(6 DOWNTO 2) IS
 
                         WHEN "11011" =>
                             opcode <= i_JAL;
@@ -539,5 +612,8 @@ BEGIN
         STD_LOGIC_VECTOR(to_unsigned(0, rd'length));
     imm <= imm_internal WHEN illegal_internal_out = '0' ELSE
         STD_LOGIC_VECTOR(to_unsigned(0, imm'length));
+
+    -- Output the pause combinational output
+    pause <= NOT (req_pause OR paused);
 
 END ARCHITECTURE;
