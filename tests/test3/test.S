@@ -20,13 +20,13 @@ _start:
     # --- Immediate forms (use 5-bit immediate instead of register) ---
 
     # CSRRWI: Write immediate 5 into mscratch, old value -> x5
-    csrrwi  x5, mscratch, 5
+    csrrwi  x5, mscratch, 18
 
     # CSRRSI: Set bit 1 in mstatus, old value -> x6
-    csrrsi  x6, mstatus, 1
+    csrrsi  x6, mscratch, 1
 
     # CSRRCI: Clear bit 1 in mstatus, old value -> x7
-    csrrci  x7, mstatus, 1
+    csrrci  x7, mscratch, 1
 
     # Load the address of infnity into a register
     la      x10,    _infty

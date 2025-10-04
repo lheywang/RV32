@@ -708,13 +708,6 @@ BEGIN
                         alu_cmd <= c_NONE;
                     END IF;
 
-                    IF (r2_is_req_csr = '1') THEN
-                        arg1_sel <= '1';
-                        csr_ra1 <= r_MTVAL; -- Need to change that line
-                    ELSE
-                        csr_ra1 <= r_MTVAL;
-                    END IF;
-
                     IF (r2_is_req_mem = '1') THEN
                         mem_req <= '1';
                         mem_we <= '1'; -- Need to change that line
@@ -770,8 +763,6 @@ BEGIN
                             --
                             -- ADDI, RD, R0, IMM, where R0 is ALWAYS 0 (hardwired).
                             --
-                            REPORT "Top !";
-                            csr_ra1 <= csr_reg;
                             arg1_sel <= '1';
                             reg_rs2_out <= (OTHERS => '0'); -- Doing this enable the read-back of ra2 for step 2, ra2 which would be used by x0.
                             arg2_sel <= '1';
@@ -779,7 +770,7 @@ BEGIN
                             reg_wa <= to_integer(unsigned(r1_dec_rd));
                             alu_cmd <= c_ADD;
                             csr_wa <= r_MTVAL;
-                            csr_ra1 <= r_MTVAL;
+                            csr_ra1 <= csr_reg;
 
                             -- The the meanwhile, read back the ra2 value for the next step
                             -- The value will be stored into the rs3_reg_rs1_in signal.
@@ -828,7 +819,6 @@ BEGIN
 
                         WHEN OTHERS =>
 
-                            REPORT "Tap !";
                             -- First, define global signals to store the future result into the CSR register file
                             csr_we <= '1';
                             reg_we <= '0';
@@ -838,6 +828,9 @@ BEGIN
                             arg2_sel <= '1';
 
                             -- Some logic is shared by the two static assignments
+                            --
+                            -- Note : the 5 bit immediate, to to parsing method used return the 5 bit immediate
+                            -- into the RS1 target, thus why we assign it to the output.
                             IF (r3_dec_opcode = i_CSRRW) THEN
                                 alu_cmd <= c_ADD;
                                 arg1_sel <= '0';
@@ -847,7 +840,7 @@ BEGIN
                                 alu_cmd <= c_ADD;
                                 arg1_sel <= '0';
                                 reg_rs2_out <= (OTHERS => '0');
-                                reg_rs2_out(4 DOWNTO 0) <= r2_dec_imm(19 DOWNTO 15);
+                                reg_rs2_out(4 DOWNTO 0) <= r2_dec_rs1;
 
                             ELSIF (r3_dec_opcode = i_CSRRS) THEN
                                 alu_cmd <= c_OR;
@@ -858,7 +851,7 @@ BEGIN
                                 alu_cmd <= c_OR;
                                 arg1_sel <= '1';
                                 reg_rs2_out <= (OTHERS => '0');
-                                reg_rs2_out(4 DOWNTO 0) <= r2_dec_imm(19 DOWNTO 15);
+                                reg_rs2_out(4 DOWNTO 0) <= r2_dec_rs1;
 
                             ELSIF (r3_dec_opcode = i_CSRRC) THEN
                                 alu_cmd <= c_AND;
@@ -869,7 +862,7 @@ BEGIN
                                 alu_cmd <= c_AND;
                                 arg1_sel <= '1';
                                 reg_rs2_out <= (OTHERS => '1');
-                                reg_rs2_out(4 DOWNTO 0) <= NOT reg_rs1_in(19 DOWNTO 15);
+                                reg_rs2_out(4 DOWNTO 0) <= NOT r2_dec_rs1;
 
                             END IF;
 
