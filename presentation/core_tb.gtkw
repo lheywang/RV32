@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
-[*] Sat Oct  4 08:53:27 2025
+[*] Sat Oct  4 14:28:30 2025
 [*]
 [dumpfile] "/home/lheywang/Dev/RV32/build/wave.ghw"
-[dumpfile_mtime] "Sat Oct  4 08:53:04 2025"
-[dumpfile_size] 36354
+[dumpfile_mtime] "Sat Oct  4 14:25:20 2025"
+[dumpfile_size] 40377
 [savefile] "/home/lheywang/Dev/RV32/presentation/core_tb.gtkw"
 [timestart] 0
 [size] 1920 1033
 [pos] -1 -1
-*-25.862608 48200000 165000000 185000000 205000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-25.862608 130500000 125000000 145000000 165000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.core_tb.
 [treeopen] top.core_tb.core.
@@ -22,7 +22,7 @@
 [sst_width] 273
 [signals_width] 261
 [sst_expanded] 1
-[sst_vpaned_height] 524
+[sst_vpaned_height] 468
 @200
 -clocks
 @28
@@ -90,9 +90,6 @@ top.core_tb.core.dec1.opcode
 -
 @28
 top.core_tb.core.dec1.shift_auth
-@29
-top.core_tb.core.dec1.r_shift_auth
-@28
 top.core_tb.core.dec1.paused
 @420
 top.core_tb.core.dec1.pause_cycles
@@ -202,6 +199,8 @@ top.core_tb.core.fsm1.r3_dec_opcode
 @22
 [color] 2
 #{top.core_tb.core.fsm1.reg_rs1_in[31:0]} top.core_tb.core.fsm1.reg_rs1_in[31] top.core_tb.core.fsm1.reg_rs1_in[30] top.core_tb.core.fsm1.reg_rs1_in[29] top.core_tb.core.fsm1.reg_rs1_in[28] top.core_tb.core.fsm1.reg_rs1_in[27] top.core_tb.core.fsm1.reg_rs1_in[26] top.core_tb.core.fsm1.reg_rs1_in[25] top.core_tb.core.fsm1.reg_rs1_in[24] top.core_tb.core.fsm1.reg_rs1_in[23] top.core_tb.core.fsm1.reg_rs1_in[22] top.core_tb.core.fsm1.reg_rs1_in[21] top.core_tb.core.fsm1.reg_rs1_in[20] top.core_tb.core.fsm1.reg_rs1_in[19] top.core_tb.core.fsm1.reg_rs1_in[18] top.core_tb.core.fsm1.reg_rs1_in[17] top.core_tb.core.fsm1.reg_rs1_in[16] top.core_tb.core.fsm1.reg_rs1_in[15] top.core_tb.core.fsm1.reg_rs1_in[14] top.core_tb.core.fsm1.reg_rs1_in[13] top.core_tb.core.fsm1.reg_rs1_in[12] top.core_tb.core.fsm1.reg_rs1_in[11] top.core_tb.core.fsm1.reg_rs1_in[10] top.core_tb.core.fsm1.reg_rs1_in[9] top.core_tb.core.fsm1.reg_rs1_in[8] top.core_tb.core.fsm1.reg_rs1_in[7] top.core_tb.core.fsm1.reg_rs1_in[6] top.core_tb.core.fsm1.reg_rs1_in[5] top.core_tb.core.fsm1.reg_rs1_in[4] top.core_tb.core.fsm1.reg_rs1_in[3] top.core_tb.core.fsm1.reg_rs1_in[2] top.core_tb.core.fsm1.reg_rs1_in[1] top.core_tb.core.fsm1.reg_rs1_in[0]
+@420
+top.core_tb.core.fsm1.csr_reg
 @200
 -
 @420
@@ -231,9 +230,6 @@ top.core_tb.core.csr1.int_en
 top.core_tb.core.csr1.int_out
 @200
 -
-@420
-top.core_tb.core.fsm1.stall_cycle_count
-@200
 -
 -controller-outs
 @28
@@ -245,6 +241,11 @@ top.core_tb.core.fsm1.arg2_sel
 @420
 top.core_tb.core.fsm1.csr_reg
 top.core_tb.core.fsm1.r2_reg_csr
+@28
+top.core_tb.core.fsm1.csr_we
+@420
+top.core_tb.core.fsm1.csr_wa
+top.core_tb.core.fsm1.csr_ra1
 @200
 -
 -reg-array

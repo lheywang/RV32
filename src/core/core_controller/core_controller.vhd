@@ -97,8 +97,6 @@ ARCHITECTURE behavioral OF core_controller IS
 
     -- Static logic for making jumps really jumps
     SIGNAL r1_flush_needed : STD_LOGIC;
-    SIGNAL regs_shift_en : STD_LOGIC;
-    SIGNAL r1_regs_shift_en : STD_LOGIC;
 
     -- PC Value registration
     SIGNAL r01_pc_value : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
@@ -177,9 +175,6 @@ ARCHITECTURE behavioral OF core_controller IS
 
     SIGNAL r3_cycles_count : FSM_states;
 
-    -- Stall cycle number
-    SIGNAL stall_cycle_count : INTEGER RANGE 0 TO 7;
-
 BEGIN
 
     --=========================================================================
@@ -197,7 +192,7 @@ BEGIN
             r04_pc_value <= (OTHERS => '0');
             r05_pc_value <= (OTHERS => '0');
 
-        ELSIF rising_edge(clock) AND (clock_en = '1') AND (r1_regs_shift_en = '1') THEN
+        ELSIF rising_edge(clock) AND (clock_en = '1') THEN
 
             r01_pc_value <= pc_value;
             r02_pc_value <= r01_pc_value;
@@ -236,7 +231,7 @@ BEGIN
             r1_csr_mip <= '0';
             r1_csr_mie <= '0';
 
-        ELSIF rising_edge(clock) AND (clock_en = '1') AND (r1_regs_shift_en = '1') THEN
+        ELSIF rising_edge(clock) AND (clock_en = '1') THEN
             r1_dec_rs1 <= dec_rs1;
             r1_dec_rs2 <= dec_rs2;
             r1_dec_rd <= dec_rd;
@@ -244,7 +239,7 @@ BEGIN
             r1_dec_opcode <= dec_opcode;
 
             -- r1_pc_value         <=  pc_value;
-            r1_pc_value <= r05_pc_value;
+            r1_pc_value <= r04_pc_value;
 
             r1_dec_illegal <= dec_illegal;
             r1_mem_addrerr <= mem_addrerr;
@@ -270,7 +265,7 @@ BEGIN
     P2 : PROCESS (nRST, r1_dec_rs1, r1_dec_rs2, r1_dec_rd,
         r1_dec_imm, r1_dec_opcode, r1_pc_value, r1_dec_illegal,
         r1_mem_addrerr, r1_pc_overflow, r1_if_err, r1_ctl_exception,
-        r1_ctl_halt)
+        r1_ctl_halt, r1_csr_mip, r1_csr_mie, r2_cycles_count)
 
         VARIABLE tmp : STD_LOGIC_VECTOR(11 DOWNTO 0);
 
@@ -580,7 +575,7 @@ BEGIN
             r2_alu_opcode <= c_NONE;
             r2_reg_csr <= r_MTVAL;
 
-        ELSIF rising_edge(clock) AND (clock_en = '1') AND (r1_regs_shift_en = '1') THEN
+        ELSIF rising_edge(clock) AND (clock_en = '1') THEN
 
             r2_dec_rs1 <= r1_dec_rs1;
             r2_dec_rs2 <= r1_dec_rs2;
@@ -620,7 +615,7 @@ BEGIN
         r2_mem_addrerr, r2_pc_overflow, r2_if_err, r2_alu_opcode,
         r2_ctl_exception, r2_ctl_halt, r2_cycles_count, r2_is_immediate,
         r2_is_req_data1, r2_is_req_data2, r2_is_req_store, r2_is_req_alu,
-        r2_is_req_csr, r2_is_req_mem)
+        r2_is_req_csr, r2_is_req_mem, r2_reg_csr)
 
     BEGIN
 
@@ -775,6 +770,7 @@ BEGIN
                             --
                             -- ADDI, RD, R0, IMM, where R0 is ALWAYS 0 (hardwired).
                             --
+                            REPORT "Top !";
                             csr_ra1 <= csr_reg;
                             arg1_sel <= '1';
                             reg_rs2_out <= (OTHERS => '0'); -- Doing this enable the read-back of ra2 for step 2, ra2 which would be used by x0.
@@ -832,6 +828,7 @@ BEGIN
 
                         WHEN OTHERS =>
 
+                            REPORT "Tap !";
                             -- First, define global signals to store the future result into the CSR register file
                             csr_we <= '1';
                             reg_we <= '0';
@@ -921,7 +918,7 @@ BEGIN
             r3_reg_csr <= r_MTVAL;
             r3_cycles_count <= T0;
 
-        ELSIF rising_edge(clock) AND (clock_en = '1') AND (r1_regs_shift_en = '1') THEN
+        ELSIF rising_edge(clock) AND (clock_en = '1') THEN
 
             r3_dec_opcode <= r2_dec_opcode;
             r3_pc_value <= r2_pc_value;
@@ -947,7 +944,7 @@ BEGIN
 
             r4_dec_opcode <= i_NOP;
 
-        ELSIF rising_edge(clock) AND (clock_en = '1') AND (r1_regs_shift_en = '1') THEN
+        ELSIF rising_edge(clock) AND (clock_en = '1') THEN
 
             r4_dec_opcode <= r3_dec_opcode;
 
@@ -965,7 +962,7 @@ BEGIN
 
             r5_dec_opcode <= i_NOP;
 
-        ELSIF rising_edge(clock) AND (clock_en = '1') AND (r1_regs_shift_en = '1') THEN
+        ELSIF rising_edge(clock) AND (clock_en = '1') THEN
 
             r5_dec_opcode <= r4_dec_opcode;
 
@@ -983,56 +980,9 @@ BEGIN
 
             r6_dec_opcode <= i_NOP;
 
-        ELSIF rising_edge(clock) AND (clock_en = '1') AND (r1_regs_shift_en = '1') THEN
+        ELSIF rising_edge(clock) AND (clock_en = '1') THEN
 
             r6_dec_opcode <= r5_dec_opcode;
-
-        END IF;
-
-    END PROCESS;
-
-    --=========================================================================
-    -- Managing the pipeline stalls / program counter enabling and so on...
-    --=========================================================================
-    P20 : PROCESS (nRST, clock)
-    BEGIN
-
-        IF (nRST = '0') THEN
-
-            r1_regs_shift_en <= '1';
-
-            pc_enable <= '1';
-            regs_shift_en <= '1';
-
-            stall_cycle_count <= 0;
-
-            -- elsif rising_edge(clock) and (clock_en = '1') then
-
-            --     r1_regs_shift_en        <= regs_shift_en;
-
-            --     -- Updating the stall cycle count signal
-            --     if (stall_cycle_count = 0) then
-            --         pc_enable           <= '1';
-            --         regs_shift_en       <= '1';
-            --     else
-            --         pc_enable           <= '0';
-            --         regs_shift_en       <= '0';
-
-            --         stall_cycle_count   <= stall_cycle_count - 1;
-            --     end if;
-
-            --     -- Updating the stall cycle needed
-            --     case cycles_count is
-
-            --         when T1_0 =>
-            --             stall_cycle_count <= 1;
-            --         when T2_0 =>
-            --             stall_cycle_count <= 2;
-            --         when T4_0 =>
-            --             stall_cycle_count <= 4;
-            --         when others =>
-
-            --     end case;
 
         END IF;
 
