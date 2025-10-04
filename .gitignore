@@ -11,6 +11,7 @@
 
 # Simulations results
 *.ghw
+*.vcd
 *.cf
 
 # Assembles / compilations outputs

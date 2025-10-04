@@ -10,3 +10,13 @@
 #       Then, read back signals to ensure the correct output has been
 #       computed. Used to automate tests against a define ISA.
 # =================================================================================
+from vcdvcd import VCDVCD
+
+vcd = VCDVCD("build/signals.vcd")
+
+print(vcd)
+
+# Command : ghdl -r --workdir=build/ -Pbuild/ core_tb --vcd=build/signals.vcd --stop-time=10us --max-stack-alloc=0 --disp-time
+
+for sig in vcd.signals:
+    print("  ", sig)
