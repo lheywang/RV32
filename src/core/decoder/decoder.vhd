@@ -93,7 +93,6 @@ BEGIN
 
             i0_addr <= (OTHERS => '0');
             i1_addr <= (OTHERS => '0');
-            i_addr <= (OTHERS => '0');
 
         ELSIF rising_edge(clock) AND (clock_en = '1') AND (shift_auth = '1') THEN
             IF (first_flag <= '0') THEN
@@ -104,6 +103,7 @@ BEGIN
                 i0_addr <= act_addr;
                 i1_addr <= i0_addr;
                 addr <= i1_addr;
+
             ELSE
                 first_flag <= '0';
             END IF;

@@ -9,10 +9,6 @@ ENTITY core_controller IS
         -- Size generic values :
         XLEN : INTEGER := 32; -- Number of bits stored by the register. 
         REG_NB : INTEGER := 32; -- Number of registers in the processor.
-        CSR_NB : INTEGER := 9; -- Number of used CSR registers. WARNING : This part is not fully spec compliant, in the 
-        -- meaning that the address of the register is not correct. There's logically some "space"
-        -- between them, that we ignore. We reuse the same register_file as generic regs, and the
-        -- data is thus joined under the same structure. The controller handle that difference.
 
         -- Handler exceptions : 
         INT_ADDR : INTEGER := 0; -- Address of the interrupt handler to jump.
@@ -98,12 +94,6 @@ ARCHITECTURE behavioral OF core_controller IS
     -- Static logic for making jumps really jumps
     SIGNAL r1_flush_needed : STD_LOGIC;
 
-    -- PC Value registration
-    SIGNAL r01_pc_value : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
-    SIGNAL r02_pc_value : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
-    SIGNAL r03_pc_value : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
-    SIGNAL r04_pc_value : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
-
     -- registered signals for stage 1
     SIGNAL r1_dec_rs1 : STD_LOGIC_VECTOR((XLEN / 8) DOWNTO 0);
     SIGNAL r1_dec_rs2 : STD_LOGIC_VECTOR((XLEN / 8) DOWNTO 0);
@@ -177,31 +167,6 @@ ARCHITECTURE behavioral OF core_controller IS
 BEGIN
 
     --=========================================================================
-    -- Due to the decoder latency, we need to register 3 mores times the
-    -- program counter value.
-    -- Otherwise, an offset would occur when jumping.
-    --=========================================================================
-    P0 : PROCESS (clock, nRST)
-    BEGIN
-        IF (nRST = '0') THEN
-
-            r01_pc_value <= (OTHERS => '0');
-            r02_pc_value <= (OTHERS => '0');
-            r03_pc_value <= (OTHERS => '0');
-            r04_pc_value <= (OTHERS => '0');
-
-        ELSIF rising_edge(clock) AND (clock_en = '1') THEN
-
-            r01_pc_value <= pc_value;
-            r02_pc_value <= r01_pc_value;
-            r03_pc_value <= r02_pc_value;
-            r04_pc_value <= r03_pc_value;
-
-        END IF;
-
-    END PROCESS;
-
-    --=========================================================================
     -- Registering the signals on each cycle. This ensure stability
     -- and higher performance (way higher clock frequency is possible)
     -- May be flushed if a branch is taken to prevent the execution of
@@ -235,7 +200,7 @@ BEGIN
             r1_dec_imm <= dec_imm;
             r1_dec_opcode <= dec_opcode;
 
-            r1_pc_value <= r04_pc_value;
+            r1_pc_value <= pc_value;
 
             r1_dec_illegal <= dec_illegal;
             r1_mem_addrerr <= mem_addrerr;

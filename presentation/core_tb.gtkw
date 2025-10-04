@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
-[*] Sat Oct  4 16:09:59 2025
+[*] Sat Oct  4 16:15:25 2025
 [*]
 [dumpfile] "/home/lheywang/Dev/RV32/build/wave.ghw"
-[dumpfile_mtime] "Sat Oct  4 16:09:35 2025"
-[dumpfile_size] 37559
+[dumpfile_mtime] "Sat Oct  4 16:14:07 2025"
+[dumpfile_size] 39668
 [savefile] "/home/lheywang/Dev/RV32/presentation/core_tb.gtkw"
-[timestart] 0
+[timestart] 519000000
 [size] 1920 1033
 [pos] -1 -1
-*-25.862608 85700000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-25.862608 153700000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.core_tb.
 [treeopen] top.core_tb.core.
@@ -22,7 +22,7 @@
 [sst_width] 273
 [signals_width] 261
 [sst_expanded] 1
-[sst_vpaned_height] 468
+[sst_vpaned_height] 442
 @200
 -clocks
 @28
@@ -77,8 +77,6 @@ top.core_tb.core.dec_reset
 @22
 [color] 5
 #{top.core_tb.core.dec1.i_instruction[31:0]} top.core_tb.core.dec1.i_instruction[31] top.core_tb.core.dec1.i_instruction[30] top.core_tb.core.dec1.i_instruction[29] top.core_tb.core.dec1.i_instruction[28] top.core_tb.core.dec1.i_instruction[27] top.core_tb.core.dec1.i_instruction[26] top.core_tb.core.dec1.i_instruction[25] top.core_tb.core.dec1.i_instruction[24] top.core_tb.core.dec1.i_instruction[23] top.core_tb.core.dec1.i_instruction[22] top.core_tb.core.dec1.i_instruction[21] top.core_tb.core.dec1.i_instruction[20] top.core_tb.core.dec1.i_instruction[19] top.core_tb.core.dec1.i_instruction[18] top.core_tb.core.dec1.i_instruction[17] top.core_tb.core.dec1.i_instruction[16] top.core_tb.core.dec1.i_instruction[15] top.core_tb.core.dec1.i_instruction[14] top.core_tb.core.dec1.i_instruction[13] top.core_tb.core.dec1.i_instruction[12] top.core_tb.core.dec1.i_instruction[11] top.core_tb.core.dec1.i_instruction[10] top.core_tb.core.dec1.i_instruction[9] top.core_tb.core.dec1.i_instruction[8] top.core_tb.core.dec1.i_instruction[7] top.core_tb.core.dec1.i_instruction[6] top.core_tb.core.dec1.i_instruction[5] top.core_tb.core.dec1.i_instruction[4] top.core_tb.core.dec1.i_instruction[3] top.core_tb.core.dec1.i_instruction[2] top.core_tb.core.dec1.i_instruction[1] top.core_tb.core.dec1.i_instruction[0]
-[color] 5
-#{top.core_tb.core.dec1.i_addr[31:0]} top.core_tb.core.dec1.i_addr[31] top.core_tb.core.dec1.i_addr[30] top.core_tb.core.dec1.i_addr[29] top.core_tb.core.dec1.i_addr[28] top.core_tb.core.dec1.i_addr[27] top.core_tb.core.dec1.i_addr[26] top.core_tb.core.dec1.i_addr[25] top.core_tb.core.dec1.i_addr[24] top.core_tb.core.dec1.i_addr[23] top.core_tb.core.dec1.i_addr[22] top.core_tb.core.dec1.i_addr[21] top.core_tb.core.dec1.i_addr[20] top.core_tb.core.dec1.i_addr[19] top.core_tb.core.dec1.i_addr[18] top.core_tb.core.dec1.i_addr[17] top.core_tb.core.dec1.i_addr[16] top.core_tb.core.dec1.i_addr[15] top.core_tb.core.dec1.i_addr[14] top.core_tb.core.dec1.i_addr[13] top.core_tb.core.dec1.i_addr[12] top.core_tb.core.dec1.i_addr[11] top.core_tb.core.dec1.i_addr[10] top.core_tb.core.dec1.i_addr[9] top.core_tb.core.dec1.i_addr[8] top.core_tb.core.dec1.i_addr[7] top.core_tb.core.dec1.i_addr[6] top.core_tb.core.dec1.i_addr[5] top.core_tb.core.dec1.i_addr[4] top.core_tb.core.dec1.i_addr[3] top.core_tb.core.dec1.i_addr[2] top.core_tb.core.dec1.i_addr[1] top.core_tb.core.dec1.i_addr[0]
 @420
 [color] 5
 top.core_tb.core.dec1.selected_decoder
@@ -230,14 +228,6 @@ top.core_tb.mem_we_t
 -
 -controller
 @22
-[color] 2
-#{top.core_tb.core.fsm1.r01_pc_value[31:0]} top.core_tb.core.fsm1.r01_pc_value[31] top.core_tb.core.fsm1.r01_pc_value[30] top.core_tb.core.fsm1.r01_pc_value[29] top.core_tb.core.fsm1.r01_pc_value[28] top.core_tb.core.fsm1.r01_pc_value[27] top.core_tb.core.fsm1.r01_pc_value[26] top.core_tb.core.fsm1.r01_pc_value[25] top.core_tb.core.fsm1.r01_pc_value[24] top.core_tb.core.fsm1.r01_pc_value[23] top.core_tb.core.fsm1.r01_pc_value[22] top.core_tb.core.fsm1.r01_pc_value[21] top.core_tb.core.fsm1.r01_pc_value[20] top.core_tb.core.fsm1.r01_pc_value[19] top.core_tb.core.fsm1.r01_pc_value[18] top.core_tb.core.fsm1.r01_pc_value[17] top.core_tb.core.fsm1.r01_pc_value[16] top.core_tb.core.fsm1.r01_pc_value[15] top.core_tb.core.fsm1.r01_pc_value[14] top.core_tb.core.fsm1.r01_pc_value[13] top.core_tb.core.fsm1.r01_pc_value[12] top.core_tb.core.fsm1.r01_pc_value[11] top.core_tb.core.fsm1.r01_pc_value[10] top.core_tb.core.fsm1.r01_pc_value[9] top.core_tb.core.fsm1.r01_pc_value[8] top.core_tb.core.fsm1.r01_pc_value[7] top.core_tb.core.fsm1.r01_pc_value[6] top.core_tb.core.fsm1.r01_pc_value[5] top.core_tb.core.fsm1.r01_pc_value[4] top.core_tb.core.fsm1.r01_pc_value[3] top.core_tb.core.fsm1.r01_pc_value[2] top.core_tb.core.fsm1.r01_pc_value[1] top.core_tb.core.fsm1.r01_pc_value[0]
-[color] 2
-#{top.core_tb.core.fsm1.r02_pc_value[31:0]} top.core_tb.core.fsm1.r02_pc_value[31] top.core_tb.core.fsm1.r02_pc_value[30] top.core_tb.core.fsm1.r02_pc_value[29] top.core_tb.core.fsm1.r02_pc_value[28] top.core_tb.core.fsm1.r02_pc_value[27] top.core_tb.core.fsm1.r02_pc_value[26] top.core_tb.core.fsm1.r02_pc_value[25] top.core_tb.core.fsm1.r02_pc_value[24] top.core_tb.core.fsm1.r02_pc_value[23] top.core_tb.core.fsm1.r02_pc_value[22] top.core_tb.core.fsm1.r02_pc_value[21] top.core_tb.core.fsm1.r02_pc_value[20] top.core_tb.core.fsm1.r02_pc_value[19] top.core_tb.core.fsm1.r02_pc_value[18] top.core_tb.core.fsm1.r02_pc_value[17] top.core_tb.core.fsm1.r02_pc_value[16] top.core_tb.core.fsm1.r02_pc_value[15] top.core_tb.core.fsm1.r02_pc_value[14] top.core_tb.core.fsm1.r02_pc_value[13] top.core_tb.core.fsm1.r02_pc_value[12] top.core_tb.core.fsm1.r02_pc_value[11] top.core_tb.core.fsm1.r02_pc_value[10] top.core_tb.core.fsm1.r02_pc_value[9] top.core_tb.core.fsm1.r02_pc_value[8] top.core_tb.core.fsm1.r02_pc_value[7] top.core_tb.core.fsm1.r02_pc_value[6] top.core_tb.core.fsm1.r02_pc_value[5] top.core_tb.core.fsm1.r02_pc_value[4] top.core_tb.core.fsm1.r02_pc_value[3] top.core_tb.core.fsm1.r02_pc_value[2] top.core_tb.core.fsm1.r02_pc_value[1] top.core_tb.core.fsm1.r02_pc_value[0]
-[color] 2
-#{top.core_tb.core.fsm1.r03_pc_value[31:0]} top.core_tb.core.fsm1.r03_pc_value[31] top.core_tb.core.fsm1.r03_pc_value[30] top.core_tb.core.fsm1.r03_pc_value[29] top.core_tb.core.fsm1.r03_pc_value[28] top.core_tb.core.fsm1.r03_pc_value[27] top.core_tb.core.fsm1.r03_pc_value[26] top.core_tb.core.fsm1.r03_pc_value[25] top.core_tb.core.fsm1.r03_pc_value[24] top.core_tb.core.fsm1.r03_pc_value[23] top.core_tb.core.fsm1.r03_pc_value[22] top.core_tb.core.fsm1.r03_pc_value[21] top.core_tb.core.fsm1.r03_pc_value[20] top.core_tb.core.fsm1.r03_pc_value[19] top.core_tb.core.fsm1.r03_pc_value[18] top.core_tb.core.fsm1.r03_pc_value[17] top.core_tb.core.fsm1.r03_pc_value[16] top.core_tb.core.fsm1.r03_pc_value[15] top.core_tb.core.fsm1.r03_pc_value[14] top.core_tb.core.fsm1.r03_pc_value[13] top.core_tb.core.fsm1.r03_pc_value[12] top.core_tb.core.fsm1.r03_pc_value[11] top.core_tb.core.fsm1.r03_pc_value[10] top.core_tb.core.fsm1.r03_pc_value[9] top.core_tb.core.fsm1.r03_pc_value[8] top.core_tb.core.fsm1.r03_pc_value[7] top.core_tb.core.fsm1.r03_pc_value[6] top.core_tb.core.fsm1.r03_pc_value[5] top.core_tb.core.fsm1.r03_pc_value[4] top.core_tb.core.fsm1.r03_pc_value[3] top.core_tb.core.fsm1.r03_pc_value[2] top.core_tb.core.fsm1.r03_pc_value[1] top.core_tb.core.fsm1.r03_pc_value[0]
-[color] 2
-#{top.core_tb.core.fsm1.r04_pc_value[31:0]} top.core_tb.core.fsm1.r04_pc_value[31] top.core_tb.core.fsm1.r04_pc_value[30] top.core_tb.core.fsm1.r04_pc_value[29] top.core_tb.core.fsm1.r04_pc_value[28] top.core_tb.core.fsm1.r04_pc_value[27] top.core_tb.core.fsm1.r04_pc_value[26] top.core_tb.core.fsm1.r04_pc_value[25] top.core_tb.core.fsm1.r04_pc_value[24] top.core_tb.core.fsm1.r04_pc_value[23] top.core_tb.core.fsm1.r04_pc_value[22] top.core_tb.core.fsm1.r04_pc_value[21] top.core_tb.core.fsm1.r04_pc_value[20] top.core_tb.core.fsm1.r04_pc_value[19] top.core_tb.core.fsm1.r04_pc_value[18] top.core_tb.core.fsm1.r04_pc_value[17] top.core_tb.core.fsm1.r04_pc_value[16] top.core_tb.core.fsm1.r04_pc_value[15] top.core_tb.core.fsm1.r04_pc_value[14] top.core_tb.core.fsm1.r04_pc_value[13] top.core_tb.core.fsm1.r04_pc_value[12] top.core_tb.core.fsm1.r04_pc_value[11] top.core_tb.core.fsm1.r04_pc_value[10] top.core_tb.core.fsm1.r04_pc_value[9] top.core_tb.core.fsm1.r04_pc_value[8] top.core_tb.core.fsm1.r04_pc_value[7] top.core_tb.core.fsm1.r04_pc_value[6] top.core_tb.core.fsm1.r04_pc_value[5] top.core_tb.core.fsm1.r04_pc_value[4] top.core_tb.core.fsm1.r04_pc_value[3] top.core_tb.core.fsm1.r04_pc_value[2] top.core_tb.core.fsm1.r04_pc_value[1] top.core_tb.core.fsm1.r04_pc_value[0]
 [color] 2
 #{top.core_tb.core.fsm1.r1_pc_value[31:0]} top.core_tb.core.fsm1.r1_pc_value[31] top.core_tb.core.fsm1.r1_pc_value[30] top.core_tb.core.fsm1.r1_pc_value[29] top.core_tb.core.fsm1.r1_pc_value[28] top.core_tb.core.fsm1.r1_pc_value[27] top.core_tb.core.fsm1.r1_pc_value[26] top.core_tb.core.fsm1.r1_pc_value[25] top.core_tb.core.fsm1.r1_pc_value[24] top.core_tb.core.fsm1.r1_pc_value[23] top.core_tb.core.fsm1.r1_pc_value[22] top.core_tb.core.fsm1.r1_pc_value[21] top.core_tb.core.fsm1.r1_pc_value[20] top.core_tb.core.fsm1.r1_pc_value[19] top.core_tb.core.fsm1.r1_pc_value[18] top.core_tb.core.fsm1.r1_pc_value[17] top.core_tb.core.fsm1.r1_pc_value[16] top.core_tb.core.fsm1.r1_pc_value[15] top.core_tb.core.fsm1.r1_pc_value[14] top.core_tb.core.fsm1.r1_pc_value[13] top.core_tb.core.fsm1.r1_pc_value[12] top.core_tb.core.fsm1.r1_pc_value[11] top.core_tb.core.fsm1.r1_pc_value[10] top.core_tb.core.fsm1.r1_pc_value[9] top.core_tb.core.fsm1.r1_pc_value[8] top.core_tb.core.fsm1.r1_pc_value[7] top.core_tb.core.fsm1.r1_pc_value[6] top.core_tb.core.fsm1.r1_pc_value[5] top.core_tb.core.fsm1.r1_pc_value[4] top.core_tb.core.fsm1.r1_pc_value[3] top.core_tb.core.fsm1.r1_pc_value[2] top.core_tb.core.fsm1.r1_pc_value[1] top.core_tb.core.fsm1.r1_pc_value[0]
 [color] 2

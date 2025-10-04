@@ -189,7 +189,7 @@ BEGIN
             mem_we => mem_rw,
             mem_req => mem_request,
             mem_addrerr => mem_err,
-            pc_value => pc_raddr,
+            pc_value => dec_addr,
             pc_overflow => pc_overflow,
             pc_enable => pc_en,
             pc_wren => pc_wen,
