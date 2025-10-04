@@ -1,10 +1,10 @@
 [*]
 [*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
-[*] Sat Oct  4 08:06:20 2025
+[*] Sat Oct  4 08:53:27 2025
 [*]
 [dumpfile] "/home/lheywang/Dev/RV32/build/wave.ghw"
-[dumpfile_mtime] "Sat Oct  4 08:05:53 2025"
-[dumpfile_size] 34418
+[dumpfile_mtime] "Sat Oct  4 08:53:04 2025"
+[dumpfile_size] 36354
 [savefile] "/home/lheywang/Dev/RV32/presentation/core_tb.gtkw"
 [timestart] 0
 [size] 1920 1033
@@ -22,7 +22,7 @@
 [sst_width] 273
 [signals_width] 261
 [sst_expanded] 1
-[sst_vpaned_height] 620
+[sst_vpaned_height] 524
 @200
 -clocks
 @28
@@ -71,7 +71,7 @@ top.core_tb.core.dec_reset
 top.core_tb.core.dec1.selected_decoder
 @200
 -
-@23
+@22
 [color] 5
 #{top.core_tb.core.dec1.i2_instruction[31:0]} top.core_tb.core.dec1.i2_instruction[31] top.core_tb.core.dec1.i2_instruction[30] top.core_tb.core.dec1.i2_instruction[29] top.core_tb.core.dec1.i2_instruction[28] top.core_tb.core.dec1.i2_instruction[27] top.core_tb.core.dec1.i2_instruction[26] top.core_tb.core.dec1.i2_instruction[25] top.core_tb.core.dec1.i2_instruction[24] top.core_tb.core.dec1.i2_instruction[23] top.core_tb.core.dec1.i2_instruction[22] top.core_tb.core.dec1.i2_instruction[21] top.core_tb.core.dec1.i2_instruction[20] top.core_tb.core.dec1.i2_instruction[19] top.core_tb.core.dec1.i2_instruction[18] top.core_tb.core.dec1.i2_instruction[17] top.core_tb.core.dec1.i2_instruction[16] top.core_tb.core.dec1.i2_instruction[15] top.core_tb.core.dec1.i2_instruction[14] top.core_tb.core.dec1.i2_instruction[13] top.core_tb.core.dec1.i2_instruction[12] top.core_tb.core.dec1.i2_instruction[11] top.core_tb.core.dec1.i2_instruction[10] top.core_tb.core.dec1.i2_instruction[9] top.core_tb.core.dec1.i2_instruction[8] top.core_tb.core.dec1.i2_instruction[7] top.core_tb.core.dec1.i2_instruction[6] top.core_tb.core.dec1.i2_instruction[5] top.core_tb.core.dec1.i2_instruction[4] top.core_tb.core.dec1.i2_instruction[3] top.core_tb.core.dec1.i2_instruction[2] top.core_tb.core.dec1.i2_instruction[1] top.core_tb.core.dec1.i2_instruction[0]
 @420
@@ -86,10 +86,15 @@ top.core_tb.core.dec1.opcode
 #{top.core_tb.core.dec1.rs1[4:0]} top.core_tb.core.dec1.rs1[4] top.core_tb.core.dec1.rs1[3] top.core_tb.core.dec1.rs1[2] top.core_tb.core.dec1.rs1[1] top.core_tb.core.dec1.rs1[0]
 [color] 5
 #{top.core_tb.core.dec1.rs2[4:0]} top.core_tb.core.dec1.rs2[4] top.core_tb.core.dec1.rs2[3] top.core_tb.core.dec1.rs2[2] top.core_tb.core.dec1.rs2[1] top.core_tb.core.dec1.rs2[0]
+@200
+-
+@28
+top.core_tb.core.dec1.shift_auth
+@29
+top.core_tb.core.dec1.r_shift_auth
 @28
 top.core_tb.core.dec1.paused
 @420
-top.core_tb.core.dec1.paused_cycles
 top.core_tb.core.dec1.pause_cycles
 @28
 top.core_tb.core.dec1.req_pause

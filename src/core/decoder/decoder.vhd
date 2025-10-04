@@ -157,7 +157,7 @@ BEGIN
                         selected_decoder <= I;
                         illegal_internal <= '0';
                         req_pause <= '1';
-                        pause_cycles <= 2;
+                        pause_cycles <= 1;
 
                     WHEN "0000011" => -- Store
                         selected_decoder <= I;
@@ -210,8 +210,13 @@ BEGIN
                 IF (req_pause = '1') THEN
 
                     -- Store the state
-                    paused <= '1';
                     paused_cycles := pause_cycles - 1;
+
+                    -- Enable to "skip" the paused status if the stall lenght is one cycle.
+                    -- This step is, in fact already handled by the state we're here.
+                    IF (pause_cycles /= 1) THEN
+                        paused <= '1';
+                    END IF;
 
                     -- ACK the pause request
                     pause_cycles <= 0;
@@ -241,10 +246,12 @@ BEGIN
     P2 : PROCESS (clock, nRST, clock_en)
     BEGIN
         IF (nRST = '0') THEN
+
             r_selected_decoder <= default_t;
             i2_instruction <= (OTHERS => '0');
 
         ELSIF rising_edge(clock) AND (clock_en = '1') AND (shift_auth = '1') THEN
+
             r_selected_decoder <= selected_decoder;
             i2_instruction <= i_instruction;
 
@@ -615,13 +622,13 @@ BEGIN
     -- Output signals, while encouting for illegal state.
     illegal <= illegal_internal_out;
 
-    rs1 <= rs1_internal WHEN illegal_internal_out = '0' ELSE
+    rs1 <= rs1_internal WHEN (illegal_internal_out = '0') ELSE
         STD_LOGIC_VECTOR(to_unsigned(0, rs1'length));
-    rs2 <= rs2_internal WHEN illegal_internal_out = '0' ELSE
+    rs2 <= rs2_internal WHEN (illegal_internal_out = '0') ELSE
         STD_LOGIC_VECTOR(to_unsigned(0, rs2'length));
-    rd <= rd_internal WHEN illegal_internal_out = '0' ELSE
+    rd <= rd_internal WHEN (illegal_internal_out = '0') ELSE
         STD_LOGIC_VECTOR(to_unsigned(0, rd'length));
-    imm <= imm_internal WHEN illegal_internal_out = '0' ELSE
+    imm <= imm_internal WHEN (illegal_internal_out = '0') ELSE
         STD_LOGIC_VECTOR(to_unsigned(0, imm'length));
 
     -- Output the pause combinational output
