@@ -22,3 +22,6 @@
 
 # Altera simulations models (not open source)
 *altera_mf*
+
+# VSCode extensions
+.VSCodeCounter/*
