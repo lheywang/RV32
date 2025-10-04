@@ -28,6 +28,9 @@ _start:
     # CSRRCI: Clear bit 1 in mstatus, old value -> x7
     csrrci  x7, mstatus, 1
 
+    # Load the address of infnity into a register
+    la      x10,    _infty
+
 _dead_code:
     nop
     nop
@@ -40,4 +43,4 @@ _dead_code:
 
     # End loop
 _infty:
-    j _infty
+    jalr  x10, x11, 0  
