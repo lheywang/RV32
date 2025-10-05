@@ -1,35 +1,33 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
-use work.common.all;
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
+USE work.common.ALL;
 
-entity endianess_tb is
-end entity;
+ENTITY endianess_tb IS
+END ENTITY;
 
-architecture behavioral of endianess_tb is
+ARCHITECTURE behavioral OF endianess_tb IS
 
-    signal datain_t : std_logic_vector(31 downto 0) := X"deadbeef";
-    signal dataout_t : std_logic_vector(31 downto 0);
+    SIGNAL datain_t : STD_LOGIC_VECTOR(31 DOWNTO 0) := X"deadbeef";
+    SIGNAL dataout_t : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
-begin
+BEGIN
 
-    U1 : entity work.endianess(rtl)
-        generic map (
-            XLEN        =>  32
+    U1 : ENTITY work.endianess(rtl)
+        GENERIC MAP(
+            XLEN => 32
         )
-        port map (
-            datain      =>  datain_t,
-            dataout     =>  dataout_t
+        PORT MAP(
+            datain => datain_t,
+            dataout => dataout_t
         );
 
-    P1 : process
-    begin
-        wait for 10 ns;
+    P1 : PROCESS
+    BEGIN
+        WAIT FOR 10 ns;
         datain_t <= X"aabbccdd";
-        wait for 10 ns;
+        WAIT FOR 10 ns;
         datain_t <= X"eeff1122";
-    end process;
+    END PROCESS;
 
-end architecture behavioral;
-        
-    
+END ARCHITECTURE behavioral;

@@ -1,137 +1,154 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
-use work.common.all;
-use work.records.all;
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
+USE work.common.ALL;
+USE work.records.ALL;
 
-entity alu is 
-generic (
-    XLEN :      integer := 32                                                                   -- Number of bits stored by the register. 
-);
-port (
-    -- Data IO
-    arg1 :          in      std_logic_vector((XLEN - 1) downto 0);                              -- Argument 1
-    arg2 :          in      std_logic_vector((XLEN - 1) downto 0);                              -- Argument 2
-    result   :      out     std_logic_vector((XLEN - 1) downto 0)       := (others => 'Z');     -- Output
+ENTITY alu IS
+    GENERIC (
+        --! @brief Configure the data width in the core. DOES NOT configure the instruction lenght, which is fixed to 32 bits.
+        XLEN : INTEGER := 32
+    );
+    PORT (
+        --------------------------------------------------------------------------------------------------------
+        -- Data I/O
+        --------------------------------------------------------------------------------------------------------
+        --! @brief Argument 1 input for the ALU logic.
+        arg1 : IN STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+        --! @brief Argument 2 input for the ALU logic.
+        arg2 : IN STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+        --! @brief Output of the ALU logic.
+        result : OUT STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := (OTHERS => 'Z');
 
-    -- Controls
-    command :       in      commands;                                                           -- Required operation
+        --------------------------------------------------------------------------------------------------------
+        -- Controls
+        --------------------------------------------------------------------------------------------------------
+        --! @brief Command of the ALU, which operation need to be done.
+        command : IN commands;
 
-    -- Status output
-    status :        out     alu_feedback
-);
-end entity;
+        --------------------------------------------------------------------------------------------------------
+        -- Status
+        --------------------------------------------------------------------------------------------------------
+        --! @brief ALU status (zero, overflow...) output.
+        status : OUT alu_feedback
+    );
+END ENTITY;
 
-architecture behavioral of alu is
+ARCHITECTURE behavioral OF alu IS
 
-    begin
+BEGIN
 
-        P1: process(arg1, arg2, command)
+    --========================================================================================
+    --! @brief Process that is executed on changed of the input arg, and trigger a new 
+    --! calculation.
+    --! Most of the operations are based on bare VHDL implementations.
+    --========================================================================================
+    P1 : PROCESS (arg1, arg2, command)
 
-            variable tmp    : signed(XLEN-1 downto 0);
-            variable res    : std_logic_vector(XLEN-1 downto 0);
-            
-            variable v_ovf  : std_logic := '0';
+        VARIABLE tmp : signed(XLEN - 1 DOWNTO 0);
+        VARIABLE res : STD_LOGIC_VECTOR(XLEN - 1 DOWNTO 0);
 
-            variable highz_out :  std_logic_vector((XLEN - 1) downto 0)       := (others => 'Z');     -- Used for HIGH-Z assignements
+        VARIABLE v_ovf : STD_LOGIC := '0';
 
-        begin
+        VARIABLE highz_out : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := (OTHERS => 'Z');
 
-            res    := (others => '0');
-            v_ovf  := '0';
+    BEGIN
 
-            case command is
+        res := (OTHERS => '0');
+        v_ovf := '0';
 
-                when c_ADD =>
-                    tmp := signed(arg1) + signed(arg2);
-                    res := std_logic_vector(tmp);
-                    -- signed overflow detection
-                    if (arg1(XLEN-1) = arg2(XLEN-1)) and (res(XLEN-1) /= arg1(XLEN-1)) then
-                        v_ovf := '1';
-                    end if;
+        CASE command IS
 
-                when c_SUB =>
-                    tmp := signed(arg1) - signed(arg2);
-                    res := std_logic_vector(tmp);
-                    -- signed overflow detection
-                    if (arg1(XLEN-1) /= arg2(XLEN-1)) and (res(XLEN-1) /= arg1(XLEN-1)) then
-                        v_ovf := '1';
-                    end if;
+            WHEN c_ADD =>
+                tmp := signed(arg1) + signed(arg2);
+                res := STD_LOGIC_VECTOR(tmp);
+                -- signed overflow detection
+                IF (arg1(XLEN - 1) = arg2(XLEN - 1)) AND (res(XLEN - 1) /= arg1(XLEN - 1)) THEN
+                    v_ovf := '1';
+                END IF;
 
-                when c_SLL =>
-                    res := std_logic_vector(shift_left(unsigned(arg1), to_integer(unsigned(arg2(4 downto 0)))));
+            WHEN c_SUB =>
+                tmp := signed(arg1) - signed(arg2);
+                res := STD_LOGIC_VECTOR(tmp);
+                -- signed overflow detection
+                IF (arg1(XLEN - 1) /= arg2(XLEN - 1)) AND (res(XLEN - 1) /= arg1(XLEN - 1)) THEN
+                    v_ovf := '1';
+                END IF;
 
-                when c_SRL =>
-                    res := std_logic_vector(shift_right(unsigned(arg1), to_integer(unsigned(arg2(4 downto 0)))));
+            WHEN c_SLL =>
+                res := STD_LOGIC_VECTOR(shift_left(unsigned(arg1), to_integer(unsigned(arg2(4 DOWNTO 0)))));
 
-                when c_SRA =>
-                    res := std_logic_vector(shift_right(signed(arg1), to_integer(unsigned(arg2(4 downto 0)))));
+            WHEN c_SRL =>
+                res := STD_LOGIC_VECTOR(shift_right(unsigned(arg1), to_integer(unsigned(arg2(4 DOWNTO 0)))));
 
-                when c_AND =>
-                    res := arg1 and arg2;
+            WHEN c_SRA =>
+                res := STD_LOGIC_VECTOR(shift_right(signed(arg1), to_integer(unsigned(arg2(4 DOWNTO 0)))));
 
-                when c_OR =>
-                    res := arg1 or arg2;
+            WHEN c_AND =>
+                res := arg1 AND arg2;
 
-                when c_XOR =>
-                    res := arg1 xor arg2;
+            WHEN c_OR =>
+                res := arg1 OR arg2;
 
-                when c_SLT =>
-                    if signed(arg1) < signed(arg2) then
-                        res := (others => '0');
-                        res(0) := '1';
-                    else
-                        res := (others => '0');
-                    end if;
+            WHEN c_XOR =>
+                res := arg1 XOR arg2;
 
-                when c_SLTU =>
-                    if unsigned(arg1) < unsigned(arg2) then
-                        res := (others => '0');
-                        res(0) := '1';
-                    else
-                        res := (others => '0');
-                    end if;
+            WHEN c_SLT =>
+                IF signed(arg1) < signed(arg2) THEN
+                    res := (OTHERS => '0');
+                    res(0) := '1';
+                ELSE
+                    res := (OTHERS => '0');
+                END IF;
 
-                when others =>
-                    res := (others => '0');
+            WHEN c_SLTU =>
+                IF unsigned(arg1) < unsigned(arg2) THEN
+                    res := (OTHERS => '0');
+                    res(0) := '1';
+                ELSE
+                    res := (OTHERS => '0');
+                END IF;
 
-            end case;
+            WHEN OTHERS =>
+                res := (OTHERS => '0');
 
-            -- outputs assignment
-            result      <= res;
-            status.overflow    <= v_ovf;
-            
-            if (unsigned(res) = 0) and (command /= c_None) then -- This make c_NONE be used for branchs evaluations.
-                status.zero <= '1';
-            else
-                status.zero <= '0';
-            end if;
+        END CASE;
 
-            -- Jumps condition checks
-            if (unsigned(arg1) = unsigned(arg2)) then
-                status.beq <= '1';
-                status.bne <= '0';
-            else
-                status.beq <= '0';
-                status.bne <= '1';
-            end if;
+        -- outputs assignment
+        result <= res;
+        status.overflow <= v_ovf;
 
-            if (unsigned(arg1) < unsigned(arg2)) then
-                status.bltu <= '1';
-                status.bgeu <= '0';
-            else
-                status.bltu <= '0';
-                status.bgeu <= '1';
-            end if;
+        IF (unsigned(res) = 0) AND (command /= c_None) THEN -- This make c_NONE be used for branchs evaluations.
+            status.zero <= '1';
+        ELSE
+            status.zero <= '0';
+        END IF;
 
-            if (signed(arg1) < signed(arg2)) then
-                status.blt <= '1';
-                status.bge <= '0';
-            else
-                status.blt <= '0';
-                status.bge <= '1';
-            end if;
+        -- Jumps condition checks
+        IF (unsigned(arg1) = unsigned(arg2)) THEN
+            status.beq <= '1';
+            status.bne <= '0';
+        ELSE
+            status.beq <= '0';
+            status.bne <= '1';
+        END IF;
 
-        end process;
-        
-    end architecture;
+        IF (unsigned(arg1) < unsigned(arg2)) THEN
+            status.bltu <= '1';
+            status.bgeu <= '0';
+        ELSE
+            status.bltu <= '0';
+            status.bgeu <= '1';
+        END IF;
+
+        IF (signed(arg1) < signed(arg2)) THEN
+            status.blt <= '1';
+            status.bge <= '0';
+        ELSE
+            status.blt <= '0';
+            status.bge <= '1';
+        END IF;
+
+    END PROCESS;
+
+END ARCHITECTURE;

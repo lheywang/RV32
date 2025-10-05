@@ -40,8 +40,7 @@ BEGIN
             REG_NB => 32,
             INPUT_FREQ => 200_000_000,
             RESET_ADDR => 0,
-            INT_ADDR => 0,
-            ERR_ADDR => 0
+            INT_ADDR => 0
         )
         PORT MAP(
             clk => clk_t,

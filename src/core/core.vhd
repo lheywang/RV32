@@ -20,8 +20,7 @@ ENTITY core IS
         --! @brief Address taken by the program counter after a reset.
         RESET_ADDR : INTEGER := 0;
         --! @brief Default address jumped in case of interrupt. This value is used to default the MTVEC register.
-        INT_ADDR : INTEGER := 0;
-        ERR_ADDR : INTEGER := 0
+        INT_ADDR : INTEGER := 0
     );
     PORT (
         --------------------------------------------------------------------------------------------------------
@@ -86,63 +85,123 @@ END ENTITY;
 
 ARCHITECTURE behavioral OF core IS
 
-    -- Clocking control
+    -- Since most signals are between a component and the core controller, they're sorted as this logic.
+    --------------------------------------------------------------------------------------------------------
+    -- Clock enabling 
+    --------------------------------------------------------------------------------------------------------
+    --! @brief Clock enable signal, used to synchronise the elements within the core without creating CDC.
     SIGNAL clk_en : STD_LOGIC;
 
-    -- Internals signals linked to registers data IO and selection
+    --------------------------------------------------------------------------------------------------------
+    -- Registers files operations.
+    --------------------------------------------------------------------------------------------------------
+    --! @brief data to be written into the registers, if required (shared with CSR registers).
     SIGNAL reg_wdata : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief data to be read from the first port of the register file.
     SIGNAL reg_rdata1 : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief data to be read from the second port of the register file.
     SIGNAL reg_rdata2 : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief address of the wrote register.
     SIGNAL reg_wa : INTEGER RANGE 0 TO (REG_NB - 1);
+    --! @brief register write enable
     SIGNAL reg_we : STD_LOGIC;
+    --! @brief address of the read register on the port 1.
     SIGNAL reg_ra1 : INTEGER RANGE 0 TO (REG_NB - 1);
+    --! @brief address of the read register on the port 2.
     SIGNAL reg_ra2 : INTEGER RANGE 0 TO (REG_NB - 1);
 
-    -- Internals signals linked to CSR registers data IO and selection
+    --------------------------------------------------------------------------------------------------------
+    -- CSR registers operations.
+    --------------------------------------------------------------------------------------------------------
+    --! @brief address of the wrote CSR register.
     SIGNAL csr_wa : csr_register;
+    --! @brief CSR register write enable.
     SIGNAL csr_we : STD_LOGIC;
+    --! @brief address of the read port of the CSR register file.
     SIGNAL csr_ra1 : csr_register;
+    --! @brief data to be read from the CSR register file.
     SIGNAL csr_rdata1 : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief special output of the register to indicate if interrupts are enabled, or not. If '0', no interrupts / exceptions are going to be handled.
     SIGNAL csr_mie : STD_LOGIC;
+    --! @brief special output of the register to indicate if an interrupt is pending, or not.
     SIGNAL csr_mip : STD_LOGIC;
 
-    -- Signals for choosing the input elements
+    --------------------------------------------------------------------------------------------------------
+    -- ALU Argument selection.
+    --------------------------------------------------------------------------------------------------------
+    --! @brief ALU selection signal for the argument 1, which is CSR ('1') or register file ('0') (port 1).
     SIGNAL arg1_sel : STD_LOGIC;
+    --! @brief ALU selection signal for the argument 2, which is Immediate ('1') or register file ('0') (port 2).
     SIGNAL arg2_sel : STD_LOGIC;
 
-    -- Controller data IO
+    --------------------------------------------------------------------------------------------------------
+    -- Core controller data input
+    --------------------------------------------------------------------------------------------------------
+    --! @brief Core controller immediate input, tied to register file read port 2. 
     SIGNAL ctl_rdata2 : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
 
-    -- alu signals
+    --------------------------------------------------------------------------------------------------------
+    -- ALU controls
+    --------------------------------------------------------------------------------------------------------
+    --! @brief ALU operation selection.
     SIGNAL alu_cmd : commands;
+    --! @brief ALU status feedback, used for exception (overflows) or branch comparisons.
     SIGNAL alu_status : alu_feedback;
+    --! @brief ALU output, to be written into CSR or the register file.
     SIGNAL alu_out : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief ALU arg 1, choosen from the mux controlled by arg1_sel.
     SIGNAL alu_arg1 : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief ALU arg 2, choosed from the mux controlled by arg2_sel.
     SIGNAL alu_arg2 : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
 
-    -- decoders signals
+    --------------------------------------------------------------------------------------------------------
+    -- Decoder inputs
+    --------------------------------------------------------------------------------------------------------
+    --! @brief Decoder RS1 value, to the core controller.
     SIGNAL dec_rs1 : STD_LOGIC_VECTOR((XLEN / 8) DOWNTO 0);
+    --! @brief Decoder RS2 value, to the core controller.
     SIGNAL dec_rs2 : STD_LOGIC_VECTOR((XLEN / 8) DOWNTO 0);
+    --! @brief Decoder RD value, to the core controller.
     SIGNAL dec_rd : STD_LOGIC_VECTOR((XLEN / 8) DOWNTO 0);
+    --! @brief Decoder Immediate value, to the core controller.
     SIGNAL dec_imm : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief Decoder Address value, to the core controller.
     SIGNAL dec_addr : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief Decoder Opcode value, to the core controller.
     SIGNAL dec_opcode : instructions;
+    --! @brief Decoder Illegal flag, to the core controller.
     SIGNAL dec_illegal : STD_LOGIC;
+    --! @brief Decoder reset flag, asserted after a jump by the core_controller.
     SIGNAL dec_reset_cmd : STD_LOGIC;
+    --! @brief Decoder RS1 value, sent to the decoder. (dec_reset_cmd AND nRST) to handle both reset cases.
     SIGNAL dec_reset : STD_LOGIC;
 
-    -- program counter
+    --------------------------------------------------------------------------------------------------------
+    -- Program counters controls
+    --------------------------------------------------------------------------------------------------------
+    --! @brief program counter load address.
     SIGNAL pc_waddr : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief program counter output address.
     SIGNAL pc_raddr : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief program counter load command bit.
     SIGNAL pc_wen : STD_LOGIC;
+    --! @brief program counter enable bit.
     SIGNAL pc_en : STD_LOGIC;
+    --! @brief program counter overflow status.
     SIGNAL pc_overflow : STD_LOGIC;
 
-    -- Memory
+    --------------------------------------------------------------------------------------------------------
+    -- Memory related
+    --------------------------------------------------------------------------------------------------------
+    --! @brief memory request flag, used to select the muxes to redirect mem data into the standard data path.
     SIGNAL mem_request : STD_LOGIC;
+    --! @brief memory read write, used to select the right mux for the current operation.
     SIGNAL mem_rw : STD_LOGIC;
 
-    -- pause required
+    --------------------------------------------------------------------------------------------------------
+    -- Pause requested
+    --------------------------------------------------------------------------------------------------------
+    --! @brief a pause is issued by the decoder when the instruction currently decoded is going to take more than a CPU cycle.
     SIGNAL pause : STD_LOGIC;
 
 BEGIN
@@ -151,7 +210,7 @@ BEGIN
     -- Reset
     dec_reset <= nRST AND dec_reset_cmd;
 
-    -- Clock generator
+    --! @brief Clock generator module, used to generate the clk_en signal.
     CLK1 : ENTITY work.clock(behavioral)
         GENERIC MAP(
             INPUT_FREQ => INPUT_FREQ,
@@ -164,7 +223,7 @@ BEGIN
             clk_en => clk_en
         );
 
-    -- Program counter
+    --! @brief Program counter module, used to generate addresses for the next instruction fetch cycle.
     PC1 : ENTITY work.pcounter(behavioral)
         GENERIC MAP(
             XLEN => XLEN,
@@ -182,7 +241,7 @@ BEGIN
             enable => pause
         );
 
-    -- Decoder
+    --! @brief Decoder module, split instruction into smaller args.
     DEC1 : ENTITY work.decoder(behavioral)
         GENERIC MAP(
             XLEN => XLEN
@@ -199,18 +258,16 @@ BEGIN
             clock => clk,
             clock_en => clk_en,
             nRST => dec_reset,
-            shift_en => pc_en,
             pause => pause,
             addr => dec_addr
         );
 
-    -- Controller / FSM
+    --! @brief Core controller module. Decide active signals for each cycles.
     FSM1 : ENTITY work.core_controller(behavioral)
         GENERIC MAP(
             XLEN => XLEN,
             REG_NB => REG_NB,
-            INT_ADDR => INT_ADDR,
-            EXP_ADDR => ERR_ADDR
+            INT_ADDR => INT_ADDR
         )
         PORT MAP(
             clock => clk,
@@ -256,7 +313,7 @@ BEGIN
             core_halt => core_halt
         );
 
-    -- Register file
+    --! @brief General purpose register file.
     REGS1 : ENTITY work.register_file(rtl)
         GENERIC MAP(
             XLEN => XLEN,
@@ -275,8 +332,7 @@ BEGIN
             rd2 => reg_rdata2
         );
 
-    -- CSR file
-    -- Register file
+    --! @brief CSR registers file.
     CSR1 : ENTITY work.csr_registers(rtl)
         GENERIC MAP(
             XLEN => XLEN
@@ -295,7 +351,7 @@ BEGIN
             int_out => csr_mip
         );
 
-    -- Arithmetic and Logic unit
+    --! @brief ALU for the whole core.
     ALU1 : ENTITY work.alu(behavioral)
         GENERIC MAP(
             XLEN => XLEN

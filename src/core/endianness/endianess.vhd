@@ -1,37 +1,44 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
-use work.common.all;
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
+USE work.common.ALL;
 
-entity endianess is
-    generic (
-        XLEN :  integer := 32
+ENTITY endianess IS
+    GENERIC (
+        --! @brief Configure the data width in the core.
+        XLEN : INTEGER := 32
     );
-    port (
-        datain : in std_logic_vector((XLEN - 1) downto 0);
-        dataout : out std_logic_vector((XLEN - 1) downto 0)
+    PORT (
+        --! @brief Data intput, to be swapped from endianness type.
+        datain : IN STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+        --! @brief Data output, swapped.
+        dataout : OUT STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0)
     );
-end entity;
+END ENTITY;
 
-architecture rtl of endianess is
+ARCHITECTURE rtl OF endianess IS
 
-begin
+BEGIN
 
-    process(datain)
+    --========================================================================================
+    --! @brief This process handle the data swapping, and isn't synchronously done.
+    --! @details
+    --! This process won't, in fact exist. It's a pure logic representation of a different wirings,
+    --! which quartus will synthetize as a ... wiring with 0 LUT usage.
+    --========================================================================================
+    PROCESS (datain)
 
-        variable temp : std_logic_vector(XLEN-1 downto 0);
+        VARIABLE temp : STD_LOGIC_VECTOR(XLEN - 1 DOWNTO 0);
 
-    begin
+    BEGIN
         -- swap byte by byte
-        for i in 0 to (XLEN/8 - 1) loop
-            temp(((i+1)*8 - 1) downto i*8) := 
-            datain(((XLEN/8 - 1 - i + 1)*8 - 1) downto (XLEN/8 - 1 - i)*8);
-        end loop;
+        FOR i IN 0 TO (XLEN/8 - 1) LOOP
+            temp(((i + 1) * 8 - 1) DOWNTO i * 8) :=
+            datain(((XLEN/8 - 1 - i + 1) * 8 - 1) DOWNTO (XLEN/8 - 1 - i) * 8);
+        END LOOP;
 
         dataout <= temp;
 
-    end process; 
+    END PROCESS;
 
-end architecture rtl;
-        
-    
+END ARCHITECTURE rtl;

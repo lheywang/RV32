@@ -1,78 +1,78 @@
 -- Recommended sim lenght : 1 us
 
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
 
-entity pcounter_tb is 
-end entity;
+ENTITY pcounter_tb IS
+END ENTITY;
 
-architecture behavioral of pcounter_tb is
+ARCHITECTURE behavioral OF pcounter_tb IS
 
-        signal address_t :      std_logic_vector(31 downto 0);
-        signal address_in_t :   std_logic_vector(31 downto 0)           := X"deadbeef";
-        signal clock_t :        std_logic                               := '0';
-        signal nRST_t :         std_logic                               := '0';
-        signal load_t :         std_logic                               := '0';
-        signal enable_t :       std_logic                               := '0';
-        signal nOVER_t :        std_logic;
+    SIGNAL address_t : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL address_in_t : STD_LOGIC_VECTOR(31 DOWNTO 0) := X"deadbeef";
+    SIGNAL clock_t : STD_LOGIC := '0';
+    SIGNAL nRST_t : STD_LOGIC := '0';
+    SIGNAL load_t : STD_LOGIC := '0';
+    SIGNAL enable_t : STD_LOGIC := '0';
+    SIGNAL nOVER_t : STD_LOGIC;
 
-    begin
+BEGIN
 
-        U1 : entity work.pcounter(behavioral)
-            generic map (
-                XLEN        =>  32,
-                RESET_ADDR  =>  255
-            )
-            port map (
-                address     =>  address_t,
-                address_in  =>  address_in_t,
-                clock       =>  clock_t,
-                nRST        =>  nRST_t,
-                load        =>  load_t,
-                enable      =>  enable_t,
-                nOVER       =>  nOVER_t
-            );
+    U1 : ENTITY work.pcounter(behavioral)
+        GENERIC MAP(
+            XLEN => 32,
+            RESET_ADDR => 255
+        )
+        PORT MAP(
+            address => address_t,
+            address_in => address_in_t,
+            clock => clock_t,
+            nRST => nRST_t,
+            load => load_t,
+            enable => enable_t,
+            nOVER => nOVER_t
+        );
 
-        P1 : process
-            begin
-                clock_t <= not clock_t;
-                wait for 10 ns;
-            end process;
+    P1 : PROCESS
+    BEGIN
+        clock_t <= NOT clock_t;
+        WAIT FOR 10 ns;
+    END PROCESS;
 
-        P2 : process
-            begin
-                nRST_t <= '0';
-                wait for 100 ns;
-                nRST_t <= '1';
-                wait for 900 ns;
-            end process;
+    P2 : PROCESS
+    BEGIN
+        nRST_t <= '0';
+        WAIT FOR 100 ns;
+        nRST_t <= '1';
+        WAIT FOR 900 ns;
+    END PROCESS;
 
-        P3 : process
-            begin
-                wait for 110 ns;
-                enable_t <= '1';
-                wait for 90 ns;
-                enable_t <= '0';
-                load_t <= '1';
+    P3 : PROCESS
+    BEGIN
+        WAIT FOR 110 ns;
+        enable_t <= '1';
+        WAIT FOR 90 ns;
+        enable_t <= '0';
+        load_t <= '1';
 
-                wait for 60 ns;
-                load_t <= '0';
-                wait for 40 ns;
-                enable_t <= '1';
+        WAIT FOR 60 ns;
+        load_t <= '0';
+        WAIT FOR 40 ns;
+        enable_t <= '1';
 
-                wait for 100 ns;
-                address_in_t <= X"FFFFFFF0";
-                load_t <= '1';
+        WAIT FOR 100 ns;
+        address_in_t <= X"FFFFFFF0";
+        load_t <= '1';
 
-                wait for 20 ns;
-                load_t <= '0';
-                wait for 380 ns;
-                load_t <= '1';
+        WAIT FOR 20 ns;
+        load_t <= '0';
+        WAIT FOR 380 ns;
+        load_t <= '1';
 
-                wait for 60 ns;
-                load_t <= '0';
-                wait for 140 ns;
-            end process;
+        WAIT FOR 60 ns;
+        load_t <= '0';
+        WAIT FOR 140 ns;
+    END PROCESS;
 
-    end architecture;
+END ARCHITECTURE;

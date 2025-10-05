@@ -1,3 +1,8 @@
+--! @file src/core/core.vhd
+--! @brief The base file that assemble all of the components of the core. Does not include any form of memory.
+--! @author l.heywang <leonard.heywang@proton.me>
+--! @date 05-10-2025
+
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
@@ -5,54 +10,129 @@ USE work.common.ALL;
 
 ENTITY csr_registers IS
     GENERIC (
+        --! @brief Configure the data width in the core.
         XLEN : INTEGER := 32
     );
     PORT (
+        --------------------------------------------------------------------------------------------------------
+        -- Clocks & controls
+        --------------------------------------------------------------------------------------------------------
+        --! @brief clock input of the core. Must match the INPUT_FREQ generics within some tolerance.
         clock : IN STD_LOGIC;
+        --! @brief clock enable from the core clock controller. Used to not create two clock domains from the master clock and the auxilliary clock.
         clock_en : IN STD_LOGIC;
+        --! @brief reset input, active low. When held to '0', the system will remain in the reset state until set to '1'.
         nRST : IN STD_LOGIC;
 
-        -- single write port
+        --------------------------------------------------------------------------------------------------------
+        -- Writing port
+        --------------------------------------------------------------------------------------------------------
+        --! @brief Write enable pin. Active high. Set to '1' to enable any write operation on the CSR register file.
         we : IN STD_LOGIC;
+        --! @brief Write address, as an integer.
         wa : IN csr_register;
+        --! @brief Write data, expressed as a vector of the same length as the the default value.
         wd : IN STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
 
-        -- two read ports
+        --------------------------------------------------------------------------------------------------------
+        -- Reading ports
+        --------------------------------------------------------------------------------------------------------
+        --! @brief Address for the read port
         ra1 : IN csr_register;
+        --! @brief Data for the read port
         rd1 : OUT STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
 
-        -- Interrupt specific IOs
+        --------------------------------------------------------------------------------------------------------
+        -- Interrupt related IOs
+        --------------------------------------------------------------------------------------------------------
+        --! @brief Interrupt vector, as input. The MIE interrupt mask will be applied to it, and result placed into MIP.
         int_vec : IN STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+        --! @brief Interrupt out, as MIP(7). Only the master external interrupt is handled, thus the interrupt_controller peripheral is required.
         int_out : OUT STD_LOGIC;
+        --! @brief Interrupt enable bit, as an output MIE(3) . Indicate that the core must account for an interrupt.
         int_en : OUT STD_LOGIC
     );
 END ENTITY;
 
 ARCHITECTURE rtl OF csr_registers IS
 
-    -- Define write permissions for each register
+    --! @brief Write mask for MSTATUS register
+    --! @details
+    --! Bitmask defining which bits in **MSTATUS** are writable.
+    --! Each bit corresponds to one bit position in the CSR.
     CONSTANT MSTATUS_W_MASK : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := "00000000000000000111100010001000";
+
+    --! @brief Write mask for MISA register
+    --! @details
+    --! Bitmask defining which bits in **MISA** are writable.
+    --! Each bit corresponds to one bit position in the CSR.
     CONSTANT MISA_W_MASK : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := "00000000000000000000000000000000";
+
+    --! @brief Write mask for MIE register
+    --! @details
+    --! Bitmask defining which bits in **MIE** are writable.
+    --! Each bit corresponds to one bit position in the CSR.
     CONSTANT MIE_W_MASK : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := "11111111111111110000100010001000";
+
+    --! @brief Write mask for MTVEC register
+    --! @details
+    --! Bitmask defining which bits in **MTVEC** are writable.
+    --! Each bit corresponds to one bit position in the CSR.
     CONSTANT MTVEC_W_MASK : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := "11111111111111111111111100000001";
+
+    --! @brief Write mask for MSCRATCH register
+    --! @details
+    --! Bitmask defining which bits in **MSCRATCH** are writable.
+    --! Each bit corresponds to one bit position in the CSR.
     CONSTANT MSCRATCH_W_MASK : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := "11111111111111111111111111111111";
+
+    --! @brief Write mask for MEPC register
+    --! @details
+    --! Bitmask defining which bits in **MEPC** are writable.
+    --! Each bit corresponds to one bit position in the CSR.
     CONSTANT MEPC_W_MASK : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := "11111111111111111111111111111110";
+
+    --! @brief Write mask for MCAUSE register
+    --! @details
+    --! Bitmask defining which bits in **MCAUSE** are writable.
+    --! Each bit corresponds to one bit position in the CSR.
     CONSTANT MCAUSE_W_MASK : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := "10000000000000000000000000011111";
+
+    --! @brief Write mask for MTVAL register
+    --! @details
+    --! Bitmask defining which bits in **MTVAL** are writable.
+    --! Each bit corresponds to one bit position in the CSR.
     CONSTANT MTVAL_W_MASK : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := "00000000000000000000000000000000";
+
+    --! @brief Write mask for MIP register
+    --! @details
+    --! Bitmask defining which bits in **MIP** are writable.
+    --! Each bit corresponds to one bit position in the CSR.
     CONSTANT MIP_W_MASK : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := "00000000000000000000000000000000";
 
-    -- Since there's not a lot of registers, we define them manually.
+    --! @brief Register mstatus.
     SIGNAL mstatus : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief Register misa.
     SIGNAL misa : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief Register mie.
     SIGNAL mie : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief Register mtvec.
     SIGNAL mtvec : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief Register mscratch.
     SIGNAL mscratch : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief Register mepc.
     SIGNAL mepc : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief Register mcause.
     SIGNAL mcause : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief Register mtval.
     SIGNAL mtval : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief Register mip.
     SIGNAL mip : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
 
-    -- Defining logic mask function for easier updates
+    --! @brief Compute the new register value by applying pure logic to the inputs, while accouting for write masks.
+    --! @details
+    --! performs the operation OUT <= (IN & MASK) | (OLD & ~MASK)
+    --! This enable to overwrite the bits with the new value regarless of their previous state, while preserving protected bits.
     FUNCTION update_bits(
         write_in : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
         write_mask : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
@@ -64,8 +144,16 @@ ARCHITECTURE rtl OF csr_registers IS
 
 BEGIN
 
-    -- synchronous write
-    PROCESS (clock, nRST, int_vec)
+    --========================================================================================
+    --! @brief P1 handle all of the write parts (since reading are done asynchronously).
+    --! @details
+    --! On each authorized rising edges, if we need to write (WE = '1') and the write
+    --! address is not 0 (as per the spec, this register could not be written), 
+    --! update the register file.
+    --! On reset, the register file is initialized to 0x00000000 for all registers.
+    --! The biggest difference with the register file is the fact that the mask is applied to ANy writes.
+    --========================================================================================
+    P1 : PROCESS (clock, nRST, int_vec)
     BEGIN
 
         -- Handle reset 

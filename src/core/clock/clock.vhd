@@ -1,54 +1,66 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
 
-entity clock is
-    generic (
-        INPUT_FREQ :    integer := 200_000_000;
-        OUTPUT_FREQ :   integer := 100_000_000;
-        DUTY_CYCLE :    integer := 50
+ENTITY clock IS
+    GENERIC (
+        --! @brief Input frequency of the module. This value is needed to deduce the counter limits.
+        INPUT_FREQ : INTEGER := 200_000_000;
+        --! @brief Output frequency of the module. This value is needed to deduce the counter limits.
+        --! output frequency must be an integer factor of the input, otherwise roundings errors will be issued,
+        --! and the output frequency may not match the requirements.
+        OUTPUT_FREQ : INTEGER := 100_000_000;
+        --! @brief Wanted duty cycle (only possible when division factor is >= 2)
+        DUTY_CYCLE : INTEGER := 50
     );
-    port (
-        clk :           in  std_logic;
-        nRST :          in  std_logic;
-        clk_en :        out std_logic
+    PORT (
+        --! @brief clock input of the core. Must match the INPUT_FREQ generics within some tolerance.
+        clk : IN STD_LOGIC;
+        --! @brief reset input, active low. When held to '0', the system will remain in the reset state until set to '1'.
+        nRST : IN STD_LOGIC;
+        --! @brief clock output, divided by the factor INPUT_FREQ / OUTPUT_FREQ and with a duty cycle of DUTY_CYCLE value.
+        clk_en : OUT STD_LOGIC
     );
-end entity;
+END ENTITY;
 
-architecture behavioral of clock is
+ARCHITECTURE behavioral OF clock IS
 
-        -- Compute values about the specs of the counter
-        constant  maxval : integer := (INPUT_FREQ / OUTPUT_FREQ) - 1;
-        constant  threshold : integer := ((maxval * DUTY_CYCLE) / 100) + 1;
+    --! @brief constant that will be used as the upper limit of the counter.
+    CONSTANT maxval : INTEGER := (INPUT_FREQ / OUTPUT_FREQ) - 1;
+    --! @brief constant that will trigger a change in the output value.
+    CONSTANT threshold : INTEGER := ((maxval * DUTY_CYCLE) / 100) + 1;
 
-         -- Initialize the vector
-        signal count : integer range 0 to maxval + 1;
+    --! @brief counter value.
+    SIGNAL count : INTEGER RANGE 0 TO maxval + 1;
 
-    begin
+BEGIN
 
-        P1 : process(clk, nRST)
-        begin
+    --========================================================================================
+    --! @brief Process to handle the clock evolution, based on a counter and comparisons.
+    --========================================================================================
+    P1 : PROCESS (clk, nRST)
+    BEGIN
 
-            if (nRST = '0') then
+        IF (nRST = '0') THEN
+            count <= 0;
+            clk_en <= '0';
+
+        ELSIF rising_edge(clk) THEN
+
+            IF (count >= maxval) THEN
                 count <= 0;
+            ELSE
+                count <= count + 1;
+            END IF;
+
+            IF (count < threshold) THEN
+                clk_en <= '1';
+            ELSE
                 clk_en <= '0';
+            END IF;
 
-            elsif rising_edge(clk) then
-                
-                if (count >= maxval) then
-                    count <= 0;
-                else
-                    count <= count + 1;
-                end if;
+        END IF;
 
-                 if (count < threshold) then
-                    clk_en <= '1';
-                else
-                    clk_en <= '0';
-                end if;
-        
-            end if;
+    END PROCESS;
 
-        end process;
-
-    end architecture;
+END ARCHITECTURE;
