@@ -1,10 +1,15 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+--! @file rv32.vhd
+--! @brief This is the top entity of the RV32 core, which include peripherals and memories. Theses may be vendor dependant.
+--! @author l.heywang <leonard.heywang@proton.me>
+--! date 05-10-25
 
-entity rv32 is 
-end entity;
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
 
-architecture behavioral of rv32 is
-    begin
-    end architecture;
+ENTITY rv32 IS
+END ENTITY;
+
+ARCHITECTURE behavioral OF rv32 IS
+BEGIN
+END ARCHITECTURE;

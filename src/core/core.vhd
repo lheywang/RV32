@@ -1,3 +1,8 @@
+--! @file src/core/core.vhd
+--! @brief The base file that assemble all of the components of the core. Does not include any form of memory.
+--! @author l.heywang <leonard.heywang@proton.me>
+--! @date 05-10-2025
+
 LIBRARY IEEE;
 USE IEEE.std_logic_1164.ALL;
 USE IEEE.numeric_std.ALL;
@@ -6,41 +11,75 @@ USE work.records.ALL;
 
 ENTITY core IS
     GENERIC (
+        --! @brief Configure the data width in the core. DOES NOT configure the instruction lenght, which is fixed to 32 bits.
         XLEN : INTEGER := 32;
+        --! @brief Configure the number of registers available. May be changed accordingly to configure for example the reduced instruction set.
         REG_NB : INTEGER := 32;
+        --! @brief Pure value to set the input frequency. Used to configure the clock subsystem, which will half it. The frequency MUST be divisible by two.
         INPUT_FREQ : INTEGER := 200_000_000;
+        --! @brief Address taken by the program counter after a reset.
         RESET_ADDR : INTEGER := 0;
+        --! @brief Default address jumped in case of interrupt. This value is used to default the MTVEC register.
         INT_ADDR : INTEGER := 0;
         ERR_ADDR : INTEGER := 0
     );
     PORT (
+        --------------------------------------------------------------------------------------------------------
         -- global IOs
+        --------------------------------------------------------------------------------------------------------
+        --! @brief clock input of the core. Must match the INPUT_FREQ generics within some tolerance.
         clk : IN STD_LOGIC;
+        --! @brief reset input, active low. When held to '0', the system will remain in the reset state until set to '1'.
         nRST : IN STD_LOGIC;
+        --! @brief halt input, active high. When hel to '1', the system won't execute any instructions and will stop as it.
         halt : IN STD_LOGIC;
+        --! @brief exception input, used to trigger exceptions for external peripherals from the core.
         exception : IN STD_LOGIC;
 
+        --------------------------------------------------------------------------------------------------------
         -- instruction fetching
+        --------------------------------------------------------------------------------------------------------
+        --! @brief Instruction fetch address. This is the output of the current program counter address.
         if_addr : OUT STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+        --! @brief Instruction read data. This is the input of the instruction to be executed.
         if_rdata : IN STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+        --! @brief Instruction fetch error. Active high. When set to '1', this indicate that the memory subsystem as encountered an issue.
         if_err : IN STD_LOGIC;
+        --! @brief Instruction fetch, output registers asynchronous clear. Used to empty the output registers of the ROM.
         if_aclr : OUT STD_LOGIC;
+        --! @brief Instruction fetch pause. Active low. This is inhibit the registers of the different memory modules, and shall stop them.
         if_pause : OUT STD_LOGIC;
 
+        --------------------------------------------------------------------------------------------------------
         -- external memory
+        --------------------------------------------------------------------------------------------------------
+        --! @brief External memory address. This is the output of the current memory location written.
         mem_addr : OUT STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+        --! @brief External memory write enable. When set to '1', this indicate a write.
         mem_we : OUT STD_LOGIC;
+        --! @brief External memory request. This signal is active '1' when the memory is performing a request, otherwise 0. Peripherals shall ignore buses states when '0'.
         mem_req : OUT STD_LOGIC;
+        --! @brief External memory write data. This is the data to be written into the memory, must be ignored when reading.
         mem_wdata : OUT STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+        --! @brief External memory byte enable signals. Used to perform I/O of different sizes (smaller) than XLEN.
         mem_byten : OUT STD_LOGIC_VECTOR(((XLEN / 8) - 1) DOWNTO 0);
+        --! @brief External memory read data. This is the data to be written into the registers, must be zeroed when writting.
         mem_rdata : IN STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+        --! @brief External memory error pin, active high. Used to trigger an exception.
         mem_err : IN STD_LOGIC;
 
+        --------------------------------------------------------------------------------------------------------
         -- Interruptions
+        --------------------------------------------------------------------------------------------------------
+        --! @brief Interrupt vector, 32 bits. When a bit is set to high, it's fed into the CSR MIE register which will mask them, and transfer them to the core if it match the right position. Only the 11 bit will trigger an interrupt, but the MIP register can be used to fetch ANY interrupt.
         int_vec : IN STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
 
+        --------------------------------------------------------------------------------------------------------
         -- debug / control
+        --------------------------------------------------------------------------------------------------------
+        --! @brief Output to indicate that the core have been halted.
         core_halt : OUT STD_LOGIC;
+        --! @brief Output to indicate that the core is actually executing code within an exception handling context.
         core_trap : OUT STD_LOGIC
     );
 END ENTITY;

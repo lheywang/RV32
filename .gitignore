@@ -4,6 +4,7 @@
 *
 !*/
 !*.*
+!DoxyFile
 
 # Then, removes some specifics patterns
 # Compiled files
@@ -23,6 +24,9 @@
 
 # Altera simulations models (not open source)
 *altera_mf*
+
+# Doxygen outputs
+documentation/*
 
 # VSCode extensions
 .VSCodeCounter/*

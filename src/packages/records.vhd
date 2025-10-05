@@ -1,19 +1,18 @@
-library ieee;
-use ieee.std_logic_1164.all;
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
 
-package records is
+PACKAGE records IS
 
-    type alu_feedback is record
-        zero :          std_logic;            -- ALU produced a zero output                                                      
-        overflow :      std_logic;            -- ALU overflow
-        beq :           std_logic;            -- Indicate that the BEQ  condition is valid for jump
-        bne :           std_logic;            -- Indicate that the BNE  condition is valid for jump
-        blt :           std_logic;            -- Indicate that the BLT  condition is valid for jump
-        bge :           std_logic;            -- Indicate that the BGE  condition is valid for jump
-        bltu :          std_logic;            -- Indicate that the BLTU condition is valid for jump
-        bgeu :          std_logic;            -- Indicate that the BGEU condition is valid for jump
+    --! @brief This records group the status flags out of the ALU, feed into the controller to decide if an exception or a branch must be taken.
+    TYPE alu_feedback IS RECORD
+        zero : STD_LOGIC; --! ALU produced a zero output                                                      
+        overflow : STD_LOGIC; --! ALU overflow (the result is then WRONG)
+        beq : STD_LOGIC; --! Indicate that the BEQ condition is valid for jump
+        bne : STD_LOGIC; --! Indicate that the BNE condition is valid for jump
+        blt : STD_LOGIC; --! Indicate that the BLT condition is valid for jump
+        bge : STD_LOGIC; --! Indicate that the BGE condition is valid for jump
+        bltu : STD_LOGIC; --! Indicate that the BLTU condition is valid for jump
+        bgeu : STD_LOGIC; --! Indicate that the BGEU condition is valid for jump
 
-    end record alu_feedback;
-
-
-end package records;
+    END RECORD alu_feedback;
+END PACKAGE records;
