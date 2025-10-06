@@ -835,6 +835,11 @@ BEGIN
                     -- the opcode is NOP.)
                     -- Thus, that's not required for now !
 
+                    -- Second designer note : The BRANCH instruction are assumed as never taken, thus, if possible :
+                    -- Write your code as the if condition will evaluate to false. This give cleaner algorithms and,
+                    -- betters performances since the core won't need to refill the whole pipeline, costing 6 CPU
+                    -- cycles.
+
                 WHEN T1_0 =>
 
                     CASE r2_dec_opcode IS
