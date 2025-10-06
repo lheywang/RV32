@@ -153,7 +153,7 @@ ARCHITECTURE behavioral OF core_controller IS
     TYPE FSM_states IS (
         T0,
         T1_0, T1_1,
-        T2_0, T2_1, T2_2,
+        -- T2_0, T2_1, T2_2,
         T4_0, T4_1, T4_2, T4_3, T4_4
     );
 
@@ -304,6 +304,9 @@ ARCHITECTURE behavioral OF core_controller IS
     --! @brief Third registration of the cycles_count value.
     SIGNAL r3_cycles_count : FSM_states;
 
+    --! @brief Register the alu status for the branch taking
+    SIGNAL r3_alu_status : alu_feedback;
+
 BEGIN
 
     --========================================================================================
@@ -404,7 +407,7 @@ BEGIN
             END IF;
 
             -- Try to deduce the next cycle ONLY if we're on the last opcode cycle
-        ELSIF (r2_cycles_count = T0) OR (r2_cycles_count = T1_1) OR (r2_cycles_count = T2_2) OR
+        ELSIF (r2_cycles_count = T0) OR (r2_cycles_count = T1_1) OR -- (r2_cycles_count = T2_2) OR
             (r2_cycles_count = T4_4) THEN
 
             CASE r1_dec_opcode IS
@@ -560,7 +563,7 @@ BEGIN
                 WHEN i_BEQ | i_BNE | i_BLT | i_BGE |
                     i_BLTU | i_BGEU =>
 
-                    cycles_count <= T2_0;
+                    cycles_count <= T1_0;
 
                     -- We don't really care about theses since we're on a 3 cycles instruction.
                     is_immediate <= '0';
@@ -606,12 +609,6 @@ BEGIN
                     -- T1_x
                 WHEN T1_0 =>
                     cycles_count <= T1_1;
-
-                    -- T2_x
-                WHEN T2_0 =>
-                    cycles_count <= T2_1;
-                WHEN T2_1 =>
-                    cycles_count <= T2_2;
 
                     -- T4_x
                 WHEN T4_0 =>
@@ -740,20 +737,34 @@ BEGIN
 
         ELSE
 
+            -----------------------------------------------------------
+            -- RESETTING THE FSM INTO IT'S DEFAULT STATE
+            -----------------------------------------------------------
+
+            -- Stop the program counter from loading value. This enable faster jumps
+            -- by saving one CPU cycle, since the pc_wren is set on the latest branch / jump cycle.
+            pc_wren <= '0';
+
+            -- Stop the reset of the decoder
+            dec_reset <= '1';
+
+            -- Enabling memory output registers.
+            -- A reset for two cycles is required, otherwise the first reading would anyway be wrong.
+            -- Failing to do that insert a wrong instruction right after a jump.
+            if_aclr <= '0';
+
+            -- Preventing from flushing the internal registers of the FSM.
+            r1_flush_needed <= '0';
+
+            -- This won't effect the jumps instruction, since theses signals are affected once the processs
+            -- has completed. Thus, when we need to overwrite them, they will.
+
             CASE r2_cycles_count IS
+
                     -----------------------------------------------------------
                     -- STANDARDS INSTRUCTIONS
                     -----------------------------------------------------------
                 WHEN T0 =>
-
-                    -- Stop the program counter from loading value. This enable faster jumps
-                    -- by saving one CPU cycle, since the pc_wren is set on the latest branch / jump cycle.
-                    pc_wren <= '0';
-
-                    -- Enabling memory output registers.
-                    -- A reset for two cycles is required, otherwise the first reading would anyway be wrong.
-                    -- Failing to do that insert a wrong instruction right after a jump.
-                    if_aclr <= '0';
 
                     -- Apply the outputs depending on the previous computed requirements.
                     IF (r2_is_immediate = '1') THEN
@@ -816,8 +827,14 @@ BEGIN
                     END IF;
 
                     -----------------------------------------------------------
-                    -- JUMPS / CSR instructions
+                    -- JUMPS / CSR / BRANCH instructions
                     -----------------------------------------------------------
+                    -- Designer note : The JUMPS instruction could me optimized to fit into a single CPU cycle, 
+                    -- but, since we'll anyway flush the pipeline and registered data, we don't really care.
+                    -- There will always be a penalty for loading the new pipeline a new time (6 CPU cycles where
+                    -- the opcode is NOP.)
+                    -- Thus, that's not required for now !
+
                 WHEN T1_0 =>
 
                     CASE r2_dec_opcode IS
@@ -840,6 +857,7 @@ BEGIN
                             reg_ra1 <= 0;
                             reg_we <= '1';
                             csr_we <= '0';
+                            mem_req <= '0';
                             reg_wa <= to_integer(unsigned(r2_dec_rd));
                             reg_ra2 <= to_integer(unsigned(r2_dec_rs1));
 
@@ -847,6 +865,29 @@ BEGIN
                             dec_reset <= '0';
                             r1_flush_needed <= '1';
                             if_aclr <= '1';
+
+                            -----------------------------------------------------------
+                            -- BRANCHES
+                            -----------------------------------------------------------
+                        WHEN i_BEQ | i_BNE | i_BLT | i_BGE | i_BLTU | i_BGEU =>
+                            -- Ensure we select both RS1 and RS2.
+                            arg1_sel <= '0';
+                            arg2_sel <= '0';
+
+                            -- Disables writes
+                            reg_we <= '0';
+                            csr_we <= '0';
+                            reg_wa <= 0;
+
+                            -- Select registers
+                            reg_ra1 <= to_integer(unsigned(r2_dec_rs1));
+                            reg_ra2 <= to_integer(unsigned(r2_dec_rs2));
+
+                            -- Configure ALU
+                            alu_cmd <= c_NONE;
+
+                            -- Disable unwanted logic
+                            mem_req <= '0';
 
                             -----------------------------------------------------------
                             -- Handle CSRR instructions.
@@ -865,6 +906,7 @@ BEGIN
                             reg_wa <= to_integer(unsigned(r1_dec_rd));
                             alu_cmd <= c_ADD;
                             csr_ra1 <= csr_reg;
+                            mem_req <= '0';
 
                             -- The the meanwhile, read back the ra2 value for the next step
                             -- The value will be stored into the rs3_reg_rs1_in signal.
@@ -889,6 +931,7 @@ BEGIN
                             reg_we <= '0';
                             csr_we <= '0';
                             reg_wa <= 0;
+                            mem_req <= '0';
 
                             -- This second section implement the proper jump logic for the PC value.
                             -- Thus, it depends from the called instruction.
@@ -907,9 +950,43 @@ BEGIN
                             -- Since the loading is done on the next cycle, we'll be computing the address next
                             pc_wren <= '1';
 
+                            -- Resetting the decoder when we took a branch 
+                            dec_reset <= '0';
+
                             -- Re-enabling decoder operation.
-                            dec_reset <= '1';
                             r1_flush_needed <= '0';
+
+                            -----------------------------------------------------------
+                            -- BRANCHES
+                            -----------------------------------------------------------
+                        WHEN i_BEQ | i_BNE | i_BLT | i_BGE | i_BLTU | i_BGEU =>
+
+                            -- Clears
+                            reg_ra1 <= 0;
+                            reg_ra2 <= 0;
+
+                            -- Deciding if we need to jump
+                            IF ((r3_dec_opcode = i_BEQ) AND (r3_alu_status.beq = '1')) OR
+                                ((r3_dec_opcode = i_BNE) AND (r3_alu_status.bne = '1')) OR
+                                ((r3_dec_opcode = i_BLT) AND (r3_alu_status.blt = '1')) OR
+                                ((r3_dec_opcode = i_BGE) AND (r3_alu_status.bge = '1')) OR
+                                ((r3_dec_opcode = i_BLTU) AND (r3_alu_status.bltu = '1')) OR
+                                ((r3_dec_opcode = i_BGEU) AND (r3_alu_status.bgeu = '1')) THEN
+
+                                -- Taking the jump
+                                pc_loadvalue <= STD_LOGIC_VECTOR(signed(r3_pc_value) + signed(r3_dec_imm));
+
+                                -- Finally, ask the program counter to jump to the new address
+                                -- Since the loading is done on the next cycle, we'll be computing the address next
+                                pc_wren <= '1';
+
+                                -- Reset the decoder to ensure no unwanted instructions are going to be executed :
+                                dec_reset <= '0';
+
+                                -- Ensure we flush the internal buffers of the core controller.
+                                r1_flush_needed <= '1';
+
+                            END IF;
 
                         WHEN OTHERS =>
 
@@ -920,6 +997,7 @@ BEGIN
                             csr_ra1 <= r2_reg_csr;
                             reg_ra1 <= 0;
                             arg2_sel <= '1';
+                            mem_req <= '0';
 
                             -- Some logic is shared by the two static assignments
                             --
@@ -963,15 +1041,6 @@ BEGIN
                     END CASE;
 
                     -----------------------------------------------------------
-                    -- BRANCHES
-                    -----------------------------------------------------------
-                WHEN T2_0 =>
-
-                WHEN T2_1 =>
-
-                WHEN T2_2 =>
-
-                    -----------------------------------------------------------
                     -- IRQ / ERR HANDLING
                     -----------------------------------------------------------
                 WHEN T4_0 =>
@@ -1004,6 +1073,7 @@ BEGIN
             r3_dec_imm <= (OTHERS => '0');
             r3_reg_csr <= r_MTVAL;
             r3_cycles_count <= T0;
+            r3_alu_status <= (OTHERS => '0');
 
         ELSIF rising_edge(clock) AND (clock_en = '1') THEN
 
@@ -1016,6 +1086,8 @@ BEGIN
             r3_reg_csr <= r2_reg_csr;
 
             r3_cycles_count <= r2_cycles_count;
+
+            r3_alu_status <= alu_status;
 
         END IF;
 
