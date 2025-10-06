@@ -444,27 +444,16 @@ BEGIN
                     csr_reg <= r_MTVAL;
 
                     CASE r1_dec_opcode IS
-                        WHEN i_ADDI | i_LUI =>
-                            alu_opcode <= c_ADD;
-                        WHEN i_SLTI =>
-                            alu_opcode <= c_SLT;
-                        WHEN i_SLTIU =>
-                            alu_opcode <= c_SLTU;
-                        WHEN i_XORI =>
-                            alu_opcode <= c_XOR;
-                        WHEN i_ANDI =>
-                            alu_opcode <= c_AND;
-                        WHEN i_SLLI =>
-                            alu_opcode <= c_SLL;
-                        WHEN i_SRLI =>
-                            alu_opcode <= c_SRL;
-                        WHEN i_SRAI =>
-                            alu_opcode <= c_SRA;
-                        WHEN i_ORI | i_AUIPC => -- Rd = imm | 0x00 result in imm for i_AUIPC
-                            alu_opcode <= c_OR;
-                            -- useless case, already covered, but otherwise design won't compile
-                        WHEN OTHERS =>
-                            alu_opcode <= c_NONE;
+                        WHEN i_ADDI | i_LUI => alu_opcode <= c_ADD;
+                        WHEN i_SLTI => alu_opcode <= c_SLT;
+                        WHEN i_SLTIU => alu_opcode <= c_SLTU;
+                        WHEN i_XORI => alu_opcode <= c_XOR;
+                        WHEN i_ANDI => alu_opcode <= c_AND;
+                        WHEN i_SLLI => alu_opcode <= c_SLL;
+                        WHEN i_SRLI => alu_opcode <= c_SRL;
+                        WHEN i_SRAI => alu_opcode <= c_SRA;
+                        WHEN i_ORI | i_AUIPC => alu_opcode <= c_OR;
+                        WHEN OTHERS => alu_opcode <= c_NONE;
                     END CASE;
 
                     ------------------------------------------------------------------
@@ -484,29 +473,17 @@ BEGIN
                     csr_reg <= r_MTVAL;
 
                     CASE r1_dec_opcode IS
-                        WHEN i_ADD =>
-                            alu_opcode <= c_ADD;
-                        WHEN i_SUB =>
-                            alu_opcode <= c_SUB;
-                        WHEN i_SLT =>
-                            alu_opcode <= c_SLT;
-                        WHEN i_SLTU =>
-                            alu_opcode <= c_SLTU;
-                        WHEN i_XOR =>
-                            alu_opcode <= c_XOR;
-                        WHEN i_AND =>
-                            alu_opcode <= c_AND;
-                        WHEN i_SLL =>
-                            alu_opcode <= c_SLL;
-                        WHEN i_SRL =>
-                            alu_opcode <= c_SRL;
-                        WHEN i_SRA =>
-                            alu_opcode <= c_SRA;
-                        WHEN i_OR =>
-                            alu_opcode <= c_OR;
-                            -- useless case, already covered, but otherwise design won't compile
-                        WHEN OTHERS =>
-                            alu_opcode <= c_NONE;
+                        WHEN i_ADD => alu_opcode <= c_ADD;
+                        WHEN i_SUB => alu_opcode <= c_SUB;
+                        WHEN i_SLT => alu_opcode <= c_SLT;
+                        WHEN i_SLTU => alu_opcode <= c_SLTU;
+                        WHEN i_XOR => alu_opcode <= c_XOR;
+                        WHEN i_AND => alu_opcode <= c_AND;
+                        WHEN i_SLL => alu_opcode <= c_SLL;
+                        WHEN i_SRL => alu_opcode <= c_SRL;
+                        WHEN i_SRA => alu_opcode <= c_SRA;
+                        WHEN i_OR => alu_opcode <= c_OR;
+                        WHEN OTHERS => alu_opcode <= c_NONE;
                     END CASE;
 
                     ------------------------------------------------------------------
@@ -607,22 +584,15 @@ BEGIN
 
             CASE r2_cycles_count IS
                     -- T1_x
-                WHEN T1_0 =>
-                    cycles_count <= T1_1;
-
+                WHEN T1_0 => cycles_count <= T1_1;
                     -- T4_x
-                WHEN T4_0 =>
-                    cycles_count <= T4_1;
-                WHEN T4_1 =>
-                    cycles_count <= T4_2;
-                WHEN T4_2 =>
-                    cycles_count <= T4_3;
-                WHEN T4_3 =>
-                    cycles_count <= T4_4;
+                WHEN T4_0 => cycles_count <= T4_1;
+                WHEN T4_1 => cycles_count <= T4_2;
+                WHEN T4_2 => cycles_count <= T4_3;
+                WHEN T4_3 => cycles_count <= T4_4;
 
                     -- Default to make quartus happy (but, we'll never get here since the if ... else)
-                WHEN OTHERS =>
-                    cycles_count <= T0;
+                WHEN OTHERS => cycles_count <= T0;
 
             END CASE;
 
