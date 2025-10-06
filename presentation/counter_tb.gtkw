@@ -1,0 +1,39 @@
+[*]
+[*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
+[*] Mon Oct  6 13:36:28 2025
+[*]
+[dumpfile] "/home/lheywang/Dev/RV32/build/wave.ghw"
+[dumpfile_mtime] "Mon Oct  6 13:36:19 2025"
+[dumpfile_size] 2551308
+[savefile] "/home/lheywang/Dev/RV32/presentation/counter_tb.gtkw"
+[timestart] 0
+[size] 1920 1033
+[pos] -1 -1
+*-37.121132 15270000000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top.
+[treeopen] top.counter_tb.
+[treeopen] top.counter_tb.u1.
+[sst_width] 269
+[signals_width] 285
+[sst_expanded] 1
+[sst_vpaned_height] 274
+@200
+-Clocks
+@28
+top.counter_tb.u1.clock
+top.counter_tb.u1.clock_en
+@200
+-
+-Controls
+@28
+top.counter_tb.u1.nrst
+top.counter_tb.u1.enable
+@200
+-
+-Outputs
+@22
+#{top.counter_tb.u1.value[63:0]} top.counter_tb.u1.value[63] top.counter_tb.u1.value[62] top.counter_tb.u1.value[61] top.counter_tb.u1.value[60] top.counter_tb.u1.value[59] top.counter_tb.u1.value[58] top.counter_tb.u1.value[57] top.counter_tb.u1.value[56] top.counter_tb.u1.value[55] top.counter_tb.u1.value[54] top.counter_tb.u1.value[53] top.counter_tb.u1.value[52] top.counter_tb.u1.value[51] top.counter_tb.u1.value[50] top.counter_tb.u1.value[49] top.counter_tb.u1.value[48] top.counter_tb.u1.value[47] top.counter_tb.u1.value[46] top.counter_tb.u1.value[45] top.counter_tb.u1.value[44] top.counter_tb.u1.value[43] top.counter_tb.u1.value[42] top.counter_tb.u1.value[41] top.counter_tb.u1.value[40] top.counter_tb.u1.value[39] top.counter_tb.u1.value[38] top.counter_tb.u1.value[37] top.counter_tb.u1.value[36] top.counter_tb.u1.value[35] top.counter_tb.u1.value[34] top.counter_tb.u1.value[33] top.counter_tb.u1.value[32] top.counter_tb.u1.value[31] top.counter_tb.u1.value[30] top.counter_tb.u1.value[29] top.counter_tb.u1.value[28] top.counter_tb.u1.value[27] top.counter_tb.u1.value[26] top.counter_tb.u1.value[25] top.counter_tb.u1.value[24] top.counter_tb.u1.value[23] top.counter_tb.u1.value[22] top.counter_tb.u1.value[21] top.counter_tb.u1.value[20] top.counter_tb.u1.value[19] top.counter_tb.u1.value[18] top.counter_tb.u1.value[17] top.counter_tb.u1.value[16] top.counter_tb.u1.value[15] top.counter_tb.u1.value[14] top.counter_tb.u1.value[13] top.counter_tb.u1.value[12] top.counter_tb.u1.value[11] top.counter_tb.u1.value[10] top.counter_tb.u1.value[9] top.counter_tb.u1.value[8] top.counter_tb.u1.value[7] top.counter_tb.u1.value[6] top.counter_tb.u1.value[5] top.counter_tb.u1.value[4] top.counter_tb.u1.value[3] top.counter_tb.u1.value[2] top.counter_tb.u1.value[1] top.counter_tb.u1.value[0]
+#{top.counter_tb.u1.valuel[31:0]} top.counter_tb.u1.valuel[31] top.counter_tb.u1.valuel[30] top.counter_tb.u1.valuel[29] top.counter_tb.u1.valuel[28] top.counter_tb.u1.valuel[27] top.counter_tb.u1.valuel[26] top.counter_tb.u1.valuel[25] top.counter_tb.u1.valuel[24] top.counter_tb.u1.valuel[23] top.counter_tb.u1.valuel[22] top.counter_tb.u1.valuel[21] top.counter_tb.u1.valuel[20] top.counter_tb.u1.valuel[19] top.counter_tb.u1.valuel[18] top.counter_tb.u1.valuel[17] top.counter_tb.u1.valuel[16] top.counter_tb.u1.valuel[15] top.counter_tb.u1.valuel[14] top.counter_tb.u1.valuel[13] top.counter_tb.u1.valuel[12] top.counter_tb.u1.valuel[11] top.counter_tb.u1.valuel[10] top.counter_tb.u1.valuel[9] top.counter_tb.u1.valuel[8] top.counter_tb.u1.valuel[7] top.counter_tb.u1.valuel[6] top.counter_tb.u1.valuel[5] top.counter_tb.u1.valuel[4] top.counter_tb.u1.valuel[3] top.counter_tb.u1.valuel[2] top.counter_tb.u1.valuel[1] top.counter_tb.u1.valuel[0]
+#{top.counter_tb.u1.valueh[31:0]} top.counter_tb.u1.valueh[31] top.counter_tb.u1.valueh[30] top.counter_tb.u1.valueh[29] top.counter_tb.u1.valueh[28] top.counter_tb.u1.valueh[27] top.counter_tb.u1.valueh[26] top.counter_tb.u1.valueh[25] top.counter_tb.u1.valueh[24] top.counter_tb.u1.valueh[23] top.counter_tb.u1.valueh[22] top.counter_tb.u1.valueh[21] top.counter_tb.u1.valueh[20] top.counter_tb.u1.valueh[19] top.counter_tb.u1.valueh[18] top.counter_tb.u1.valueh[17] top.counter_tb.u1.valueh[16] top.counter_tb.u1.valueh[15] top.counter_tb.u1.valueh[14] top.counter_tb.u1.valueh[13] top.counter_tb.u1.valueh[12] top.counter_tb.u1.valueh[11] top.counter_tb.u1.valueh[10] top.counter_tb.u1.valueh[9] top.counter_tb.u1.valueh[8] top.counter_tb.u1.valueh[7] top.counter_tb.u1.valueh[6] top.counter_tb.u1.valueh[5] top.counter_tb.u1.valueh[4] top.counter_tb.u1.valueh[3] top.counter_tb.u1.valueh[2] top.counter_tb.u1.valueh[1] top.counter_tb.u1.valueh[0]
+[pattern_trace] 1
+[pattern_trace] 0
