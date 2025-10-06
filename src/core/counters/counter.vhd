@@ -10,7 +10,7 @@ USE ieee.numeric_std.ALL;
 ENTITY counter32 IS
     GENERIC (
         --! @brief Configure the  value exposed by the counter on reset state.
-        RESET_ADDR : INTEGER := 0;
+        RESET : INTEGER := 0;
         --! @brief Configure the value that is added on each iteration cycle.
         INCREMENT : INTEGER := 1
     );
@@ -55,7 +55,7 @@ BEGIN
     BEGIN
 
         IF (nRST = '0') THEN
-            value <= to_unsigned(RESET_ADDR, value'length);
+            value <= to_unsigned(RESET, value'length);
 
         ELSIF rising_edge(clock) AND (clock_en = '1') THEN
 

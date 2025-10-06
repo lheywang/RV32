@@ -28,7 +28,7 @@ BEGIN
 
     U1 : ENTITY work.counter32(rtl)
         GENERIC MAP(
-            RESET_ADDR => 2147483392,
+            RESET => 2147483392,
             INCREMENT => 65535
         )
         PORT MAP(

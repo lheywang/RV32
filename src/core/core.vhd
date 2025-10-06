@@ -125,6 +125,14 @@ ARCHITECTURE behavioral OF core IS
     SIGNAL csr_mie : STD_LOGIC;
     --! @brief special output of the register to indicate if an interrupt is pending, or not.
     SIGNAL csr_mip : STD_LOGIC;
+    --! @brief Performance monitor, cycleL value
+    SIGNAL csr_cyclel : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief Performance monitor, cycleH value
+    SIGNAL csr_cycleh : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief Performance monitor, instrL value
+    SIGNAL csr_instrl : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief Performance monitor, instrH value
+    SIGNAL csr_instrh : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
 
     --------------------------------------------------------------------------------------------------------
     -- ALU Argument selection.
@@ -348,7 +356,11 @@ BEGIN
             rd1 => csr_rdata1,
             int_vec => int_vec,
             int_en => csr_mie,
-            int_out => csr_mip
+            int_out => csr_mip,
+            in_cycleh => csr_cycleh,
+            in_cyclel => csr_cyclel,
+            in_instrh => csr_instrh,
+            in_instrl => csr_instrl
         );
 
     --! @brief ALU for the whole core.
@@ -362,6 +374,36 @@ BEGIN
             result => alu_out,
             command => alu_cmd,
             status => alu_status
+        );
+
+    --! @brief Cycle counter module
+    CYCLECNT : ENTITY work.counter32(rtl)
+        GENERIC MAP(
+            RESET => 0,
+            INCREMENT => 1
+        )
+        PORT MAP(
+            clock => clk,
+            clock_en => clk_en,
+            nRST => nRST,
+            enable => '1',
+            valueL => csr_cyclel,
+            valueH => csr_cycleh
+        );
+
+    --! @brief Instruction counter.
+    INSTRCNT : ENTITY work.counter32(rtl)
+        GENERIC MAP(
+            RESET => 0,
+            INCREMENT => 1
+        )
+        PORT MAP(
+            clock => clk,
+            clock_en => clk_en,
+            nRST => nRST,
+            enable => pause,
+            valueL => csr_instrl,
+            valueH => csr_instrh
         );
 
     -- Static mappings

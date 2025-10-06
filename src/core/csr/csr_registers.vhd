@@ -50,7 +50,20 @@ ENTITY csr_registers IS
         --! @brief Interrupt out, as MIP(7). Only the master external interrupt is handled, thus the interrupt_controller peripheral is required.
         int_out : OUT STD_LOGIC;
         --! @brief Interrupt enable bit, as an output MIE(3) . Indicate that the core must account for an interrupt.
-        int_en : OUT STD_LOGIC
+        int_en : OUT STD_LOGIC;
+
+        --------------------------------------------------------------------------------------------------------
+        -- Interrupt related IOs
+        --------------------------------------------------------------------------------------------------------
+        --! @brief Cycle counter 32 MSB Input.
+        in_cycleh : IN STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+        --! @brief Cycle counter 32 LSB Input.
+        in_cyclel : IN STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+        --! @brief Instruction counter 32 MSB Input.
+        in_instrh : IN STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+        --! @brief Instruction counter 32 LSB Input.
+        in_instrl : IN STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0)
+
     );
 END ENTITY;
 
@@ -61,12 +74,6 @@ ARCHITECTURE rtl OF csr_registers IS
     --! Bitmask defining which bits in **MSTATUS** are writable.
     --! Each bit corresponds to one bit position in the CSR.
     CONSTANT MSTATUS_W_MASK : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := "00000000000000000111100010001000";
-
-    --! @brief Write mask for MISA register
-    --! @details
-    --! Bitmask defining which bits in **MISA** are writable.
-    --! Each bit corresponds to one bit position in the CSR.
-    CONSTANT MISA_W_MASK : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := "00000000000000000000000000000000";
 
     --! @brief Write mask for MIE register
     --! @details
@@ -79,13 +86,6 @@ ARCHITECTURE rtl OF csr_registers IS
     --! Bitmask defining which bits in **MTVEC** are writable.
     --! Each bit corresponds to one bit position in the CSR.
     CONSTANT MTVEC_W_MASK : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := "11111111111111111111111100000001";
-
-    --! @brief Write mask for MSCRATCH register
-    --! @details
-    --! Bitmask defining which bits in **MSCRATCH** are writable.
-    --! Each bit corresponds to one bit position in the CSR.
-    CONSTANT MSCRATCH_W_MASK : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := "11111111111111111111111111111111";
-
     --! @brief Write mask for MEPC register
     --! @details
     --! Bitmask defining which bits in **MEPC** are writable.
@@ -97,18 +97,6 @@ ARCHITECTURE rtl OF csr_registers IS
     --! Bitmask defining which bits in **MCAUSE** are writable.
     --! Each bit corresponds to one bit position in the CSR.
     CONSTANT MCAUSE_W_MASK : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := "10000000000000000000000000011111";
-
-    --! @brief Write mask for MTVAL register
-    --! @details
-    --! Bitmask defining which bits in **MTVAL** are writable.
-    --! Each bit corresponds to one bit position in the CSR.
-    CONSTANT MTVAL_W_MASK : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := "00000000000000000000000000000000";
-
-    --! @brief Write mask for MIP register
-    --! @details
-    --! Bitmask defining which bits in **MIP** are writable.
-    --! Each bit corresponds to one bit position in the CSR.
-    CONSTANT MIP_W_MASK : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0) := "00000000000000000000000000000000";
 
     --! @brief Register mstatus.
     SIGNAL mstatus : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
@@ -128,6 +116,14 @@ ARCHITECTURE rtl OF csr_registers IS
     SIGNAL mtval : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
     --! @brief Register mip.
     SIGNAL mip : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief Register cycleh
+    SIGNAL cycleh : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief Register cyclel
+    SIGNAL cyclel : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief Register instrh
+    SIGNAL instrh : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    --! @brief Register instrl
+    SIGNAL instrl : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
 
     --! @brief Compute the new register value by applying pure logic to the inputs, while accouting for write masks.
     --! @details
@@ -157,7 +153,7 @@ BEGIN
     BEGIN
 
         -- Handle reset 
-        IF nRST = '0' THEN
+        IF (nRST = '0') THEN
 
             mstatus <= X"0000_1800";
             misa <= X"4000_0100";
@@ -168,6 +164,10 @@ BEGIN
             mcause <= (OTHERS => '0');
             mtval <= (OTHERS => '0');
             mip <= (OTHERS => '0');
+            cycleh <= (OTHERS => '0');
+            cyclel <= (OTHERS => '0');
+            instrl <= (OTHERS => '0');
+            instrh <= (OTHERS => '0');
 
             -- Handle standard writes
         ELSIF rising_edge(clock) AND (clock_en = '1') THEN
@@ -175,6 +175,13 @@ BEGIN
             -- Synchronizing the MIP register
             mip <= int_vec AND mie;
 
+            -- Copying the values of the counters
+            cyclel <= in_cyclel;
+            cycleh <= in_cycleh;
+            instrl <= in_instrl;
+            instrh <= in_instrh;
+
+            -- Updating the others registers.
             IF (we = '1') THEN
 
                 CASE wa IS
@@ -216,6 +223,10 @@ BEGIN
         mcause WHEN (ra1 = r_MCAUSE) ELSE
         mtval WHEN (ra1 = r_MTVAL) ELSE
         mip WHEN (ra1 = r_MIP) ELSE
+        cycleh WHEN (ra1 = r_CYCLEH) ELSE
+        cyclel WHEN (ra1 = r_CYCLE) ELSE
+        instrh WHEN (ra1 = r_INSTRH) ELSE
+        instrl WHEN (ra1 = r_INSTR) ELSE
         (OTHERS => '0');
 
     -- always read the MIP port.
