@@ -265,13 +265,13 @@ BEGIN
                         selected_decoder <= B;
                         illegal_internal <= '0';
                         req_pause <= '1';
-                        pause_cycles <= 3;
+                        pause_cycles <= 1;
 
                     WHEN "0100011" => -- Loads
                         selected_decoder <= S;
                         illegal_internal <= '0';
                         req_pause <= '0';
-                        pause_cycles <= 2;
+                        pause_cycles <= 0;
 
                     WHEN "1101111" => -- Jumps
                         selected_decoder <= J;
@@ -613,10 +613,11 @@ BEGIN
                     rs1_internal <= i2_instruction(19 DOWNTO 15);
                     rs2_internal <= i2_instruction(24 DOWNTO 20);
                     imm_internal <= (OTHERS => i2_instruction(31));
-                    imm_internal(11 DOWNTO 0) <= i2_instruction(31)
+                    imm_internal(12 DOWNTO 1) <= i2_instruction(31)
                     & i2_instruction(7)
                     & i2_instruction(30 DOWNTO 25)
                     & i2_instruction(11 DOWNTO 8);
+                    imm_internal(0) <= '0';
 
                     -- i_instruction identification
                     CASE i2_instruction(14 DOWNTO 12) IS
