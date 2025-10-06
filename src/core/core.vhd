@@ -424,3 +424,11 @@ BEGIN
         reg_rdata2;
 
 END ARCHITECTURE;
+
+-- todo : 
+-- add mvendorid (0x00000)
+-- add marchid (0x00000)
+-- add mimpid (0x0000)
+-- add mhartid (0x0000)
+-- add mtime(h) & mtimecmd(h)
+-- update interrupt logic to handle time counter
