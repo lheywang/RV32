@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
-[*] Mon Oct  6 18:00:34 2025
+[*] Mon Oct  6 18:32:01 2025
 [*]
 [dumpfile] "/home/user/RV32/build/wave.ghw"
-[dumpfile_mtime] "Mon Oct  6 17:57:21 2025"
-[dumpfile_size] 88985
+[dumpfile_mtime] "Mon Oct  6 18:30:32 2025"
+[dumpfile_size] 67009
 [savefile] "/home/user/RV32/presentation/core_tb.gtkw"
 [timestart] 472100000
 [size] 3840 2053
 [pos] -27 -24
-*-25.184538 1305000000 185000000 205000000 225000000 165000000 245000000 385000000 405000000 425800000 445100000 465000000 605000000 625000000 645000000 665000000 685000000 825000000 845000000 865000000 885000000 1045000000 1065000000 1085000000 1105000000 1125000000 1265000000 1285000000
+*-25.184538 545000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.core_tb.
 [treeopen] top.core_tb.core.
@@ -72,6 +72,7 @@ top.core_tb.core.dec1.illegal
 top.core_tb.core.dec1.illegal_internal
 [color] 5
 top.core_tb.core.dec1.illegal_internal2
+@29
 [color] 5
 top.core_tb.core.dec_reset
 @22
@@ -213,10 +214,8 @@ top.core_tb.core.alu1.status.bgeu
 @28
 [color] 5
 top.core_tb.mem_err_t
-@29
 [color] 5
 top.core_tb.mem_req_t
-@28
 [color] 5
 top.core_tb.mem_we_t
 @22

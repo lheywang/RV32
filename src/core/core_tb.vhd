@@ -111,7 +111,7 @@ BEGIN
     P3 : PROCESS
     BEGIN
         WAIT FOR 228 ns;
-        -- int_vec_t(11) <= '1';
+        int_vec_t(11) <= '1';
         WAIT;
     END PROCESS;
 
