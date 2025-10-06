@@ -57,7 +57,9 @@ PACKAGE common IS
         r_MEPC,
         r_MCAUSE,
         r_MTVAL,
-        r_MIP
+        r_MIP,
+        r_CYCLE, r_CYCLEH,
+        r_INSTR, r_INSTRH
     );
 
 END common;

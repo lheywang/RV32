@@ -524,26 +524,20 @@ BEGIN
 
                     tmp := r1_dec_imm(11 DOWNTO 0);
                     CASE tmp IS
-                        WHEN X"300" =>
-                            csr_reg <= r_MSTATUS;
-                        WHEN X"301" =>
-                            csr_reg <= r_MISA;
-                        WHEN X"304" =>
-                            csr_reg <= r_MIE;
-                        WHEN X"305" =>
-                            csr_reg <= r_MTVEC;
-                        WHEN X"340" =>
-                            csr_reg <= r_MSCRATCH;
-                        WHEN X"341" =>
-                            csr_reg <= r_MEPC;
-                        WHEN X"342" =>
-                            csr_reg <= r_MCAUSE;
-                        WHEN X"343" =>
-                            csr_reg <= r_MTVAL;
-                        WHEN X"344" =>
-                            csr_reg <= r_MIP;
-                        WHEN OTHERS =>
-                            csr_reg <= r_MTVAL;
+                        WHEN X"300" => csr_reg <= r_MSTATUS;
+                        WHEN X"301" => csr_reg <= r_MISA;
+                        WHEN X"304" => csr_reg <= r_MIE;
+                        WHEN X"305" => csr_reg <= r_MTVEC;
+                        WHEN X"340" => csr_reg <= r_MSCRATCH;
+                        WHEN X"341" => csr_reg <= r_MEPC;
+                        WHEN X"342" => csr_reg <= r_MCAUSE;
+                        WHEN X"343" => csr_reg <= r_MTVAL;
+                        WHEN X"344" => csr_reg <= r_MIP;
+                        WHEN X"C00" => csr_reg <= r_CYCLE;
+                        WHEN X"C80" => csr_reg <= r_CYCLEH;
+                        WHEN X"C02" => csr_reg <= r_INSTR;
+                        WHEN X"C82" => csr_reg <= r_INSTRH;
+                        WHEN OTHERS => csr_reg <= r_MTVAL;
                     END CASE;
 
                     ------------------------------------------------------------------
