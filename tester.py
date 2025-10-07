@@ -131,8 +131,11 @@ config = None
 with open(config_path, "rb") as file:
     config = tomllib.load(file)
 
+source = ""
 # Compute some files paths
-source = test_dir / pathlib.Path(config["config"]["source"])
+for src in config["config"]["source"].split(" "):
+    source = source + str(test_dir / pathlib.Path(src)) + " "
+
 linker_script = (
     (test_dir / pathlib.Path(config["config"]["linker_script"]))
     if config["config"]["linker_script"] != ""
