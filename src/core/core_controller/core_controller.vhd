@@ -824,12 +824,10 @@ BEGIN
                         WHEN i_JAL | i_JALR =>
 
                             -- This first section implement the rd = pc + 4.
-                            -- We only need to copy the **next** program counter value, already incremented by four,
-                            -- into RD. To do this, we simulate this instruction : 
                             --
                             -- ADDI, RD, R0, IMM, where R0 is ALWAYS 0 (hardwired).
                             --
-                            reg_rs2_out <= r1_pc_value;
+                            reg_rs2_out <= STD_LOGIC_VECTOR(unsigned(r1_pc_value) + 4);
                             alu_cmd <= c_ADD;
                             arg2_sel <= '1';
                             arg1_sel <= '0';

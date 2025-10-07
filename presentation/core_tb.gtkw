@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
-[*] Mon Oct  6 18:32:01 2025
+[*] Tue Oct  7 18:16:49 2025
 [*]
 [dumpfile] "/home/user/RV32/build/wave.ghw"
-[dumpfile_mtime] "Mon Oct  6 18:30:32 2025"
-[dumpfile_size] 67009
+[dumpfile_mtime] "Tue Oct  7 18:16:39 2025"
+[dumpfile_size] 133574
 [savefile] "/home/user/RV32/presentation/core_tb.gtkw"
-[timestart] 472100000
+[timestart] 0
 [size] 3840 2053
 [pos] -27 -24
-*-25.184538 545000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-28.184538 245000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.core_tb.
 [treeopen] top.core_tb.core.
@@ -72,7 +72,6 @@ top.core_tb.core.dec1.illegal
 top.core_tb.core.dec1.illegal_internal
 [color] 5
 top.core_tb.core.dec1.illegal_internal2
-@29
 [color] 5
 top.core_tb.core.dec_reset
 @22
@@ -240,8 +239,10 @@ top.core_tb.mem_we_t
 top.core_tb.core.fsm1.cycles_count
 [color] 2
 top.core_tb.core.fsm1.r2_cycles_count
+@421
 [color] 2
 top.core_tb.core.fsm1.r1_dec_opcode
+@420
 [color] 3
 top.core_tb.core.fsm1.r2_dec_opcode
 [color] 2
@@ -423,8 +424,6 @@ top.core_tb.core.csr1.we
 #{top.core_tb.core.csr1.mepc[31:0]} top.core_tb.core.csr1.mepc[31] top.core_tb.core.csr1.mepc[30] top.core_tb.core.csr1.mepc[29] top.core_tb.core.csr1.mepc[28] top.core_tb.core.csr1.mepc[27] top.core_tb.core.csr1.mepc[26] top.core_tb.core.csr1.mepc[25] top.core_tb.core.csr1.mepc[24] top.core_tb.core.csr1.mepc[23] top.core_tb.core.csr1.mepc[22] top.core_tb.core.csr1.mepc[21] top.core_tb.core.csr1.mepc[20] top.core_tb.core.csr1.mepc[19] top.core_tb.core.csr1.mepc[18] top.core_tb.core.csr1.mepc[17] top.core_tb.core.csr1.mepc[16] top.core_tb.core.csr1.mepc[15] top.core_tb.core.csr1.mepc[14] top.core_tb.core.csr1.mepc[13] top.core_tb.core.csr1.mepc[12] top.core_tb.core.csr1.mepc[11] top.core_tb.core.csr1.mepc[10] top.core_tb.core.csr1.mepc[9] top.core_tb.core.csr1.mepc[8] top.core_tb.core.csr1.mepc[7] top.core_tb.core.csr1.mepc[6] top.core_tb.core.csr1.mepc[5] top.core_tb.core.csr1.mepc[4] top.core_tb.core.csr1.mepc[3] top.core_tb.core.csr1.mepc[2] top.core_tb.core.csr1.mepc[1] top.core_tb.core.csr1.mepc[0]
 [color] 3
 #{top.core_tb.core.csr1.mcause[31:0]} top.core_tb.core.csr1.mcause[31] top.core_tb.core.csr1.mcause[30] top.core_tb.core.csr1.mcause[29] top.core_tb.core.csr1.mcause[28] top.core_tb.core.csr1.mcause[27] top.core_tb.core.csr1.mcause[26] top.core_tb.core.csr1.mcause[25] top.core_tb.core.csr1.mcause[24] top.core_tb.core.csr1.mcause[23] top.core_tb.core.csr1.mcause[22] top.core_tb.core.csr1.mcause[21] top.core_tb.core.csr1.mcause[20] top.core_tb.core.csr1.mcause[19] top.core_tb.core.csr1.mcause[18] top.core_tb.core.csr1.mcause[17] top.core_tb.core.csr1.mcause[16] top.core_tb.core.csr1.mcause[15] top.core_tb.core.csr1.mcause[14] top.core_tb.core.csr1.mcause[13] top.core_tb.core.csr1.mcause[12] top.core_tb.core.csr1.mcause[11] top.core_tb.core.csr1.mcause[10] top.core_tb.core.csr1.mcause[9] top.core_tb.core.csr1.mcause[8] top.core_tb.core.csr1.mcause[7] top.core_tb.core.csr1.mcause[6] top.core_tb.core.csr1.mcause[5] top.core_tb.core.csr1.mcause[4] top.core_tb.core.csr1.mcause[3] top.core_tb.core.csr1.mcause[2] top.core_tb.core.csr1.mcause[1] top.core_tb.core.csr1.mcause[0]
-[color] 3
-#{top.core_tb.core.csr1.mtval[31:0]} top.core_tb.core.csr1.mtval[31] top.core_tb.core.csr1.mtval[30] top.core_tb.core.csr1.mtval[29] top.core_tb.core.csr1.mtval[28] top.core_tb.core.csr1.mtval[27] top.core_tb.core.csr1.mtval[26] top.core_tb.core.csr1.mtval[25] top.core_tb.core.csr1.mtval[24] top.core_tb.core.csr1.mtval[23] top.core_tb.core.csr1.mtval[22] top.core_tb.core.csr1.mtval[21] top.core_tb.core.csr1.mtval[20] top.core_tb.core.csr1.mtval[19] top.core_tb.core.csr1.mtval[18] top.core_tb.core.csr1.mtval[17] top.core_tb.core.csr1.mtval[16] top.core_tb.core.csr1.mtval[15] top.core_tb.core.csr1.mtval[14] top.core_tb.core.csr1.mtval[13] top.core_tb.core.csr1.mtval[12] top.core_tb.core.csr1.mtval[11] top.core_tb.core.csr1.mtval[10] top.core_tb.core.csr1.mtval[9] top.core_tb.core.csr1.mtval[8] top.core_tb.core.csr1.mtval[7] top.core_tb.core.csr1.mtval[6] top.core_tb.core.csr1.mtval[5] top.core_tb.core.csr1.mtval[4] top.core_tb.core.csr1.mtval[3] top.core_tb.core.csr1.mtval[2] top.core_tb.core.csr1.mtval[1] top.core_tb.core.csr1.mtval[0]
 [color] 3
 #{top.core_tb.core.csr1.mip[31:0]} top.core_tb.core.csr1.mip[31] top.core_tb.core.csr1.mip[30] top.core_tb.core.csr1.mip[29] top.core_tb.core.csr1.mip[28] top.core_tb.core.csr1.mip[27] top.core_tb.core.csr1.mip[26] top.core_tb.core.csr1.mip[25] top.core_tb.core.csr1.mip[24] top.core_tb.core.csr1.mip[23] top.core_tb.core.csr1.mip[22] top.core_tb.core.csr1.mip[21] top.core_tb.core.csr1.mip[20] top.core_tb.core.csr1.mip[19] top.core_tb.core.csr1.mip[18] top.core_tb.core.csr1.mip[17] top.core_tb.core.csr1.mip[16] top.core_tb.core.csr1.mip[15] top.core_tb.core.csr1.mip[14] top.core_tb.core.csr1.mip[13] top.core_tb.core.csr1.mip[12] top.core_tb.core.csr1.mip[11] top.core_tb.core.csr1.mip[10] top.core_tb.core.csr1.mip[9] top.core_tb.core.csr1.mip[8] top.core_tb.core.csr1.mip[7] top.core_tb.core.csr1.mip[6] top.core_tb.core.csr1.mip[5] top.core_tb.core.csr1.mip[4] top.core_tb.core.csr1.mip[3] top.core_tb.core.csr1.mip[2] top.core_tb.core.csr1.mip[1] top.core_tb.core.csr1.mip[0]
 @24

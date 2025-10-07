@@ -110,9 +110,12 @@ BEGIN
     -- Interrupt emulation (command / uncomment if neded)
     P3 : PROCESS
     BEGIN
-        WAIT FOR 228 ns;
+        -- WAIT; -- uncomment to disable interrupts.
+        WAIT FOR 1000 ns;
         int_vec_t(11) <= '1';
-        WAIT;
+        WAIT FOR 20 ns;
+        int_vec_t(11) <= '0';
+        WAIT FOR 1000 ns;
     END PROCESS;
 
 END ARCHITECTURE;
