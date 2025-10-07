@@ -311,6 +311,7 @@ BEGIN
             csr_ra1 => csr_ra1,
             csr_mie => csr_mie,
             csr_mip => csr_mip,
+            csr_rs1_in => csr_rdata1,
             alu_cmd => alu_cmd,
             alu_status => alu_status,
             if_err => if_err,

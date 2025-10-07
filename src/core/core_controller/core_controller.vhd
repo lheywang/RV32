@@ -105,6 +105,8 @@ ENTITY core_controller IS
         csr_mie : IN STD_LOGIC;
         --! @brief CSR register master interrupt pending bit.
         csr_mip : IN STD_LOGIC;
+        --! @brief CSR register raw read value
+        csr_rs1_in : IN STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
 
         --------------------------------------------------------------------------------------------------------
         -- ALU controls I/O signals
@@ -187,6 +189,8 @@ ARCHITECTURE behavioral OF core_controller IS
     SIGNAL r1_csr_mie : STD_LOGIC;
     --! @brief registered MIP bit status
     SIGNAL r1_csr_mip : STD_LOGIC;
+    --! @brief registered CSR in value
+    SIGNAL r1_csr_rs1_in : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
 
     --! @brief registered program counter value.
     SIGNAL r1_pc_value : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
@@ -278,6 +282,8 @@ ARCHITECTURE behavioral OF core_controller IS
     SIGNAL r2_alu_opcode : commands;
     --! @brief Second registration stage of reg_csr.
     SIGNAL r2_reg_csr : csr_register;
+    --! @brief registered CSR in value
+    SIGNAL r2_csr_rs1_in : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
 
     --------------------------------------------------------------------------------------------------------
     -- Laters stages registration.
@@ -306,6 +312,24 @@ ARCHITECTURE behavioral OF core_controller IS
 
     --! @brief Register the alu status for the branch taking
     SIGNAL r3_alu_status : alu_feedback;
+
+    --! @brief Register the interrupt pending bit
+    SIGNAL r2_csr_mip : STD_LOGIC;
+
+    --! @brief Register the interrupt pending bit a second time
+    SIGNAL r3_csr_mip : STD_LOGIC;
+    --! @brief Second registration stage of memory address error status flag.
+    SIGNAL r3_mem_addrerr : STD_LOGIC;
+    --! @brief Second registration stage of decoder illegal instruction error status flag.
+    SIGNAL r3_dec_illegal : STD_LOGIC;
+    --! @brief Second registration stage of program counter overflow error status flag.
+    SIGNAL r3_pc_overflow : STD_LOGIC;
+    --! @brief Second registration stage of instruction fetch error flag.
+    SIGNAL r3_if_err : STD_LOGIC;
+    --! @brief Second registration stage of control exception request flag.
+    SIGNAL r3_ctl_exception : STD_LOGIC;
+    --! @brief Second registration stage of halt request flag.
+    SIGNAL r3_ctl_halt : STD_LOGIC;
 
 BEGIN
 
@@ -342,6 +366,8 @@ BEGIN
             r1_ctl_exception <= '0';
             r1_ctl_halt <= '0';
 
+            r1_csr_rs1_in <= (OTHERS => '0');
+
         ELSIF rising_edge(clock) AND (clock_en = '1') THEN
             r1_dec_rs1 <= dec_rs1;
             r1_dec_rs2 <= dec_rs2;
@@ -360,6 +386,8 @@ BEGIN
 
             r1_csr_mip <= csr_mip;
             r1_csr_mie <= csr_mie;
+
+            r1_csr_rs1_in <= csr_rs1_in;
 
         END IF;
 
@@ -392,13 +420,9 @@ BEGIN
             csr_reg <= r_MTVAL;
 
         ELSIF (r1_dec_illegal = '1') OR (r1_mem_addrerr = '1') OR (r1_pc_overflow = '1') OR
-            (r1_if_err = '1') OR (r1_ctl_exception = '1') OR (r1_ctl_halt = '1') OR
-            (r1_csr_mip = '1') THEN
-
-            REPORT "Handling trap";
-
+            (r1_if_err = '1') OR (r1_ctl_exception = '1') OR (r1_csr_mip = '1') THEN
             -- Check if we're already interrupting, and if we have the right to do it...
-            IF (irq_err = '0') AND (r1_csr_mie = '1') THEN
+            IF (irq_err = '0') THEN
 
                 cycles_count <= T4_0;
 
@@ -414,8 +438,6 @@ BEGIN
 
                 -- Inhibit the next irq / err
                 irq_err <= '1';
-
-                REPORT "configured trap jump";
 
             END IF;
 
@@ -572,8 +594,7 @@ BEGIN
                     csr_reg <= r_MTVAL;
 
                     ------------------------------------------------------------------
-                WHEN i_JAL | i_JALR | i_ECALL | i_EBREAK |
-                    i_MRET =>
+                WHEN i_JAL | i_JALR | i_ECALL | i_EBREAK =>
 
                     cycles_count <= T1_0;
 
@@ -589,10 +610,23 @@ BEGIN
                     alu_opcode <= c_NONE;
                     csr_reg <= r_MTVAL;
 
-                    -- If we took an special handler route, unlock the future interrupts.
-                    IF (r1_dec_opcode = i_MRET) THEN
-                        irq_err <= '0';
-                    END IF;
+                    ------------------------------------------------------------------
+                WHEN i_MRET =>
+
+                    -- We don't really care about theses since we're on a 2 cycles instruction.
+                    is_immediate <= '0';
+                    is_req_data1 <= '0';
+                    is_req_data2 <= '0';
+                    is_req_store <= '0';
+                    is_req_alu <= '0';
+                    is_req_csr <= '0';
+                    is_req_mem <= '0';
+
+                    alu_opcode <= c_NONE;
+                    csr_reg <= r_MTVAL;
+
+                    -- Reset from instruction.
+                    irq_err <= '0';
 
             END CASE;
 
@@ -606,7 +640,7 @@ BEGIN
                 WHEN T4_0 => cycles_count <= T4_1;
                 WHEN T4_1 => cycles_count <= T4_2;
                 WHEN T4_2 => cycles_count <= T4_3;
-                WHEN T4_3 => cycles_count <= T4_4;
+                    -- WHEN T4_3 => cycles_count <= T4_4; -- We don't need that much cycle to handle the TRAP.
 
                     -- Default to make quartus happy (but, we'll never get here since the if ... else)
                 WHEN OTHERS => cycles_count <= T0;
@@ -641,6 +675,7 @@ BEGIN
             r2_ctl_exception <= '0';
             r2_ctl_halt <= '0';
             r2_cycles_count <= T0;
+            r2_csr_mip <= '0';
 
             r2_is_immediate <= '0';
             r2_is_req_data1 <= '0';
@@ -653,6 +688,8 @@ BEGIN
             r2_alu_opcode <= c_NONE;
             r2_reg_csr <= r_MTVAL;
 
+            r2_csr_rs1_in <= (OTHERS => '0');
+
         ELSIF rising_edge(clock) AND (clock_en = '1') THEN
 
             r2_dec_rs1 <= r1_dec_rs1;
@@ -660,6 +697,7 @@ BEGIN
             r2_dec_rd <= r1_dec_rd;
             r2_dec_imm <= r1_dec_imm;
             r2_dec_opcode <= r1_dec_opcode;
+
             r2_dec_illegal <= r1_dec_illegal;
             r2_mem_addrerr <= r1_mem_addrerr;
             r2_pc_value <= r1_pc_value;
@@ -679,6 +717,9 @@ BEGIN
 
             r2_alu_opcode <= alu_opcode;
             r2_reg_csr <= csr_reg;
+
+            r2_csr_mip <= r1_csr_mip;
+            r2_csr_rs1_in <= r1_csr_rs1_in;
 
         END IF;
 
@@ -759,7 +800,6 @@ BEGIN
 
                         -- Handle the AUIPC case
                         IF (r2_dec_opcode = i_AUIPC) THEN
-                            REPORT "AUIPC !";
                             reg_rs2_out <= STD_LOGIC_VECTOR(signed(r2_pc_value) + signed(r2_dec_imm)); -- Can't use the ALU because
                             -- both would require imm port.
                             -- Thus, we make the addition
@@ -828,6 +868,8 @@ BEGIN
                     -- cycles.
 
                 WHEN T1_0 =>
+
+                    -- REPORT "T1_0";
 
                     CASE r2_dec_opcode IS
 
@@ -906,6 +948,8 @@ BEGIN
                     END CASE;
 
                 WHEN T1_1 =>
+
+                    -- REPORT "T1_1";
 
                     CASE r3_dec_opcode IS
 
@@ -1035,13 +1079,90 @@ BEGIN
                     -----------------------------------------------------------
                 WHEN T4_0 =>
 
+                    -- First, write MEPC with the current PC value.
+                    mem_req <= '0';
+
+                    -- enable writes on the CSR register file, and select the correct one
+                    csr_we <= '1';
+                    reg_we <= '0';
+                    csr_wa <= r_MEPC;
+                    csr_ra1 <= r_MSTATUS; -- Read MSTATUS to mask the corrects bits.
+                    reg_ra1 <= 0;
+                    reg_ra2 <= 0;
+
+                    -- output the CURRENT PC value to the immediate port
+                    reg_rs2_out <= r3_pc_value;
+
+                    -- Select the data path
+                    arg2_sel <= '1';
+                    arg1_sel <= '0';
+                    alu_cmd <= c_ADD;
+
                 WHEN T4_1 =>
 
+                    -- First, update the MCAUSE value with the right one : 
+                    csr_we <= '1';
+                    reg_we <= '0';
+                    csr_wa <= r_MCAUSE;
+                    csr_ra1 <= r_MTVEC;
+                    reg_ra1 <= 0;
+                    reg_ra1 <= 0;
+
+                    -- Configuring data path
+                    arg2_sel <= '1';
+                    arg1_sel <= '0';
+                    alu_cmd <= c_ADD;
+
+                    -- Output the right value, depending on some causes :
+                    IF (r3_dec_illegal = '1') THEN
+                        reg_rs2_out <= X"00000002";
+                    ELSIF (r3_mem_addrerr = '1') THEN
+                        reg_rs2_out <= X"00000010";
+                    ELSIF (r3_pc_overflow = '1') THEN
+                        reg_rs2_out <= X"00000011";
+                    ELSIF (r3_if_err = '1') THEN
+                        reg_rs2_out <= X"00000001";
+                    ELSIF (r3_ctl_exception = '1') THEN
+                        reg_rs2_out <= X"7FFFFFFF"; -- Custom one, externally induced.
+                    ELSIF (r3_csr_mip = '1') THEN
+                        reg_rs2_out <= X"80000008";
+                    END IF;
+
                 WHEN T4_2 =>
+                    -- Updating MSTATUS to the new value
+                    csr_we <= '1';
+                    reg_we <= '0';
+                    csr_wa <= r_MSTATUS;
+                    csr_ra1 <= r_MTVAL; -- Read jump address
+                    reg_ra1 <= 0;
+                    reg_ra1 <= 0;
+
+                    -- Configuring data path
+                    arg2_sel <= '1';
+                    arg1_sel <= '0';
+                    alu_cmd <= c_ADD;
+
+                    -- Updating the MIE / MPIE bits into the value
+                    reg_rs2_out <= r2_csr_rs1_in; -- Copy MSTATUS
+                    reg_rs2_out(7) <= r2_csr_rs1_in(3); -- MIE -> MPIE
+                    reg_rs2_out(3) <= '0'; -- MIE ='0' (disable future traps)
 
                 WHEN T4_3 =>
+                    -- Jump to the MTVEC value
+                    pc_loadvalue <= r2_csr_rs1_in;
+
+                    -- Finally, ask the program counter to jump to the new address
+                    -- Since the loading is done on the next cycle, we'll be computing the address next
+                    pc_wren <= '1';
+
+                    -- Resetting the decoder when we took a branch 
+                    dec_reset <= '0';
+
+                    -- Re-enabling decoder operation.
+                    r1_flush_needed <= '0';
 
                 WHEN T4_4 =>
+                    REPORT "T4_4";
 
             END CASE;
 
@@ -1065,19 +1186,31 @@ BEGIN
             r3_cycles_count <= T0;
             r3_alu_status <= (OTHERS => '0');
 
+            r3_csr_mip <= '0';
+            r3_mem_addrerr <= '0';
+            r3_dec_illegal <= '0';
+            r3_pc_overflow <= '0';
+            r3_if_err <= '0';
+            r3_ctl_exception <= '0';
+            r3_ctl_halt <= '0';
+
         ELSIF rising_edge(clock) AND (clock_en = '1') THEN
 
             r3_dec_opcode <= r2_dec_opcode;
             r3_pc_value <= r2_pc_value;
             r3_dec_imm <= r2_dec_imm;
-
             r3_reg_rs1_in <= reg_rs1_in;
-
             r3_reg_csr <= r2_reg_csr;
-
             r3_cycles_count <= r2_cycles_count;
-
             r3_alu_status <= alu_status;
+
+            r3_csr_mip <= r2_csr_mip;
+            r3_mem_addrerr <= r2_mem_addrerr;
+            r3_dec_illegal <= r2_dec_illegal;
+            r3_pc_overflow <= r2_pc_overflow;
+            r3_if_err <= r2_if_err;
+            r3_ctl_exception <= r2_ctl_exception;
+            r3_ctl_halt <= r2_ctl_halt;
 
         END IF;
 
