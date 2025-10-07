@@ -314,6 +314,18 @@ BEGIN
     --========================================================================================
     P1 : PROCESS (clock, nRST, r1_flush_needed)
     BEGIN
+
+        IF (nRST = '0') THEN
+
+            -- We don't want to interfer with trap handling 
+            -- when the previous instruction was a jump.
+            -- Thus, we exclude them from the reset (but, they're 
+            -- affect by they're source reset, the csr register file).
+            r1_csr_mip <= '0';
+            r1_csr_mie <= '0';
+
+        END IF;
+
         IF (nRST = '0') OR (r1_flush_needed = '1') THEN
             r1_dec_rs1 <= (OTHERS => '0');
             r1_dec_rs2 <= (OTHERS => '0');
@@ -329,9 +341,6 @@ BEGIN
             r1_if_err <= '0';
             r1_ctl_exception <= '0';
             r1_ctl_halt <= '0';
-
-            r1_csr_mip <= '0';
-            r1_csr_mie <= '0';
 
         ELSIF rising_edge(clock) AND (clock_en = '1') THEN
             r1_dec_rs1 <= dec_rs1;
@@ -386,6 +395,8 @@ BEGIN
             (r1_if_err = '1') OR (r1_ctl_exception = '1') OR (r1_ctl_halt = '1') OR
             (r1_csr_mip = '1') THEN
 
+            REPORT "Handling trap";
+
             -- Check if we're already interrupting, and if we have the right to do it...
             IF (irq_err = '0') AND (r1_csr_mie = '1') THEN
 
@@ -403,6 +414,8 @@ BEGIN
 
                 -- Inhibit the next irq / err
                 irq_err <= '1';
+
+                REPORT "configured trap jump";
 
             END IF;
 

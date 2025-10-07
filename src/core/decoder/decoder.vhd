@@ -200,7 +200,7 @@ BEGIN
 
         IF (nRST = '0') THEN
             illegal_internal <= '0';
-            selected_decoder <= default_t;
+            selected_decoder <= NOP;
             req_pause <= '0';
             pause_cycles <= 0;
             paused_cycles := 0;
