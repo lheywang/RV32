@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
-[*] Tue Oct  7 18:33:34 2025
+[*] Tue Oct  7 20:07:24 2025
 [*]
 [dumpfile] "/home/user/RV32/build/wave.ghw"
-[dumpfile_mtime] "Tue Oct  7 18:31:56 2025"
-[dumpfile_size] 133458
+[dumpfile_mtime] "Tue Oct  7 20:02:45 2025"
+[dumpfile_size] 118363
 [savefile] "/home/user/RV32/presentation/core_tb.gtkw"
-[timestart] 374200000
+[timestart] 772200000
 [size] 3840 2053
 [pos] -27 -24
-*-26.184538 1000000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-26.184538 1085000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.core_tb.
 [treeopen] top.core_tb.core.
@@ -126,9 +126,23 @@ top.core_tb.core.dec1.shift_auth
 top.core_tb.core.fsm1.r1_csr_mip
 [color] 2
 top.core_tb.core.fsm1.r1_csr_mie
-@29
 [color] 2
 top.core_tb.core.fsm1.irq_err
+@29
+[color] 2
+top.core_tb.core.fsm1.r2_dec_illegal
+[color] 2
+top.core_tb.core.fsm1.r2_mem_addrerr
+[color] 2
+top.core_tb.core.fsm1.r2_if_err
+[color] 2
+top.core_tb.core.fsm1.r2_pc_overflow
+[color] 2
+top.core_tb.core.fsm1.r2_ctl_exception
+[color] 2
+top.core_tb.core.fsm1.r2_ctl_halt
+[color] 2
+top.core_tb.core.fsm1.r2_csr_mip
 @200
 -
 @22
@@ -141,7 +155,7 @@ top.core_tb.core.fsm1.irq_err
 @420
 [color] 2
 top.core_tb.core.fsm1.cycles_count
-[color] 2
+[color] 3
 top.core_tb.core.fsm1.r2_cycles_count
 [color] 2
 top.core_tb.core.fsm1.r1_dec_opcode
@@ -152,9 +166,14 @@ top.core_tb.core.fsm1.r3_dec_opcode
 @22
 [color] 2
 #{top.core_tb.core.fsm1.reg_rs1_in[31:0]} top.core_tb.core.fsm1.reg_rs1_in[31] top.core_tb.core.fsm1.reg_rs1_in[30] top.core_tb.core.fsm1.reg_rs1_in[29] top.core_tb.core.fsm1.reg_rs1_in[28] top.core_tb.core.fsm1.reg_rs1_in[27] top.core_tb.core.fsm1.reg_rs1_in[26] top.core_tb.core.fsm1.reg_rs1_in[25] top.core_tb.core.fsm1.reg_rs1_in[24] top.core_tb.core.fsm1.reg_rs1_in[23] top.core_tb.core.fsm1.reg_rs1_in[22] top.core_tb.core.fsm1.reg_rs1_in[21] top.core_tb.core.fsm1.reg_rs1_in[20] top.core_tb.core.fsm1.reg_rs1_in[19] top.core_tb.core.fsm1.reg_rs1_in[18] top.core_tb.core.fsm1.reg_rs1_in[17] top.core_tb.core.fsm1.reg_rs1_in[16] top.core_tb.core.fsm1.reg_rs1_in[15] top.core_tb.core.fsm1.reg_rs1_in[14] top.core_tb.core.fsm1.reg_rs1_in[13] top.core_tb.core.fsm1.reg_rs1_in[12] top.core_tb.core.fsm1.reg_rs1_in[11] top.core_tb.core.fsm1.reg_rs1_in[10] top.core_tb.core.fsm1.reg_rs1_in[9] top.core_tb.core.fsm1.reg_rs1_in[8] top.core_tb.core.fsm1.reg_rs1_in[7] top.core_tb.core.fsm1.reg_rs1_in[6] top.core_tb.core.fsm1.reg_rs1_in[5] top.core_tb.core.fsm1.reg_rs1_in[4] top.core_tb.core.fsm1.reg_rs1_in[3] top.core_tb.core.fsm1.reg_rs1_in[2] top.core_tb.core.fsm1.reg_rs1_in[1] top.core_tb.core.fsm1.reg_rs1_in[0]
+[color] 2
+#{top.core_tb.core.fsm1.r1_csr_rs1_in[31:0]} top.core_tb.core.fsm1.r1_csr_rs1_in[31] top.core_tb.core.fsm1.r1_csr_rs1_in[30] top.core_tb.core.fsm1.r1_csr_rs1_in[29] top.core_tb.core.fsm1.r1_csr_rs1_in[28] top.core_tb.core.fsm1.r1_csr_rs1_in[27] top.core_tb.core.fsm1.r1_csr_rs1_in[26] top.core_tb.core.fsm1.r1_csr_rs1_in[25] top.core_tb.core.fsm1.r1_csr_rs1_in[24] top.core_tb.core.fsm1.r1_csr_rs1_in[23] top.core_tb.core.fsm1.r1_csr_rs1_in[22] top.core_tb.core.fsm1.r1_csr_rs1_in[21] top.core_tb.core.fsm1.r1_csr_rs1_in[20] top.core_tb.core.fsm1.r1_csr_rs1_in[19] top.core_tb.core.fsm1.r1_csr_rs1_in[18] top.core_tb.core.fsm1.r1_csr_rs1_in[17] top.core_tb.core.fsm1.r1_csr_rs1_in[16] top.core_tb.core.fsm1.r1_csr_rs1_in[15] top.core_tb.core.fsm1.r1_csr_rs1_in[14] top.core_tb.core.fsm1.r1_csr_rs1_in[13] top.core_tb.core.fsm1.r1_csr_rs1_in[12] top.core_tb.core.fsm1.r1_csr_rs1_in[11] top.core_tb.core.fsm1.r1_csr_rs1_in[10] top.core_tb.core.fsm1.r1_csr_rs1_in[9] top.core_tb.core.fsm1.r1_csr_rs1_in[8] top.core_tb.core.fsm1.r1_csr_rs1_in[7] top.core_tb.core.fsm1.r1_csr_rs1_in[6] top.core_tb.core.fsm1.r1_csr_rs1_in[5] top.core_tb.core.fsm1.r1_csr_rs1_in[4] top.core_tb.core.fsm1.r1_csr_rs1_in[3] top.core_tb.core.fsm1.r1_csr_rs1_in[2] top.core_tb.core.fsm1.r1_csr_rs1_in[1] top.core_tb.core.fsm1.r1_csr_rs1_in[0]
 @420
 [color] 2
 top.core_tb.core.fsm1.csr_reg
+@28
+[color] 2
+top.core_tb.core.fsm1.r1_flush_needed
 @200
 -
 @420
@@ -396,10 +415,13 @@ top.core_tb.core.csr1.ra1
 [color] 3
 top.core_tb.core.csr1.we
 @22
-[color] 3
+[color] 2
 #{top.core_tb.core.csr1.wd[31:0]} top.core_tb.core.csr1.wd[31] top.core_tb.core.csr1.wd[30] top.core_tb.core.csr1.wd[29] top.core_tb.core.csr1.wd[28] top.core_tb.core.csr1.wd[27] top.core_tb.core.csr1.wd[26] top.core_tb.core.csr1.wd[25] top.core_tb.core.csr1.wd[24] top.core_tb.core.csr1.wd[23] top.core_tb.core.csr1.wd[22] top.core_tb.core.csr1.wd[21] top.core_tb.core.csr1.wd[20] top.core_tb.core.csr1.wd[19] top.core_tb.core.csr1.wd[18] top.core_tb.core.csr1.wd[17] top.core_tb.core.csr1.wd[16] top.core_tb.core.csr1.wd[15] top.core_tb.core.csr1.wd[14] top.core_tb.core.csr1.wd[13] top.core_tb.core.csr1.wd[12] top.core_tb.core.csr1.wd[11] top.core_tb.core.csr1.wd[10] top.core_tb.core.csr1.wd[9] top.core_tb.core.csr1.wd[8] top.core_tb.core.csr1.wd[7] top.core_tb.core.csr1.wd[6] top.core_tb.core.csr1.wd[5] top.core_tb.core.csr1.wd[4] top.core_tb.core.csr1.wd[3] top.core_tb.core.csr1.wd[2] top.core_tb.core.csr1.wd[1] top.core_tb.core.csr1.wd[0]
-[color] 3
+[color] 2
 #{top.core_tb.core.csr1.rd1[31:0]} top.core_tb.core.csr1.rd1[31] top.core_tb.core.csr1.rd1[30] top.core_tb.core.csr1.rd1[29] top.core_tb.core.csr1.rd1[28] top.core_tb.core.csr1.rd1[27] top.core_tb.core.csr1.rd1[26] top.core_tb.core.csr1.rd1[25] top.core_tb.core.csr1.rd1[24] top.core_tb.core.csr1.rd1[23] top.core_tb.core.csr1.rd1[22] top.core_tb.core.csr1.rd1[21] top.core_tb.core.csr1.rd1[20] top.core_tb.core.csr1.rd1[19] top.core_tb.core.csr1.rd1[18] top.core_tb.core.csr1.rd1[17] top.core_tb.core.csr1.rd1[16] top.core_tb.core.csr1.rd1[15] top.core_tb.core.csr1.rd1[14] top.core_tb.core.csr1.rd1[13] top.core_tb.core.csr1.rd1[12] top.core_tb.core.csr1.rd1[11] top.core_tb.core.csr1.rd1[10] top.core_tb.core.csr1.rd1[9] top.core_tb.core.csr1.rd1[8] top.core_tb.core.csr1.rd1[7] top.core_tb.core.csr1.rd1[6] top.core_tb.core.csr1.rd1[5] top.core_tb.core.csr1.rd1[4] top.core_tb.core.csr1.rd1[3] top.core_tb.core.csr1.rd1[2] top.core_tb.core.csr1.rd1[1] top.core_tb.core.csr1.rd1[0]
+@200
+-
+@22
 [color] 3
 #{top.core_tb.core.csr1.mstatus[31:0]} top.core_tb.core.csr1.mstatus[31] top.core_tb.core.csr1.mstatus[30] top.core_tb.core.csr1.mstatus[29] top.core_tb.core.csr1.mstatus[28] top.core_tb.core.csr1.mstatus[27] top.core_tb.core.csr1.mstatus[26] top.core_tb.core.csr1.mstatus[25] top.core_tb.core.csr1.mstatus[24] top.core_tb.core.csr1.mstatus[23] top.core_tb.core.csr1.mstatus[22] top.core_tb.core.csr1.mstatus[21] top.core_tb.core.csr1.mstatus[20] top.core_tb.core.csr1.mstatus[19] top.core_tb.core.csr1.mstatus[18] top.core_tb.core.csr1.mstatus[17] top.core_tb.core.csr1.mstatus[16] top.core_tb.core.csr1.mstatus[15] top.core_tb.core.csr1.mstatus[14] top.core_tb.core.csr1.mstatus[13] top.core_tb.core.csr1.mstatus[12] top.core_tb.core.csr1.mstatus[11] top.core_tb.core.csr1.mstatus[10] top.core_tb.core.csr1.mstatus[9] top.core_tb.core.csr1.mstatus[8] top.core_tb.core.csr1.mstatus[7] top.core_tb.core.csr1.mstatus[6] top.core_tb.core.csr1.mstatus[5] top.core_tb.core.csr1.mstatus[4] top.core_tb.core.csr1.mstatus[3] top.core_tb.core.csr1.mstatus[2] top.core_tb.core.csr1.mstatus[1] top.core_tb.core.csr1.mstatus[0]
 [color] 3
