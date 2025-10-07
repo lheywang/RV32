@@ -505,7 +505,7 @@ BEGIN
                     tmp := r1_dec_imm(11 DOWNTO 0);
                     CASE tmp IS
                         WHEN X"300" => csr_reg <= r_MSTATUS;
-                        WHEN X"301" => csr_reg <= r_MISA;
+                        WHEN X"F10" => csr_reg <= r_MISA;
                         WHEN X"304" => csr_reg <= r_MIE;
                         WHEN X"305" => csr_reg <= r_MTVEC;
                         WHEN X"340" => csr_reg <= r_MSCRATCH;
@@ -517,6 +517,10 @@ BEGIN
                         WHEN X"C80" => csr_reg <= r_CYCLEH;
                         WHEN X"C02" => csr_reg <= r_INSTR;
                         WHEN X"C82" => csr_reg <= r_INSTRH;
+                        WHEN X"F11" => csr_reg <= r_MVENDORID;
+                        WHEN X"F12" => csr_reg <= r_MARCHID;
+                        WHEN X"F13" => csr_reg <= r_MIMPID;
+                        WHEN X"F14" => csr_reg <= r_MHARTID;
                         WHEN OTHERS => csr_reg <= r_MTVAL;
                     END CASE;
 

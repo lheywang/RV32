@@ -59,7 +59,11 @@ PACKAGE common IS
         r_MTVAL,
         r_MIP,
         r_CYCLE, r_CYCLEH,
-        r_INSTR, r_INSTRH
+        r_INSTR, r_INSTRH,
+        r_MVENDORID,
+        r_MARCHID,
+        r_MIMPID,
+        r_MHARTID
     );
 
 END common;

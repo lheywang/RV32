@@ -113,7 +113,7 @@ ARCHITECTURE rtl OF csr_registers IS
     --! @brief Register mcause.
     SIGNAL mcause : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
     --! @brief Register mtval.
-    SIGNAL mtval : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
+    -- SIGNAL mtval : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
     --! @brief Register mip.
     SIGNAL mip : STD_LOGIC_VECTOR((XLEN - 1) DOWNTO 0);
     --! @brief Register cycleh
@@ -162,7 +162,7 @@ BEGIN
             mscratch <= (OTHERS => '0');
             mepc <= (OTHERS => '0');
             mcause <= (OTHERS => '0');
-            mtval <= (OTHERS => '0');
+            -- mtval <= (OTHERS => '0');
             mip <= (OTHERS => '0');
             cycleh <= (OTHERS => '0');
             cyclel <= (OTHERS => '0');
@@ -221,12 +221,17 @@ BEGIN
         mscratch WHEN (ra1 = r_MSCRATCH) ELSE
         mepc WHEN (ra1 = r_MEPC) ELSE
         mcause WHEN (ra1 = r_MCAUSE) ELSE
-        mtval WHEN (ra1 = r_MTVAL) ELSE
+        -- mtval WHEN (ra1 = r_MTVAL) ELSE -- Reset to 0, can never been update --> return 0x00000000 on the other close
         mip WHEN (ra1 = r_MIP) ELSE
         cycleh WHEN (ra1 = r_CYCLEH) ELSE
         cyclel WHEN (ra1 = r_CYCLE) ELSE
         instrh WHEN (ra1 = r_INSTRH) ELSE
         instrl WHEN (ra1 = r_INSTR) ELSE
+        -- Remaining registers are known, but unused and thus return 0 :
+        -- mvendorid (0x00000000)
+        -- marchid (0x00000000)
+        -- mimpid (0x00000000)
+        -- mhartid (0x00000000)
         (OTHERS => '0');
 
     -- always read the MIP port.
