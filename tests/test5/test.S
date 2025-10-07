@@ -26,14 +26,8 @@ _enable_interrupts:
 
     li      t0,         0x800           # External interrupt bit in MIE
     csrs    mie,        t0              # Enable machine external interrupts
+
+    la      t0,         _trap_handler   # Load the address of the trap handler
+    csrw    mtvec,      t0              # Set the trap handler address in mtvec
+
     ret                                 # Return, alias to JALR
-
-
-
-
-_trap_handler:
-    addi    t0,         zero,   1       # Set t1 to 1 to indicate we entered the trap handler
-_trap_loop:
-    addi    t0,         t0,     1       # Increment t1 to show we are in the trap handler
-    jal     ra,         _trap_loop      # Infinite loop to simulate work in the trap handler
-    
