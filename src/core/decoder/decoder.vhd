@@ -671,9 +671,9 @@ BEGIN
 
                     -- Jumps
                 WHEN J =>
-                    rd_internal <= (OTHERS => '0');
-                    rs1_internal <= i2_instruction(19 DOWNTO 15);
-                    rs2_internal <= i2_instruction(24 DOWNTO 20);
+                    rd_internal <= i2_instruction(11 DOWNTO 7);
+                    rs1_internal <= (OTHERS => '0');
+                    rs2_internal <= (OTHERS => '0');
                     imm_internal <= (OTHERS => i2_instruction(31));
                     imm_internal(20 DOWNTO 1) <= i2_instruction(31)
                     & i2_instruction(19 DOWNTO 12)
