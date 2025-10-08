@@ -1,10 +1,10 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
 
-entity serial_peripheral is 
-end entity;
+ENTITY serial_peripheral IS
+END ENTITY;
 
-architecture behavioral of serial_peripheral is
-    begin
-    end architecture;
+ARCHITECTURE behavioral OF serial_peripheral IS
+BEGIN
+END ARCHITECTURE;

@@ -1,10 +1,10 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
 
-entity argb_peripheral_tb is 
-end entity;
+ENTITY argb_peripheral_tb IS
+END ENTITY;
 
-architecture behavioral of argb_peripheral_tb is
-    begin
-    end architecture;
+ARCHITECTURE behavioral OF argb_peripheral_tb IS
+BEGIN
+END ARCHITECTURE;

@@ -1,10 +1,10 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
 
-entity keys_peripheral is 
-end entity;
+ENTITY keys_peripheral IS
+END ENTITY;
 
-architecture behavioral of keys_peripheral is
-    begin
-    end architecture;
+ARCHITECTURE behavioral OF keys_peripheral IS
+BEGIN
+END ARCHITECTURE;

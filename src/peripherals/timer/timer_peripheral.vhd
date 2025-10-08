@@ -1,10 +1,10 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
 
-entity timer_peripheral is 
-end entity;
+ENTITY timer_peripheral IS
+END ENTITY;
 
-architecture behavioral of timer_peripheral is
-    begin
-    end architecture;
+ARCHITECTURE behavioral OF timer_peripheral IS
+BEGIN
+END ARCHITECTURE;
