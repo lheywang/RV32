@@ -10,15 +10,15 @@ vluint64_t sim_time = 0;
 int clkdiv;
 
 // Toggle clock helper
-void tick(Vpcounter *tb, VerilatedVcdC *tfp)
-{
-    tb->clk = 0;
-    tb->eval();
-    tfp->dump(sim_time++);
-    tb->clk = 1;
-    tb->eval();
-    tfp->dump(sim_time++);
-}
+    void tick(Vpcounter *tb, VerilatedVcdC *tfp)
+    {
+        tb->clk = 0;
+        tb->eval();
+        tfp->dump(sim_time++);
+        tb->clk = 1;
+        tb->eval();
+        tfp->dump(sim_time++);
+    }
 
 // Main
 int main(int argc, char **argv)
