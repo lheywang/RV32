@@ -25,6 +25,9 @@
 # Altera simulations models (not open source)
 *altera_mf*
 
+# Verilator files
+obj_dir
+
 # Doxygen outputs
 documentation/*
 

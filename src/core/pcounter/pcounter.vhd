@@ -53,10 +53,11 @@ END ENTITY;
 
 ARCHITECTURE behavioral OF pcounter IS
 
+    CONSTANT address_maxval : unsigned((XLEN - 1) DOWNTO 0) := (OTHERS => '1');
     --! @brief Internal counter for the address value, as an unsigned of XLEN bits.
     SIGNAL internal_address : unsigned((XLEN - 1) DOWNTO 0);
     --! @brief Internal value for the maximal address, computed on the runtime.
-    SIGNAL address_maxval : unsigned((XLEN - 1) DOWNTO 0) := (OTHERS => '1');
+    -- SIGNAL
     --! @brief Internal overflow status. Used to block the future evolutions of the counter.
     SIGNAL internal_nOVER : STD_LOGIC;
 
@@ -75,8 +76,8 @@ BEGIN
     BEGIN
         IF (nRST = '0') THEN
             internal_address <= to_unsigned(RESET_ADDR, internal_address'length);
-            address_maxval <= (OTHERS => '1');
-            address_maxval(2 DOWNTO 0) <= (OTHERS => '0');
+            -- address_maxval <= (OTHERS => '1');
+            -- address_maxval(2 DOWNTO 0) <= (OTHERS => '0');
             internal_nOVER <= '0';
 
         ELSIF rising_edge(clock) AND (clock_en = '1') THEN
