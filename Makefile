@@ -9,6 +9,7 @@ VERILOG_SRCS = $(SRC_DIR)/packages/core_config_pkg.sv
 
 # Including all core files
 VERILOG_SRCS += $(SRC_DIR)/core/pcounter.sv
+VERILOG_SRCS += $(SRC_DIR)/core/counter.sv
 VERILOG_SRCS += $(SRC_DIR)/core/clock.sv
 VERILOG_SRCS += $(SRC_DIR)/core/alu.sv
 VERILOG_SRCS += $(SRC_DIR)/core/csr.sv
