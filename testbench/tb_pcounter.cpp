@@ -46,8 +46,11 @@ int main(int argc, char **argv)
 
     std::cout << "Starting counter simulation...\n";
 
+    int pass = 0;
+    int fail = 0;
+
     // --- Test 1: Count until overflow ---
-    for (int i = 0; i < 32; i++)
+    for (int i = 0; i < 4095; i++)
     {
         tb->enable = 1;
         tick(tb, tfp);
@@ -56,11 +59,7 @@ int main(int argc, char **argv)
 
         if (tb->address == tb->loaded)
         {
-            std::cout << KGRN
-                      << "\t[ PASS ] Cycle "
-                      << std::setw(4)
-                      << i
-                      << std::endl;
+            pass += 1;
         }
         else
         {
@@ -74,6 +73,7 @@ int main(int argc, char **argv)
                       << tb->loaded
                       << RST
                       << std::endl;
+            fail += 1;
         }
     }
 
@@ -95,12 +95,7 @@ int main(int argc, char **argv)
 
         if ((tb->address == tb->loaded) & ((int)tb->ovf == ovf[i]))
         {
-            std::cout << KGRN
-                      << "\t[ PASS ] Cycle "
-                      << std::setw(4)
-                      << i
-                      << RST
-                      << std::endl;
+            pass += 1;
         }
         else
         {
@@ -118,10 +113,33 @@ int main(int argc, char **argv)
                       << ovf[i]
                       << RST
                       << std::endl;
+            fail += 1;
         }
     }
 
-    std::cout << "Simulation complete." << std::endl;
+    std::cout << "Simulation complete."
+              << std::endl
+              << KYEL << "--------------------------------------------------------\n"
+              << "Results : "
+              << "\n--------------------------------------------------------"
+              << std::endl
+              << KGRN << "\tPass : "
+              << std::setw(4) << pass
+              << KRED << "\n\tFail : "
+              << std::setw(4) << fail
+              << RST
+              << std::endl;
+
+    if (fail == 0)
+        std::cout << KGRN
+                  << "Tests passed !"
+                  << RST
+                  << std::endl;
+    else
+        std::cout << KRED
+                  << "Tests failed !"
+                  << RST
+                  << std::endl;
 
     tfp->close();
     delete tb;
