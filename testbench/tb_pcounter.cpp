@@ -7,6 +7,7 @@
 
 // Simulation time
 vluint64_t sim_time = 0;
+int clkdiv;
 
 // Toggle clock helper
 void tick(Vpcounter *tb, VerilatedVcdC *tfp)
