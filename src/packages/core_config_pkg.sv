@@ -2,6 +2,8 @@
 
 package core_config_pkg;
 
+    // Disabling unused param for verilator.
+    /* verilator lint_off UNUSEDPARAM */
     // -------------------------------------------------------------------------
     // Clocks and resets
     // -------------------------------------------------------------------------
@@ -37,4 +39,6 @@ package core_config_pkg;
     // localparam int INVALID_REG      = 0;                // Reserved reg index (x0)
     // localparam int DEFAULT_PC       = 32'h0000_0000;
 
+    // Re-enabling used parameters of Verilator.
+    /* verilator lint_on UNUSEDPARAM */
 endpackage
