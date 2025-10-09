@@ -24,7 +24,8 @@ module clock (
             cnt <= 0;
             clk_en <= 0;
         
-        end else begin
+        end 
+        else begin
 
             // Handle counter evolution
             if (cnt >= logic'(max)) begin

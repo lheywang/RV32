@@ -29,7 +29,8 @@ module pcounter
             address <= IF_BASE_ADDR;
             ovf <= 0;
 
-        end else if (clk_en) begin
+        end 
+        else if (clk_en) begin
 
             if (load) begin
 
@@ -45,7 +46,7 @@ module pcounter
                 end else begin
 
                     ovf <= 1;
-                    
+
                 end
             end
         end
