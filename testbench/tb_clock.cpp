@@ -74,7 +74,7 @@ int main(int argc, char **argv)
     std::cout << "Simulation complete."
               << std::endl
               << KYEL << "--------------------------------------------------------\n"
-              << "Results : "
+              << "Results : (Clock)"
               << "\n--------------------------------------------------------"
               << std::endl
               << KGRN << "\tPass : "
