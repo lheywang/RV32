@@ -32,7 +32,7 @@ int main(int argc, char **argv)
     Verilated::traceEverOn(true);
     VerilatedVcdC *tfp = new VerilatedVcdC;
     tb->trace(tfp, 99);
-    tfp->open("pcounter.vcd");
+    tfp->open("simout/pcounter.vcd");
 
     // Reset sequence
     tb->rst_n = 0;

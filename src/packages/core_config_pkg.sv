@@ -3,6 +3,14 @@
 package core_config_pkg;
 
     // -------------------------------------------------------------------------
+    // Clocks and resets
+    // -------------------------------------------------------------------------
+    parameter int REF_CLK_FREQ      = 200_000_000;       // 200 MHz
+    parameter int CORE_CLK_FREQ     = 100_000_000;       // 100 MHz
+    parameter int CORE_CLK_DUTY     = 50;                // Duty cycle in percentage
+    // parameter int RST_TICK_CNT    = 10;                // Number of reference clock cycles for reset
+
+    // -------------------------------------------------------------------------
     // Data path widths
     // -------------------------------------------------------------------------
     parameter int XLEN              = 32;               // Register width (32-bit or 64-bit)

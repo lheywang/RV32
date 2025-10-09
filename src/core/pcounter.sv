@@ -45,13 +45,10 @@ module pcounter
                 end else begin
 
                     ovf <= 1;
-
+                    
                 end
-
             end
-
         end
-
     end
 
 endmodule
