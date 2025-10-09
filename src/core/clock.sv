@@ -27,24 +27,24 @@ module clock (
         end else begin
 
             // Handle counter evolution
-            if (count >= max) begin
+            if (cnt >= logic'(max)) begin
                 
-                count <= 0;
+                cnt <= 0;
 
             end else begin
 
-                count <= count + 1;
+                cnt <= cnt + 1;
 
             end
 
             // Handle output state
-            if (count < thres) begin
+            if (cnt < logic'(thres)) begin
 
-                clk_en <= '1';
+                clk_en <= 1;
 
             end else begin
 
-                clk_en <= '0';
+                clk_en <= 0;
 
             end
         end
