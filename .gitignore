@@ -5,6 +5,7 @@
 !*/
 !*.*
 !DoxyFile
+!Makefile
 
 # Then, removes some specifics patterns
 # Compiled files
@@ -33,3 +34,4 @@ documentation/*
 
 # VSCode extensions
 .VSCodeCounter/*
+.vscode/*
