@@ -8,18 +8,18 @@ import core_config_pkg::IF_BASE_ADDR;
 module pcounter
 (
     // Logic inputs
-    input   logic               clk,
-    input   logic               clk_en,
-    input   logic               rst_n,
-    input   logic               enable,
-    input   logic               load,
+    input   logic                       clk,
+    input   logic                       clk_en,
+    input   logic                       rst_n,
+    input   logic                       enable,
+    input   logic                       load,
 
     // Bus inputs
-    input   logic   [XLEN-1:0]  loaded,
+    input   logic   [(XLEN - 1) : 0]    loaded,
 
     // Outputs
-    output  logic               ovf,
-    output  logic   [XLEN-1:0]  address
+    output  logic                       ovf,
+    output  logic   [(XLEN - 1) : 0]    address
 );
 
     always_ff @( posedge clk or negedge rst_n ) begin

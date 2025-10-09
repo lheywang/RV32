@@ -6,19 +6,19 @@ import core_config_pkg::PERF_CNT_INC;
 import core_config_pkg::XLEN;
 
 module counter(
-    input   logic                   clk,
-    input   logic                   clk_en,
-    input   logic                   rst_n,
-    input   logic                   enable,
+    input   logic                       clk,
+    input   logic                       clk_en,
+    input   logic                       rst_n,
+    input   logic                       enable,
 
-    output logic    [XLEN-1:0]      outL,
+    output logic    [(XLEN - 1) : 0]    outL,
 
      // optionnally assigned, depending if we use the higher port or not.
-    output logic    [XLEN-1:0]      outH
+    output logic    [(XLEN - 1) : 0]    outH
 );
 
     // Internal counter
-    logic   [PERF_CNT_LEN-1:0]      cnt;
+    logic   [(PERF_CNT_LEN - 1) : 0]    cnt;
 
     always_ff @( posedge clk or negedge rst_n) begin
 
@@ -42,12 +42,12 @@ module counter(
     generate
         // Assigning outputs depending on the core configuration
         if (PERF_CNT_PORT == 1) begin : gen_dualport
-            assign outL[XLEN-1:0] = cnt[(PERF_CNT_LEN/2)-1:0];              // 32 LSB
-            assign outH[XLEN-1:0] = cnt[PERF_CNT_LEN-1:(PERF_CNT_LEN/2)];   // 32 MSB
+            assign outL[XLEN-1:0] = cnt[((PERF_CNT_LEN / 2) - 1) : 0];              // 32 LSB
+            assign outH[XLEN-1:0] = cnt[(PERF_CNT_LEN - 1) : (PERF_CNT_LEN / 2)];   // 32 MSB
         end 
         else begin : gen_singleport
-            assign outL[PERF_CNT_LEN-1:0] = cnt[PERF_CNT_LEN-1:0];
-            assign outH = 0;
+            assign outL[(PERF_CNT_LEN - 1) : 0] = cnt[(PERF_CNT_LEN - 1) : 0];      // 64 LSB
+            assign outH = 0;                                                        // 0
         end
     endgenerate
 
