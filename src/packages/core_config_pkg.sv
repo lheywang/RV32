@@ -7,20 +7,27 @@ package core_config_pkg;
     // -------------------------------------------------------------------------
     // Clocks and resets
     // -------------------------------------------------------------------------
-    parameter int REF_CLK_FREQ      = 200_000_000;       // 200 MHz
-    parameter int CORE_CLK_FREQ     = 100_000_000;       // 100 MHz
-    parameter int CORE_CLK_DUTY     = 50;                // Duty cycle in percentage
-    parameter int RST_TICK_CNT      = 10;                // Number of reference clock cycles for reset
+    parameter int REF_CLK_FREQ      = 200_000_000;      // 200 MHz
+    parameter int CORE_CLK_FREQ     = 100_000_000;      // 100 MHz
+    parameter int CORE_CLK_DUTY     = 50;               // Duty cycle in percentage
+    parameter int RST_TICK_CNT      = 10;               // Number of reference clock cycles for reset
 
     // -------------------------------------------------------------------------
     // Data path widths
     // -------------------------------------------------------------------------
     parameter int XLEN              = 32;               // Register width (32-bit or 64-bit)
-    parameter int REG_ADDR_W        = 5;                // Number of bits for register index (32 registers)
-    parameter int REG_COUNT         = 32;               // Number of general-purpose registers
-
     parameter int MEM_ADDR_W        = XLEN;             // Address width for memory
     parameter int MEM_DATA_W        = XLEN;             // Data width
+
+    // -------------------------------------------------------------------------
+    // Registers configuration
+    // -------------------------------------------------------------------------
+    parameter int REG_ADDR_W        = 5;                // Number of bits for register index (32 registers)
+    parameter int REG_COUNT         = 32;               // Number of general-purpose registers
+    parameter int CSR_ADDR_W        = 12;               // Number of bits for register index (32 registers)
+    parameter int CSR_COUNT         = 23;               // Number of CSR registers
+
+    // CSR Addresses
     
     // -------------------------------------------------------------------------
     // Instruction fetch parameters
@@ -46,6 +53,38 @@ package core_config_pkg;
     parameter int RS2_LSB           = 20;
     parameter int FUNCT7_MSB        = 31;
     parameter int FUNCT7_LSB        = 25;
+
+    // -------------------------------------------------------------------------
+    // CSR internal settings
+    // -------------------------------------------------------------------------
+    /*
+     * Writes masks
+     */
+    parameter logic [(XLEN - 1):0] CSR_WMASK [CSR_COUNT] = '{
+        32'h00007188, // MSTATUS
+        32'hFFFF0888, // MIE
+        32'hFFFFFF01, // MTVEC
+        32'hFFFFFFFF, // MSCRATCH
+        32'hFFFFFFFE, // MEPC
+        32'h8000001F, // MCAUSE
+        32'h00000000, // MTVAL
+        32'h00000000, // MIP
+        32'h00000000, // VENDORID
+        32'h00000000, // MARCHID
+        32'h00000000, // MIMPID
+        32'h00000000, // MHARTID
+        32'h00000000, // MISA
+        32'h00000000, // CYCLE
+        32'h00000000, // CYCLEH
+        32'h00000000, // INSTR
+        32'h00000000, // INSTRH
+        32'h00000000, // FLUSH
+        32'h00000000, // FLUSHH
+        32'h00000000, // WAIT
+        32'h00000000, // WAITH
+        32'h00000000, // DECOD
+        32'h00000000  // DECODH
+    };
 
     // -------------------------------------------------------------------------
     // Performance counter configuration
@@ -96,6 +135,21 @@ package core_config_pkg;
     typedef enum {
         DEC_U, DEC_I, DEC_R, DEC_B, DEC_S, DEC_J, DEC_NONE
     } decoders;
+
+    typedef enum {
+        r_MSTATUS, r_MIE, r_MTVEC, r_MSCRATCH, r_MEPC, r_MCAUSE,
+        r_MTVAL, r_MIP, 
+        
+        r_MVENDORID, r_MARCHID, r_MIMPID, r_MHARTID, r_MISA,
+
+        r_CYCLE, r_CYCLEH,  // CPU Cycle counters
+        r_INSTR, r_INSTRH,  // CPU Commited instructions
+        r_FLUSH, r_FLUSHH,  // CPU Pipeline flush counters
+        r_WAIT, r_WAITH,    // CPU Number of waited cycles
+        r_DECOD, r_DECODH,  // CPU Number of decoded instructions.
+
+        r_NONE              // Must be the last
+    } csr_t;
 
     // Re-enabling used parameters of Verilator.
     /* verilator lint_on UNUSEDPARAM */

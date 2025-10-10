@@ -6,7 +6,6 @@ import core_config_pkg::REG_ADDR_W;
 
 module registers (
     input   logic                                   clk,
-    input   logic                                   clk_en,
 
     input   logic                                   we,
     input   logic   [(REG_ADDR_W - 1) : 0]          wa,
@@ -25,25 +24,22 @@ module registers (
     logic   [(XLEN - 1) : 0]    	regs					[(REG_COUNT - 1) : 0];
 
     /*
-    *   Synchronous write logic
+    *   Synchronous write logic (2 per cpu cycles).
     */
     always_ff @( posedge clk) begin
-	 
-			if (clk_en) begin
+	
+                if (we) begin
 
-            if (we) begin
+                    if (wa != 0) begin
 
-                if (wa != 0) begin
+                        regs[wa] <= wd;
 
-                    regs[wa] <= wd;
-
+                    end
                 end
-            end
 				
-				rd1 <= regs[ra1];
-				rd2 <= regs[ra2];
-	 
-        end
+            rd1 <= regs[ra1];
+            rd2 <= regs[ra2];
+
     end
 
 endmodule
