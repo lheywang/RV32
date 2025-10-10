@@ -144,5 +144,5 @@ int main(int argc, char **argv)
 
     tfp->close();
     delete tb;
-    return 0;
+    return fail;
 }
