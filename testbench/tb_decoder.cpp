@@ -24,101 +24,102 @@ struct decoded
 
 unsigned int instructions[]{
     // Loads
-    0b01110100101001101010011110110111, // LUI
-    0b01110100101001101010011110010111, // AUIPC
+    0b0111010'01010'01101'010'01111'01101'11, // LUI
+    0b0111010'01010'01101'010'01111'00101'11, // AUIPC
 
     // Immediates
-    0b01111111111100011000000010010011, // ADDI
-    0b11111111111101011010100000010011, // SLTI
-    0b01111111111111111011100000010011, // SLTIU
-    0b11111111111110011100100000010011, // XORI
-    0b11111111111100011110100000010011, // ORI
-    0b11111111111100011111100000010011, // ANDI
-    0b11111111111100011001100000010011, // SLLI
-    0b00000010111101010101011110010011, // SRLI
-    0b01000010111101010101011110010011, // SRAI
+    0b1111111'11111'00011'000'10000'00100'11,  // ADDI
+    0b1111111'11111'00011'010'10000'00100'11,  // SLTI
+    0b1111111'11111'00011'011'10000'00100'11,  // SLTIU
+    0b1111111'11111'00011'100'10000'00100'11,  // XORI
+    0b1111111'11111'00011'110'10000'00100'11,  // ORI
+    0b1111111'11111'00011'111'10000'00100'11,  // ANDI
+    0b1111111'11111'00011'001'10000'00100'11,  // SLLI
+    0b00000'01'11111'00011'101'10000'00100'11, // SRLI
+    0b01000'01'11111'00011'101'10000'00100'11, // SRAI
 
     // Registers
-    0b00000000111110001000111110110011, // ADD
-    0b01000000111110001000111110110011, // SUB
-    0b00000000111110011001111110110011, // SLL
-    0b00000000111110001010111110110011, // SLT
-    0b00000000111110001011111110110011, // SLTU
-    0b00000000111110001100111110110011, // XOR
-    0b00000000111110001101111110110011, // SRL
-    0b01000000111110001101111110110011, // SRA
-    0b00000000111110001110111110110011, // OR
-    0b00000000111110001111111110110011, // AND
+    0b0000000'01111'10001'000'11111'01100'11, // ADD
+    0b0100000'01111'10001'000'11111'01100'11, // SUB
+    0b0000000'01111'10001'001'11111'01100'11, // SLL
+    0b0000000'01111'10001'010'11111'01100'11, // SLT
+    0b0000000'01111'10001'011'11111'01100'11, // SLTU
+    0b0000000'01111'10001'100'11111'01100'11, // XOR
+    0b0000000'01111'10001'101'11111'01100'11, // SRL
+    0b0100000'01111'10001'101'11111'01100'11, // SRA
+    0b0000000'01111'10001'110'11111'01100'11, // OR
+    0b0000000'01111'10001'111'11111'01100'11, // AND
 
     // Misc
-    0b00001001100100000000000000001111, // FENCE
+    0b0000000'00000'00000'000'00000'00011'11, // FENCE
 
     // Jumps
-    0b01111110011100110000111111100011, // BEQ
-    0b11111110011100110001111111100011, // BNE
-    0b01111110011100110100111111100011, // BLT
-    0b11111110011100110101111111100011, // BGE
-    0b01111110011100110110111111100011, // BLTU
-    0b11111110011100110111111111100011, // BGEU
+    0b0111111'00111'00110'000'11111'11000'11, // BEQ
+    0b0111111'00111'00110'001'11111'11000'11, // BNE
+    0b0111111'00111'00110'100'11111'11000'11, // BLT
+    0b0111111'00111'00110'101'11111'11000'11, // BGE
+    0b0111111'00111'00110'110'11111'11000'11, // BLTU
+    0b0111111'00111'00110'111'11111'11000'11, // BGEU
 
     // Memory
-    0b11111110000100011000111110100011, // SB
-    0b11111110000100011001111110100011, // SH
-    0b11111110000100011010111110100011, // SW
-    0b11111111111100011000000010000011, // LB
-    0b11111111111100011001000010000011, // LH
-    0b11111111111100011010000010000011, // LW
-    0b11111111111100011100000010000011, // LBU
-    0b11111111111100011101000010000011, // LHU
+    0b1111111'11111'00011'000'11111'01000'11, // SB
+    0b1111111'11111'00011'001'11111'01000'11, // SH
+    0b1111111'11111'00011'010'11111'01000'11, // SW
+    0b1111111'11111'00011'000'00001'00000'11, // LB
+    0b1111111'11111'00011'001'00001'00000'11, // LH
+    0b1111111'11111'00011'010'00001'00000'11, // LW
+    0b1111111'11111'00011'100'00001'00000'11, // LBU
+    0b1111111'11111'00011'101'00001'00000'11, // LHU
 
     // Jumps
-    0b11111111111111111111000111101111, // JAL
-    0b11111111111100001000000111100111, // JALR
+    0b1111111'11111'11111'111'00011'11011'11, // JAL
+    0b1111111'11111'00001'000'00011'11001'11, // JALR
 
     // Syscalls
-    0b00000000000000000000000001110011, // ECALL
-    0b00000000000100000000000001110011, // EBREAK
+    0b0000000'00000'00000'000'00000'11100'11, // ECALL
+    0b0000000'00001'00000'000'00000'11100'11, // EBREAK
+    0b0011000'00010'00000'000'00000'11100'11, // MRET
 
     // RV32M
-    0b00000010000100011000111110110011, // MUL
-    0b00000010000100011001111110110011, // MULH
-    0b00000010000100011010111110110011, // MULSHU
-    0b00000010000100011011111110110011, // MULHU
-    0b00000010000100011100111110110011, // DIV
-    0b00000010000100011101111110110011, // DIVU
-    0b00000010000100011110111110110011, // REM
-    0b00000010000100011111111110110011, // REMU
+    0b0000001'01111'10001'000'11111'01100'11, // MUL
+    0b0000001'01111'10001'001'11111'01100'11, // MULH
+    0b0000001'01111'10001'010'11111'01100'11, // MULSHU
+    0b0000001'01111'10001'011'11111'01100'11, // MULHU
+    0b0000001'01111'10001'100'11111'01100'11, // DIV
+    0b0000001'01111'10001'101'11111'01100'11, // DIVU
+    0b0000001'01111'10001'110'11111'01100'11, // REM
+    0b0000001'01111'10001'111'11111'01100'11, // REMU
 
     // ZICSR
-    0b11111111111111111001000011110011, // CSRRW
-    0b11111111111111111010000011110011, // CSRRS
-    0b11111111111111111011000011110011, // CSRRC
-    0b11111111111111111101000011110011, // CSRRWI
-    0b11111111111111111110000011110011, // CSRRSI
-    0b11111111111111111111000011110011, // CSRRCI
+    0b1111111'11111'11111'001'00001'11100'11, // CSRRW
+    0b1111111'11111'11111'010'00001'11100'11, // CSRRS
+    0b1111111'11111'11111'011'00001'11100'11, // CSRRC
+    0b1111111'11111'11111'101'00001'11100'11, // CSRRWI
+    0b1111111'11111'11111'110'00001'11100'11, // CSRRSI
+    0b1111111'11111'11111'111'00001'11100'11, // CSRRCI
 
     // Illegals
-    0b11111110000100011011111110100011, // (Illegal : SH)
-    0b01111110011100110010111111100011  // (Illegal : BGE)
+    0b1111111'00001'00011'011'11111'01000'11, // (Illegal : SH)
+    0b0111111'00111'00110'010'11111'11000'11  // (Illegal : BGE)
 };
 
 decoded dinstructions[] = {
-    // Loads
+    // Loads (0)
     {.rs1 = 0, .rs2 = 0, .rd = 15, .imm = 1957076992, .opcode = 1, .illegal = 0}, // LUI
     {.rs1 = 0, .rs2 = 0, .rd = 15, .imm = 1957076992, .opcode = 2, .illegal = 0}, // AUIPC
 
-    // Immediates
-    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 3, .illegal = 0}, // ADDI
-    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 4, .illegal = 0}, // SLTI
-    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 5, .illegal = 0}, // SLTIU
-    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 6, .illegal = 0}, // XORI
-    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 7, .illegal = 0}, // ORI
-    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 8, .illegal = 0}, // ANDI
-    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 15, .opcode = 9, .illegal = 0},         // SLLI
-    {.rs1 = 3, .rs2 = 0, .rd = 15, .imm = 15, .opcode = 10, .illegal = 0},        // SRLI
-    {.rs1 = 3, .rs2 = 0, .rd = 15, .imm = 15, .opcode = 11, .illegal = 0},        // SRAI
+    // Immediates (2)
+    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 3, .illegal = 0},  // ADDI
+    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 4, .illegal = 0},  // SLTI
+    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 5, .illegal = 0},  // SLTIU
+    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 6, .illegal = 0},  // XORI
+    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 11, .illegal = 0}, // ORI
+    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 7, .illegal = 0},  // ANDI
+    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 8, .illegal = 0},  // SLLI
+    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0x3F, .opcode = 9, .illegal = 0},        // SRLI
+    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0x43F, .opcode = 10, .illegal = 0},      // SRAI
 
-    // Registers
+    // Registers (b)
     {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 12, .illegal = 0}, // ADD
     {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 13, .illegal = 0}, // SUB
     {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 14, .illegal = 0}, // SLL
@@ -130,45 +131,47 @@ decoded dinstructions[] = {
     {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 20, .illegal = 0}, // OR
     {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 21, .illegal = 0}, // AND
 
-    // Misc
+    // Misc (15)
     {.rs1 = 0, .rs2 = 0, .rd = 0, .imm = 0, .opcode = 30, .illegal = 0}, // FENCE
 
-    // Branches
-    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0, .opcode = 31, .illegal = 0}, // BEQ
-    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0, .opcode = 32, .illegal = 0}, // BNE
-    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0, .opcode = 33, .illegal = 0}, // BLT
-    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0, .opcode = 34, .illegal = 0}, // BGE
-    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0, .opcode = 35, .illegal = 0}, // BLTU
-    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0, .opcode = 36, .illegal = 0}, // BGEU
+    // Branches (16)
+    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0xFFE, .opcode = 31, .illegal = 0}, // BEQ
+    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0xFFE, .opcode = 32, .illegal = 0}, // BNE
+    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0xFFE, .opcode = 33, .illegal = 0}, // BLT
+    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0xFFE, .opcode = 34, .illegal = 0}, // BGE
+    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0xFFE, .opcode = 35, .illegal = 0}, // BLTU
+    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0xFFE, .opcode = 36, .illegal = 0}, // BGEU
 
-    // Memory
-    {.rs1 = 3, .rs2 = 1, .rd = 0, .imm = 0, .opcode = 37, .illegal = 0}, // SB
-    {.rs1 = 3, .rs2 = 1, .rd = 0, .imm = 0, .opcode = 38, .illegal = 0}, // SH
-    {.rs1 = 3, .rs2 = 1, .rd = 0, .imm = 0, .opcode = 39, .illegal = 0}, // SW
-    {.rs1 = 3, .rs2 = 1, .rd = 0, .imm = 0, .opcode = 40, .illegal = 0}, // LB
-    {.rs1 = 3, .rs2 = 1, .rd = 0, .imm = 0, .opcode = 41, .illegal = 0}, // LH
-    {.rs1 = 3, .rs2 = 1, .rd = 0, .imm = 0, .opcode = 42, .illegal = 0}, // LW
-    {.rs1 = 3, .rs2 = 1, .rd = 0, .imm = 0, .opcode = 43, .illegal = 0}, // LBU
-    {.rs1 = 3, .rs2 = 1, .rd = 0, .imm = 0, .opcode = 44, .illegal = 0}, // LHU
+    // Memory (1c)
+    {.rs1 = 3, .rs2 = 0x1F, .rd = 0, .imm = 0xFFFFFFFF, .opcode = 42, .illegal = 0}, // SB
+    {.rs1 = 3, .rs2 = 0x1F, .rd = 0, .imm = 0xFFFFFFFF, .opcode = 43, .illegal = 0}, // SH
+    {.rs1 = 3, .rs2 = 0x1F, .rd = 0, .imm = 0xFFFFFFFF, .opcode = 44, .illegal = 0}, // SW
+    {.rs1 = 3, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 37, .illegal = 0},    // LB
+    {.rs1 = 3, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 38, .illegal = 0},    // LH
+    {.rs1 = 3, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 39, .illegal = 0},    // LW
+    {.rs1 = 3, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 40, .illegal = 0},    // LBU
+    {.rs1 = 3, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 41, .illegal = 0},    // LHU
 
-    {.rs1 = 0, .rs2 = 0, .rd = 3, .imm = 0xFFFFFFFF, .opcode = 45, .illegal = 0}, // JAL
+    // Jumps (24)
+    {.rs1 = 0, .rs2 = 0, .rd = 3, .imm = 0xFFFFFFFE, .opcode = 45, .illegal = 0}, // JAL
     {.rs1 = 1, .rs2 = 0, .rd = 3, .imm = 0xFFFFFFFF, .opcode = 46, .illegal = 0}, // JALR
 
+    // Syscalls (26)
     {.rs1 = 0, .rs2 = 0, .rd = 0, .imm = 0, .opcode = 47, .illegal = 0}, // ECALL
     {.rs1 = 0, .rs2 = 0, .rd = 0, .imm = 0, .opcode = 48, .illegal = 0}, // EBREAK
     {.rs1 = 0, .rs2 = 0, .rd = 0, .imm = 0, .opcode = 49, .illegal = 0}, // MRET
 
-    // RV32M
+    // RV32M (29)
     {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 22, .illegal = 0}, // MUL
     {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 23, .illegal = 0}, // MULH
-    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 24, .illegal = 0}, // MULHSU
-    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 25, .illegal = 0}, // MULHU
+    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 25, .illegal = 0}, // MULHSU
+    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 24, .illegal = 0}, // MULHU
     {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 26, .illegal = 0}, // DIV
     {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 27, .illegal = 0}, // DIVU
     {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 28, .illegal = 0}, // REM
     {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 29, .illegal = 0}, // REMU
 
-    // ZICSR
+    // ZICSR (31)
     {.rs1 = 31, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 50, .illegal = 0}, // CSRRW
     {.rs1 = 31, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 51, .illegal = 0}, // CSRRS
     {.rs1 = 31, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 52, .illegal = 0}, // CSRRC
@@ -176,9 +179,9 @@ decoded dinstructions[] = {
     {.rs1 = 31, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 54, .illegal = 0}, // CSRRSI
     {.rs1 = 31, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 55, .illegal = 0}, // CSRRCI
 
-    // Illegals
-    {.rs1 = 0, .rs2 = 0, .rd = 0, .imm = 0, .opcode = 0, .illegal = 1}, // SH Based
-    {.rs1 = 0, .rs2 = 0, .rd = 0, .imm = 0, .opcode = 0, .illegal = 1}  // BGE Based
+    // Illegals (37)
+    {.rs1 = 3, .rs2 = 1, .rd = 0, .imm = 0xFFFFFFFF, .opcode = 0, .illegal = 1}, // SH Based
+    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0xFFE, .opcode = 0, .illegal = 1}       // BGE Based
 };
 
 bool compare_decoder(decoded source, decoded reference)

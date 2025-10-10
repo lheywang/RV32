@@ -181,6 +181,22 @@ module decoder (
                         endcase
                     end
 
+                    7'b0000001 : begin
+
+                        unique case (r1_instruction[core_config_pkg::FUNCT3_MSB : core_config_pkg::FUNCT3_LSB])
+
+                            3'b000 : opcode = core_config_pkg::i_MUL;
+                            3'b001 : opcode = core_config_pkg::i_MULH;
+                            3'b010 : opcode = core_config_pkg::i_MULHSU;
+                            3'b011 : opcode = core_config_pkg::i_MULHU;
+                            3'b100 : opcode = core_config_pkg::i_DIV;
+                            3'b101 : opcode = core_config_pkg::i_DIVU;
+                            3'b110 : opcode = core_config_pkg::i_REM;
+                            3'b111 : opcode = core_config_pkg::i_REMU;
+
+                        endcase
+                    end
+
                     default :  decoder_illegal_2 = 1;
 
                 endcase
@@ -256,12 +272,21 @@ module decoder (
 
                             3'b000 : begin
 
+                                /*
+                                 * Theses values aren't used by the encoding, and more importantly : They 
+                                 * shall not appear on the ouputs.
+                                 */
+                                imm = 0;
+                                rs1 = 0; 
+                                rd = 0;
+
                                 unique case (r1_instruction[core_config_pkg::XLEN - 1 : core_config_pkg::RS2_LSB])
                                     12'h000 : opcode = core_config_pkg::i_ECALL;
                                     12'h001 : opcode = core_config_pkg::i_EBREAK;
                                     12'h302 : opcode = core_config_pkg::i_MRET;
                                     default : decoder_illegal_2 = 1;
                                 endcase
+
                             end
                             3'b001 : opcode = core_config_pkg::i_CSRRW;
                             3'b010 : opcode = core_config_pkg::i_CSRRS;
@@ -306,10 +331,10 @@ module decoder (
                 rs1     = r1_instruction[core_config_pkg::RS1_MSB : core_config_pkg::RS1_LSB];
                 rs2     = r1_instruction[core_config_pkg::RS2_MSB : core_config_pkg::RS2_LSB];
                 imm     = { 
-                            {32-13{r1_instruction[31]}}, 
+                            {32-12{r1_instruction[31]}}, 
                             r1_instruction[7],
-                            r1_instruction[30 : core_config_pkg::FUNCT7_LSB], 
-                            r1_instruction[core_config_pkg::RD_MSB : core_config_pkg::RD_LSB],
+                            r1_instruction[30 : 25], 
+                            r1_instruction[11 : 8],
                             1'b0 
                         };
 
@@ -348,6 +373,7 @@ module decoder (
             core_config_pkg::DEC_J : begin
 
                 rd      = r1_instruction[core_config_pkg::RD_MSB : core_config_pkg::RD_LSB];
+                opcode  = core_config_pkg::i_JAL;
                 imm     = {
                             {32-20{r1_instruction[31]}},
                             r1_instruction[19 : 12],
@@ -355,13 +381,11 @@ module decoder (
                             r1_instruction[30 : 21],
                             1'b0
                         };
-
             end
 
             core_config_pkg::DEC_NONE : decoder_illegal_2 = 1;
 
         endcase
-        
     end
 
     assign illegal = r_decoder_illegal | decoder_illegal_2;
