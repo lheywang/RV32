@@ -7,7 +7,230 @@
 
 // Simulation time
 vluint64_t sim_time = 0;
-int clkdiv;
+unsigned clkdiv;
+
+int pass;
+int fail;
+
+struct decoded
+{
+    unsigned int rs1;
+    unsigned int rs2;
+    unsigned int rd;
+    unsigned int imm;
+    unsigned int opcode;
+    unsigned int illegal;
+};
+
+unsigned int instructions[]{
+    // Loads
+    0b01110100101001101010011110110111, // LUI
+    0b01110100101001101010011110010111, // AUIPC
+
+    // Immediates
+    0b01111111111100011000000010010011, // ADDI
+    0b11111111111101011010100000010011, // SLTI
+    0b01111111111111111011100000010011, // SLTIU
+    0b11111111111110011100100000010011, // XORI
+    0b11111111111100011110100000010011, // ORI
+    0b11111111111100011111100000010011, // ANDI
+    0b11111111111100011001100000010011, // SLLI
+    0b00000010111101010101011110010011, // SRLI
+    0b01000010111101010101011110010011, // SRAI
+
+    // Registers
+    0b00000000111110001000111110110011, // ADD
+    0b01000000111110001000111110110011, // SUB
+    0b00000000111110011001111110110011, // SLL
+    0b00000000111110001010111110110011, // SLT
+    0b00000000111110001011111110110011, // SLTU
+    0b00000000111110001100111110110011, // XOR
+    0b00000000111110001101111110110011, // SRL
+    0b01000000111110001101111110110011, // SRA
+    0b00000000111110001110111110110011, // OR
+    0b00000000111110001111111110110011, // AND
+
+    // Misc
+    0b00001001100100000000000000001111, // FENCE
+
+    // Jumps
+    0b01111110011100110000111111100011, // BEQ
+    0b11111110011100110001111111100011, // BNE
+    0b01111110011100110100111111100011, // BLT
+    0b11111110011100110101111111100011, // BGE
+    0b01111110011100110110111111100011, // BLTU
+    0b11111110011100110111111111100011, // BGEU
+
+    // Memory
+    0b11111110000100011000111110100011, // SB
+    0b11111110000100011001111110100011, // SH
+    0b11111110000100011010111110100011, // SW
+    0b11111111111100011000000010000011, // LB
+    0b11111111111100011001000010000011, // LH
+    0b11111111111100011010000010000011, // LW
+    0b11111111111100011100000010000011, // LBU
+    0b11111111111100011101000010000011, // LHU
+
+    // Jumps
+    0b11111111111111111111000111101111, // JAL
+    0b11111111111100001000000111100111, // JALR
+
+    // Syscalls
+    0b00000000000000000000000001110011, // ECALL
+    0b00000000000100000000000001110011, // EBREAK
+
+    // RV32M
+    0b00000010000100011000111110110011, // MUL
+    0b00000010000100011001111110110011, // MULH
+    0b00000010000100011010111110110011, // MULSHU
+    0b00000010000100011011111110110011, // MULHU
+    0b00000010000100011100111110110011, // DIV
+    0b00000010000100011101111110110011, // DIVU
+    0b00000010000100011110111110110011, // REM
+    0b00000010000100011111111110110011, // REMU
+
+    // ZICSR
+    0b11111111111111111001000011110011, // CSRRW
+    0b11111111111111111010000011110011, // CSRRS
+    0b11111111111111111011000011110011, // CSRRC
+    0b11111111111111111101000011110011, // CSRRWI
+    0b11111111111111111110000011110011, // CSRRSI
+    0b11111111111111111111000011110011, // CSRRCI
+
+    // Illegals
+    0b11111110000100011011111110100011, // (Illegal : SH)
+    0b01111110011100110010111111100011  // (Illegal : BGE)
+};
+
+decoded dinstructions[] = {
+    // Loads
+    {.rs1 = 0, .rs2 = 0, .rd = 15, .imm = 1957076992, .opcode = 1, .illegal = 0}, // LUI
+    {.rs1 = 0, .rs2 = 0, .rd = 15, .imm = 1957076992, .opcode = 2, .illegal = 0}, // AUIPC
+
+    // Immediates
+    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 3, .illegal = 0}, // ADDI
+    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 4, .illegal = 0}, // SLTI
+    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 5, .illegal = 0}, // SLTIU
+    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 6, .illegal = 0}, // XORI
+    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 7, .illegal = 0}, // ORI
+    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 8, .illegal = 0}, // ANDI
+    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 15, .opcode = 9, .illegal = 0},         // SLLI
+    {.rs1 = 3, .rs2 = 0, .rd = 15, .imm = 15, .opcode = 10, .illegal = 0},        // SRLI
+    {.rs1 = 3, .rs2 = 0, .rd = 15, .imm = 15, .opcode = 11, .illegal = 0},        // SRAI
+
+    // Registers
+    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 12, .illegal = 0}, // ADD
+    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 13, .illegal = 0}, // SUB
+    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 14, .illegal = 0}, // SLL
+    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 15, .illegal = 0}, // SLT
+    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 16, .illegal = 0}, // SLTU
+    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 17, .illegal = 0}, // XOR
+    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 18, .illegal = 0}, // SRL
+    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 19, .illegal = 0}, // SRA
+    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 20, .illegal = 0}, // OR
+    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 21, .illegal = 0}, // AND
+
+    // Misc
+    {.rs1 = 0, .rs2 = 0, .rd = 0, .imm = 0, .opcode = 30, .illegal = 0}, // FENCE
+
+    // Branches
+    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0, .opcode = 31, .illegal = 0}, // BEQ
+    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0, .opcode = 32, .illegal = 0}, // BNE
+    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0, .opcode = 33, .illegal = 0}, // BLT
+    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0, .opcode = 34, .illegal = 0}, // BGE
+    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0, .opcode = 35, .illegal = 0}, // BLTU
+    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0, .opcode = 36, .illegal = 0}, // BGEU
+
+    // Memory
+    {.rs1 = 3, .rs2 = 1, .rd = 0, .imm = 0, .opcode = 37, .illegal = 0}, // SB
+    {.rs1 = 3, .rs2 = 1, .rd = 0, .imm = 0, .opcode = 38, .illegal = 0}, // SH
+    {.rs1 = 3, .rs2 = 1, .rd = 0, .imm = 0, .opcode = 39, .illegal = 0}, // SW
+    {.rs1 = 3, .rs2 = 1, .rd = 0, .imm = 0, .opcode = 40, .illegal = 0}, // LB
+    {.rs1 = 3, .rs2 = 1, .rd = 0, .imm = 0, .opcode = 41, .illegal = 0}, // LH
+    {.rs1 = 3, .rs2 = 1, .rd = 0, .imm = 0, .opcode = 42, .illegal = 0}, // LW
+    {.rs1 = 3, .rs2 = 1, .rd = 0, .imm = 0, .opcode = 43, .illegal = 0}, // LBU
+    {.rs1 = 3, .rs2 = 1, .rd = 0, .imm = 0, .opcode = 44, .illegal = 0}, // LHU
+
+    {.rs1 = 0, .rs2 = 0, .rd = 3, .imm = 0xFFFFFFFF, .opcode = 45, .illegal = 0}, // JAL
+    {.rs1 = 1, .rs2 = 0, .rd = 3, .imm = 0xFFFFFFFF, .opcode = 46, .illegal = 0}, // JALR
+
+    {.rs1 = 0, .rs2 = 0, .rd = 0, .imm = 0, .opcode = 47, .illegal = 0}, // ECALL
+    {.rs1 = 0, .rs2 = 0, .rd = 0, .imm = 0, .opcode = 48, .illegal = 0}, // EBREAK
+    {.rs1 = 0, .rs2 = 0, .rd = 0, .imm = 0, .opcode = 49, .illegal = 0}, // MRET
+
+    // RV32M
+    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 22, .illegal = 0}, // MUL
+    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 23, .illegal = 0}, // MULH
+    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 24, .illegal = 0}, // MULHSU
+    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 25, .illegal = 0}, // MULHU
+    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 26, .illegal = 0}, // DIV
+    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 27, .illegal = 0}, // DIVU
+    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 28, .illegal = 0}, // REM
+    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 29, .illegal = 0}, // REMU
+
+    // ZICSR
+    {.rs1 = 31, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 50, .illegal = 0}, // CSRRW
+    {.rs1 = 31, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 51, .illegal = 0}, // CSRRS
+    {.rs1 = 31, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 52, .illegal = 0}, // CSRRC
+    {.rs1 = 31, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 53, .illegal = 0}, // CSRRWI
+    {.rs1 = 31, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 54, .illegal = 0}, // CSRRSI
+    {.rs1 = 31, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 55, .illegal = 0}, // CSRRCI
+
+    // Illegals
+    {.rs1 = 0, .rs2 = 0, .rd = 0, .imm = 0, .opcode = 0, .illegal = 1}, // SH Based
+    {.rs1 = 0, .rs2 = 0, .rd = 0, .imm = 0, .opcode = 0, .illegal = 1}  // BGE Based
+};
+
+bool compare_decoder(decoded source, decoded reference)
+{
+    if (reference.rs1 != source.rs1)
+        return false;
+    if (reference.rs2 != source.rs2)
+        return false;
+    if (reference.rd != source.rd)
+        return false;
+    if (reference.imm != source.imm)
+        return false;
+    if (reference.opcode != source.opcode)
+        return false;
+    if (reference.illegal != source.illegal)
+        return false;
+    return true;
+}
+
+bool compare_w_print(int cycleID, decoded source, decoded reference)
+{
+    if (compare_decoder(source, reference))
+    {
+        std::cout << KGRN
+                  << "\t[ PASS ] Cycle "
+                  << std::hex
+                  << std::setw(4) << cycleID
+                  << RST
+                  << std::endl;
+        pass += 1;
+        return true;
+    }
+
+    else
+    {
+        std::cout << KRED
+                  << "[ FAIL ] Cycle "
+                  << std::hex
+                  << std::setw(4) << cycleID
+                  << std::endl
+                  << "    RS1     (ref | val) : " << std::setw(8) << reference.rs1 << " | " << std::setw(8) << source.rs1 << std::endl
+                  << "    RS2     (ref | val) : " << std::setw(8) << reference.rs2 << " | " << std::setw(8) << source.rs2 << std::endl
+                  << "    RD      (ref | val) : " << std::setw(8) << reference.rd << " | " << std::setw(8) << source.rd << std::endl
+                  << "    IMM     (ref | val) : " << std::setw(8) << reference.imm << " | " << std::setw(8) << source.imm << std::endl
+                  << "    OPCODE  (ref | val) : " << std::setw(8) << reference.opcode << " | " << std::setw(8) << source.opcode << std::endl
+                  << "    ILLEGAL (ref | val) : " << std::setw(8) << reference.illegal << " | " << std::setw(8) << source.illegal << std::endl
+                  << RST
+                  << std::endl;
+        fail += 1;
+        return false;
+    }
+}
 
 // Toggle clock helper
 void tick(Vdecoder *tb, VerilatedVcdC *tfp)
@@ -32,14 +255,11 @@ int main(int argc, char **argv)
     Verilated::traceEverOn(true);
     VerilatedVcdC *tfp = new VerilatedVcdC;
     tb->trace(tfp, 99);
-    tfp->open("simout/pcounter.vcd");
+    tfp->open("simout/decoder.vcd");
 
     // Reset sequence
     tb->rst_n = 0;
     tb->clk_en = 1;
-    tb->enable = 0;
-    tb->load = 0;
-    tb->loaded = 0x10000000;
     tick(tb, tfp);
 
     tb->rst_n = 1;
@@ -47,80 +267,30 @@ int main(int argc, char **argv)
 
     std::cout << "Starting counter simulation...\n";
 
-    int pass = 0;
-    int fail = 0;
-
     // --- Test 1: Count until overflow ---
-    for (int i = 0; i < 4095; i++)
+    for (int i = 0; i < (sizeof(instructions) / sizeof(unsigned)); i++)
     {
-        tb->enable = 1;
+        tb->instruction = instructions[i];
+        tb->i_address = 4 * i;
+        tick(tb, tfp);
+        tick(tb, tfp);
         tick(tb, tfp);
 
-        tb->loaded += 4;
+        decoded res = {
+            .rs1 = tb->rs1,
+            .rs2 = tb->rs2,
+            .rd = tb->rd,
+            .imm = tb->imm,
+            .opcode = tb->opcode,
+            .illegal = tb->illegal};
 
-        if (tb->address == tb->loaded)
-        {
-            pass += 1;
-        }
-        else
-        {
-            std::cout << KRED
-                      << "\t[ FAIL ] Cycle "
-                      << std::hex
-                      << std::setw(4) << i
-                      << " addr : "
-                      << tb->address
-                      << " waited : "
-                      << tb->loaded
-                      << RST
-                      << std::endl;
-            fail += 1;
-        }
-    }
-
-    // --- Test 2: Load a new address ---
-    tb->enable = 0;
-    tb->load = 1;
-    tb->loaded = 0x10003FF0;
-    int ovf[4] = {0, 0, 0, 1};
-    tick(tb, tfp);
-
-    tb->load = 0;
-    tb->enable = 1;
-    for (int i = 0; i < 4; i++)
-    {
-        tick(tb, tfp);
-
-        if (i != 3)
-            tb->loaded += 4;
-
-        if ((tb->address == tb->loaded) & ((int)tb->ovf == ovf[i]))
-        {
-            pass += 1;
-        }
-        else
-        {
-            std::cout << KRED
-                      << "\t[ FAIL ] Cycle "
-                      << std::hex
-                      << std::setw(4) << i
-                      << " addr : "
-                      << tb->address
-                      << " waited : "
-                      << tb->loaded
-                      << " ovf : "
-                      << (int)tb->ovf
-                      << " waiting : "
-                      << ovf[i]
-                      << RST
-                      << std::endl;
-            fail += 1;
-        }
+        compare_w_print(i, res, dinstructions[i]);
     }
 
     std::cout << "Simulation complete."
               << std::endl
-              << KYEL << "--------------------------------------------------------\n"
+              << std::dec << KYEL
+              << "--------------------------------------------------------\n"
               << "Results : (PCounter)"
               << "\n--------------------------------------------------------"
               << std::endl
@@ -144,5 +314,5 @@ int main(int argc, char **argv)
 
     tfp->close();
     delete tb;
-    return 0;
+    return fail;
 }
