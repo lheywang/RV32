@@ -361,9 +361,10 @@ module decoder (
             core_config_pkg::DEC_NONE : decoder_illegal_2 = 1;
 
         endcase
-
-        o_busy = i_busy;
-        assign illegal = r_decoder_illegal | decoder_illegal_2;
+        
     end
+
+    assign illegal = r_decoder_illegal | decoder_illegal_2;
+    assign o_busy = i_busy;
 
 endmodule
