@@ -52,11 +52,7 @@ int main(int argc, char **argv)
     tfp->open("simout/registers.vcd");
 
     // Reset sequence
-    tb->rst_n = 0;
     tb->clk_en = 1;
-    tick(tb, tfp);
-
-    tb->rst_n = 1;
     tick(tb, tfp);
 
     tb->we = 1;

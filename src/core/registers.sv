@@ -7,7 +7,6 @@ import core_config_pkg::REG_ADDR_W;
 module registers (
     input   logic                                   clk,
     input   logic                                   clk_en,
-    input   logic                                   rst_n,
 
     input   logic                                   we,
     input   logic   [(REG_ADDR_W - 1) : 0]          wa,
@@ -23,19 +22,14 @@ module registers (
      *  Storage array
      */
 
-    logic  [(REG_COUNT - 1) : 0][(XLEN - 1) : 0]    regs;
+    logic   [(XLEN - 1) : 0]    	regs					[(REG_COUNT - 1) : 0];
 
     /*
     *   Synchronous write logic
     */
-    always_ff @( posedge clk or negedge rst_n) begin
-
-        if (!rst_n) begin
-
-            regs <= 0;
-
-        end
-        else if (clk_en) begin
+    always_ff @( posedge clk) begin
+	 
+			if (clk_en) begin
 
             if (we) begin
 
@@ -45,17 +39,11 @@ module registers (
 
                 end
             end
+				
+				rd1 <= regs[ra1];
+				rd2 <= regs[ra2];
+	 
         end
-    end
-
-    /*
-    *   Asynchronous read logic
-    */
-    always_comb begin
-
-        rd1 = regs[ra1];
-        rd2 = regs[ra2];
-
     end
 
 endmodule
