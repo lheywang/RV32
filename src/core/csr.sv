@@ -70,7 +70,6 @@ module csr (
         input logic [(core_config_pkg::XLEN - 1) : 0] data);
 
         update_bits = (data & mask) | (reg_value & ~mask);
-
     endfunction
 
     /* 
@@ -79,9 +78,13 @@ module csr (
     logic [(core_config_pkg::XLEN - 1) : 0] csrs [(core_config_pkg::r_MVENDORID - 1) : 0];
     core_config_pkg::csr_t wid;
     core_config_pkg::csr_t rid;
+    /* verilator lint_off UNUSEDSIGNAL */
     core_config_pkg::csr_t r_wid;
-    core_config_pkg::csr_t r_rid;
-    logic   [(core_config_pkg::XLEN - 1) : 0] r_wd;
+    /* verilator lint_on UNUSEDSIGNAL */
+
+    logic [(core_config_pkg::XLEN - 1) : 0] r_wd;
+    logic [(core_config_pkg::XLEN - 1) : 0] r_readback;
+    logic write_state; // 0 if not performing a write (writting readback), 1 if performing a write (writing)
 
     /*
      *  Comb. logic to assign the right ID to each values, and set the error pin.
@@ -91,7 +94,7 @@ module csr (
         wid = csr_index(wa);
         rid = csr_index(ra);
 
-        if (wid == core_config_pkg::r_NONE | rid == core_config_pkg::r_NONE) begin
+        if (wid == core_config_pkg::r_NONE || rid == core_config_pkg::r_NONE) begin
             err = 1;
         end else begin
             err = 0;
@@ -110,13 +113,23 @@ module csr (
 
             if (wid != core_config_pkg::r_NONE) begin
 
-                csrs[wid] <= update_bits(
-                    csrs[wid], 
-                    core_config_pkg::CSR_WMASK[wid], 
+                if (!write_state) begin
+                    r_readback <= csrs[wid];
+                    write_state <= 1'b1;
+                    r_wd <= wd;
+                    r_wid <= wid;
+                end
+            end
+        end
+
+        if (write_state) begin
+
+            csrs[r_wid] <= update_bits(
+                    r_readback, 
+                    core_config_pkg::CSR_WMASK[r_wid], 
                     r_wd
                 ); 
-
-            end
+            write_state <= 1'b0;
         end
           
         if (rid != core_config_pkg::r_NONE) begin
@@ -147,10 +160,6 @@ module csr (
                 core_config_pkg::r_MIMPID,
                 core_config_pkg::r_MHARTID,
                 core_config_pkg::r_MISA :   rd <= 32'h0; // Default value on simple impl.
-
-                default :                   rd <= 32'h0;
-
-
             endcase
         end  
      end
