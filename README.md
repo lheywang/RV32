@@ -95,3 +95,16 @@ Trying to compile without will end up in errors.
 ├── ghdl.py Main simulation script.<br>
 ├── LICENSE<br>
 └── README.md<br>
+
+## Versions history
+
+### v1 (VHDL)
+A first version, wroten in VHDL is available trough a stale branch. This version, even if working was NOT complete, and
+thus shall not be used as an official core.
+
+It's major drawback was pure combinational ALU and reg to reg operations. This created extremely long paths, which cause
+the frequency to reduce drastically. In the last version, it was not able to handle more than 50 MHz, where the latest version
+is designed to operate at 200+ MHz !
+
+### v2 (SystemVerilog)
+To be done !
