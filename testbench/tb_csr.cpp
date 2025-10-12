@@ -20,6 +20,28 @@ void tick(Vcsr *tb, VerilatedVcdC *tfp)
     tfp->dump(sim_time++);
 }
 
+unsigned short int addresses[] = {
+    0x300, 0x304, 0x305,
+    0x340, 0x341, 0x342,
+    0x343, 0x344, 0xB00,
+    0xB02, 0xB03, 0xB04,
+    0xB05, 0xB80, 0xB82,
+    0xB83, 0xB84, 0xB85,
+    0xF10, 0xF11, 0xF12,
+    0xF13, 0xF14 // Written addresses of CSR registers.
+};
+
+unsigned int readback[] = {
+    0x00007188, 0xFFFF0888, 0xFFFFFF01,
+    0xFFFFFFFF, 0xFFFFFFFE, 0x8000001F,
+    0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000 // Values that shall be read
+};
+
 // Main
 int main(int argc, char **argv)
 {
@@ -32,49 +54,60 @@ int main(int argc, char **argv)
     Verilated::traceEverOn(true);
     VerilatedVcdC *tfp = new VerilatedVcdC;
     tb->trace(tfp, 99);
-    tfp->open("simout/registers.vcd");
+    tfp->open("simout/csr.vcd");
 
-    tb->we = 1;
+    tb->wd = 0xFFFFFFFF;
     tick(tb, tfp);
 
-    std::cout << "Starting counter simulation...\n";
+    std::cout << KMAG
+              << "Starting counter simulation...\n"
+              << RST;
 
     int pass = 0;
     int fail = 0;
 
     // Count test
-    for (uint64_t k = 0; k < 65; k++)
+    for (uint64_t k = 0; k < 23; k++)
     {
         // Write some data (and calling tick to register them)
-        tb->wa = k % 32;
-        tb->wd = data[k];
+        tb->wa = addresses[k];
+        tb->wd = 0xFFFFFFFF;
+        tb->we = 1;
+        tick(tb, tfp);
+        tb->we = 0;
+        tick(tb, tfp); // Writes are taking two cycles (or 1 CPU cycle).
+
+        tb->ra = addresses[k];
         tick(tb, tfp);
 
         // Read some data (without calling tick but only eval to register them without clock)
-        tb->ra1 = k % 32;
-        tb->ra2 = k % 32;
-        tick(tb, tfp);
 
-        if ((k % 32) == 0)
+        if ((tb->rd != readback[k]))
         {
-            if ((tb->rd1 != 0) | (tb->rd2 != 0))
-                fail += 1;
-            else
-                pass += 1;
+            fail += 1;
+            std::cout << KRED
+                      << std::hex
+                      << " [ FAIL ] : Value readen : "
+                      << tb->rd
+                      << " Value waited : "
+                      << readback[k]
+                      << " At address : "
+                      << addresses[k]
+                      << RST
+                      << std::dec
+                      << std::endl;
         }
         else
-        {
-            if ((tb->rd1 != data[k]) | (tb->rd2 != data[k]))
-                fail += 1;
-            else
-                pass += 1;
-        }
+            pass += 1;
+
+        // tick(tb, tfp);
     }
 
-    std::cout << "Simulation complete."
+    std::cout << KMAG
+              << "Simulation complete."
               << std::endl
               << KYEL << "--------------------------------------------------------\n"
-              << "Results : (Registers)"
+              << "Results : (CSR)"
               << "\n--------------------------------------------------------"
               << std::endl
               << KGRN << "\tPass : "
