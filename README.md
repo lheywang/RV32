@@ -1,3 +1,8 @@
+> [!WARNING]  
+> You're on a stale branch, where the core IS NOT COMPLETE and non fully tested. Be sure to know
+> what you're doing here !
+> DO NOT USE in any design.
+
 # RV32
 
 This is a student's implementation of an RV32 core, so, please don't use them in prod :)

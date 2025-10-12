@@ -30,3 +30,4 @@ documentation/*
 
 # VSCode extensions
 .VSCodeCounter/*
+.vscode/*
