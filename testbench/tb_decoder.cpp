@@ -268,7 +268,9 @@ int main(int argc, char **argv)
     tb->rst_n = 1;
     tick(tb, tfp);
 
-    std::cout << "Starting counter simulation...\n";
+    std::cout << KMAG
+              << "Starting counter simulation...\n"
+              << RST;
 
     // --- Test 1: Count until overflow ---
     for (int i = 0; i < (sizeof(instructions) / sizeof(unsigned)); i++)
@@ -290,11 +292,11 @@ int main(int argc, char **argv)
         compare_w_print(i, res, dinstructions[i]);
     }
 
-    std::cout << "Simulation complete."
+    std::cout << KMAG
+              << "Simulation complete."
               << std::endl
-              << std::dec << KYEL
-              << "--------------------------------------------------------\n"
-              << "Results : (PCounter)"
+              << KYEL << "--------------------------------------------------------\n"
+              << "Results : (Decoder)"
               << "\n--------------------------------------------------------"
               << std::endl
               << KGRN << "\tPass : "

@@ -45,7 +45,9 @@ int main(int argc, char **argv)
     tick(tb, tfp);
     tb->enable = 1;
 
-    std::cout << "Starting counter simulation...\n";
+    std::cout << KMAG
+              << "Starting counter simulation...\n"
+              << RST;
 
     int pass = 0;
     int fail = 0;
@@ -77,10 +79,11 @@ int main(int argc, char **argv)
         tick(tb, tfp);
     }
 
-    std::cout << "Simulation complete."
+    std::cout << KMAG
+              << "Simulation complete."
               << std::endl
               << KYEL << "--------------------------------------------------------\n"
-              << "Results : (Counter)"
+              << "Results : (Counters)"
               << "\n--------------------------------------------------------"
               << std::endl
               << KGRN << "\tPass : "

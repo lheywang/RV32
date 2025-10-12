@@ -51,8 +51,9 @@ int main(int argc, char **argv)
         0xa5a5a5a5,
         0xbbbbaaaa};
 
-    std::cout
-        << "Starting clock simulation...\n";
+    std::cout << KMAG
+              << "Starting counter simulation...\n"
+              << RST;
 
     int pass = 0;
     int fail = 0;
@@ -72,7 +73,8 @@ int main(int argc, char **argv)
         }
     }
 
-    std::cout << "Simulation complete."
+    std::cout << KMAG
+              << "Simulation complete."
               << std::endl
               << KYEL << "--------------------------------------------------------\n"
               << "Results : (Endianess)"

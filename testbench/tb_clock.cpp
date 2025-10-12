@@ -44,7 +44,9 @@ int main(int argc, char **argv)
     tb->rst_n = 1;
     tick(tb, tfp);
 
-    std::cout << "Starting clock simulation...\n";
+    std::cout << KMAG
+              << "Starting counter simulation...\n"
+              << RST;
 
     int pass = 0;
     int fail = 0;
@@ -71,10 +73,11 @@ int main(int argc, char **argv)
         }
     }
 
-    std::cout << "Simulation complete."
+    std::cout << KMAG
+              << "Simulation complete."
               << std::endl
               << KYEL << "--------------------------------------------------------\n"
-              << "Results : (Clock)"
+              << "Results : (Clocks)"
               << "\n--------------------------------------------------------"
               << std::endl
               << KGRN << "\tPass : "
