@@ -23,6 +23,9 @@ VERILOG_SRCS += $(SRC_DIR)/core/csr.sv
 VERILOG_SRCS += $(SRC_DIR)/core/decoder.sv
 VERILOG_SRCS += $(SRC_DIR)/core/endianess.sv
 VERILOG_SRCS += $(SRC_DIR)/core/registers.sv
+VERILOG_SRCS += $(SRC_DIR)/core/occupancy.sv
+VERILOG_SRCS += $(SRC_DIR)/core/issuer.sv
+VERILOG_SRCS += $(SRC_DIR)/core/commiter.sv
 VERILOG_SRCS += $(SRC_DIR)/core/core.sv
 
 # Including all peripherals files
@@ -43,7 +46,7 @@ NPROC = $(shell nproc)
 
 
 # --- Verilator options ---
-VERILATOR_FLAGS = -Wall --trace -j $(NPROC) --cc $(VERILOG_SRCS) --top-module $(TOP) --exe $(CXX_TB) $(CCX_UTILS)
+VERILATOR_FLAGS = -Wall --trace -j 16 --cc $(VERILOG_SRCS) --top-module $(TOP) --exe $(CXX_TB) $(CCX_UTILS)
 
 # --- Default target ---
 all: run

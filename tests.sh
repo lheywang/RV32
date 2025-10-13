@@ -13,6 +13,7 @@ targets=(
     registers
     csr
     alu0
+    occupancy
 )
 
 # Create a logs folder
