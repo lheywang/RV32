@@ -8,7 +8,7 @@
 #include "utils/colors.h"
 #include "utils/utils.h"
 
-char *module = (char*)"PCounter";
+char *module = (char *)"PCounter";
 
 // Main
 int main(int argc, char **argv)
@@ -38,9 +38,6 @@ int main(int argc, char **argv)
 
     initial_print(module);
 
-    int pass = 0;
-    int fail = 0;
-
     // --- Test 1: Count until overflow ---
     for (int i = 0; i < 4095; i++)
     {
@@ -48,25 +45,7 @@ int main(int argc, char **argv)
         tick(tb, tfp);
 
         tb->loaded += 4;
-
-        if (tb->address == tb->loaded)
-        {
-            pass += 1;
-        }
-        else
-        {
-            std::cout << KRED
-                      << "\t[ FAIL ] Cycle "
-                      << std::hex
-                      << std::setw(4) << i
-                      << " addr : "
-                      << tb->address
-                      << " waited : "
-                      << tb->loaded
-                      << RST
-                      << std::endl;
-            fail += 1;
-        }
+        equality_print((char *)"Count until overflow", i, tb->address, tb->loaded);
     }
 
     // --- Test 2: Load a new address ---
@@ -85,33 +64,16 @@ int main(int argc, char **argv)
         if (i != 3)
             tb->loaded += 4;
 
-        if ((tb->address == tb->loaded) & ((int)tb->ovf == ovf[i]))
-        {
-            pass += 1;
-        }
-        else
-        {
-            std::cout << KRED
-                      << "\t[ FAIL ] Cycle "
-                      << std::hex
-                      << std::setw(4) << i
-                      << " addr : "
-                      << tb->address
-                      << " waited : "
-                      << tb->loaded
-                      << " ovf : "
-                      << (int)tb->ovf
-                      << " waiting : "
-                      << ovf[i]
-                      << RST
-                      << std::endl;
-            fail += 1;
-        }
+        equality_print((char *)"Loading values", i + 4095, tb->address, tb->loaded);
     }
 
-    final_print(pass, fail, module);
+    final_print(module);
 
     tfp->close();
+
+    uint64_t fail, pass;
+    get_counts(&pass, &fail);
+
     delete tb;
     return fail;
 }

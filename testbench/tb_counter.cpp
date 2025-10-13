@@ -8,7 +8,7 @@
 #include "utils/colors.h"
 #include "utils/utils.h"
 
-char *module = (char*)"Counter";
+char *module = (char *)"Counter";
 
 // Main
 int main(int argc, char **argv)
@@ -38,17 +38,10 @@ int main(int argc, char **argv)
 
     initial_print(module);
 
-    int pass = 0;
-    int fail = 0;
-
     // Count test
     for (uint64_t k = 0; k < 10000; k++)
     {
-        if (tb->outL == k)
-            pass += 1;
-        else
-            fail += 1;
-
+        equality_print((char *)"Count", k, tb->outL, k);
         tick(tb, tfp);
     }
 
@@ -60,17 +53,17 @@ int main(int argc, char **argv)
 
     for (uint64_t k = 0; k < 10000; k++)
     {
-        if (tb->outL == 0)
-            pass += 1;
-        else
-            fail += 1;
-
+        equality_print((char *)"Count", k, tb->outL, 0);
         tick(tb, tfp);
     }
 
-    final_print(pass, fail, module);
+    final_print(module);
 
     tfp->close();
+
+    uint64_t fail, pass;
+    get_counts(&pass, &fail);
+
     delete tb;
     return fail;
 }

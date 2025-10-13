@@ -8,7 +8,7 @@
 #include "utils/colors.h"
 #include "utils/utils.h"
 
-char *module = (char*)"Registers";
+char *module = (char *)"Registers";
 
 unsigned int data[65] =
     {
@@ -47,9 +47,6 @@ int main(int argc, char **argv)
 
     initial_print(module);
 
-    int pass = 0;
-    int fail = 0;
-
     // Count test
     for (uint64_t k = 0; k < 65; k++)
     {
@@ -65,23 +62,23 @@ int main(int argc, char **argv)
 
         if ((k % 32) == 0)
         {
-            if ((tb->rd1 != 0) | (tb->rd2 != 0))
-                fail += 1;
-            else
-                pass += 1;
+            equality_print((char *)"Reg 0 (RD1)", k, tb->rd1, 0);
+            equality_print_arg((char *)"Reg 0 (RD2)", tb->rd2, 0);
         }
         else
         {
-            if ((tb->rd1 != data[k]) | (tb->rd2 != data[k]))
-                fail += 1;
-            else
-                pass += 1;
+            equality_print((char *)"Reg N (RD1)", k, tb->rd1, data[k]);
+            equality_print_arg((char *)"Reg N (RD2)", tb->rd2, data[k]);
         }
     }
 
-    final_print(pass, fail, module);
+    final_print(module);
 
     tfp->close();
+
+    uint64_t fail, pass;
+    get_counts(&pass, &fail);
+
     delete tb;
     return fail;
 }

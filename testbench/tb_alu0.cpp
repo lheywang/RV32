@@ -11,7 +11,7 @@
 unsigned int inputs1[5] = {10, 32, 48, 64, 1024};
 unsigned int inputs2[5] = {0x7FFFF000, 4096, 0xAAAAAAAA, 0x55555555, 0};
 
-char *module = (char*)"ALU0";
+char *module = (char *)"ALU0";
 
 // Main
 int main(int argc, char **argv)
@@ -37,9 +37,7 @@ int main(int argc, char **argv)
     stick(tb, tfp);
     stick(tb, tfp);
 
-    int pass = 0;
-    int fail = 0;
-    int cycle;
+    int cycle = 0;
 
     // Formal calculation test
     for (int i = 0; i < 5; i++)
@@ -58,119 +56,31 @@ int main(int argc, char **argv)
                 stick(tb, tfp);
                 stick(tb, tfp);
                 stick(tb, tfp);
-                if (tb->busy != 1)
-                    fail += 1;
-                else
-                    pass += 1;
-                if (tb->valid != 1)
-                    fail += 1;
-                else
-                    pass += 1;
-                if (tb->o_rd != 0x1F)
-                    fail += 1;
-                else
-                    pass += 1;
+
+                equality_print((char *)"Busy", cycle, tb->busy, 1);
+                equality_print((char *)"Valid", cycle, tb->valid, 1);
+                equality_print((char *)"RD", cycle, tb->o_rd, 0x1F);
 
                 switch (i)
                 {
                 case 0: // ADD
-                    if (tb->res != (inputs1[ii] + inputs2[iii]))
-                    {
-                        std::cout << KRED
-                                  << "[ FAIL ] Cycle "
-                                  << std::hex
-                                  << std::setw(4) << cycle
-                                  << std::endl
-                                  << "    OP  : " << std::setw(8) << inputs1[ii] << " + " << std::setw(8) << inputs2[iii] << std::endl
-                                  << "    GOT : " << std::setw(8) << tb->res << std::endl
-                                  << RST
-                                  << std::endl;
-                        fail += 1;
-                    }
-                    else
-                    {
-                        pass += 1;
-                    }
+                    equality_print((char *)"Add", cycle, tb->res, (inputs1[ii] + inputs2[iii]));
                     break;
 
                 case 1: // SUB
-                    if (tb->res != (inputs1[ii] - inputs2[iii]))
-                    {
-                        std::cout << KRED
-                                  << "[ FAIL ] Cycle "
-                                  << std::hex
-                                  << std::setw(4) << cycle
-                                  << std::endl
-                                  << "    OP  : " << std::setw(8) << inputs1[ii] << " - " << std::setw(8) << inputs2[iii] << std::endl
-                                  << "    GOT : " << std::setw(8) << tb->res << std::endl
-                                  << RST
-                                  << std::endl;
-                        fail += 1;
-                    }
-                    else
-                    {
-                        pass += 1;
-                    }
+                    equality_print((char *)"Sub", cycle, tb->res, (inputs1[ii] - inputs2[iii]));
                     break;
 
                 case 2: // AND
-                    if (tb->res != (inputs1[ii] & inputs2[iii]))
-                    {
-                        std::cout << KRED
-                                  << "[ FAIL ] Cycle "
-                                  << std::hex
-                                  << std::setw(4) << cycle
-                                  << std::endl
-                                  << "    OP  : " << std::setw(8) << inputs1[ii] << " & " << std::setw(8) << inputs2[iii] << std::endl
-                                  << "    GOT : " << std::setw(8) << tb->res << std::endl
-                                  << RST
-                                  << std::endl;
-                        fail += 1;
-                    }
-                    else
-                    {
-                        pass += 1;
-                    }
+                    equality_print((char *)"And", cycle, tb->res, (inputs1[ii] & inputs2[iii]));
                     break;
 
                 case 3: // OR
-                    if (tb->res != (inputs1[ii] | inputs2[iii]))
-                    {
-                        std::cout << KRED
-                                  << "[ FAIL ] Cycle "
-                                  << std::hex
-                                  << std::setw(4) << cycle
-                                  << std::endl
-                                  << "    OP  : " << std::setw(8) << inputs1[ii] << " | " << std::setw(8) << inputs2[iii] << std::endl
-                                  << "    GOT : " << std::setw(8) << tb->res << std::endl
-                                  << RST
-                                  << std::endl;
-                        fail += 1;
-                    }
-                    else
-                    {
-                        pass += 1;
-                    }
+                    equality_print((char *)"Or ", cycle, tb->res, (inputs1[ii] | inputs2[iii]));
                     break;
 
                 case 4: // XOR
-                    if (tb->res != (inputs1[ii] ^ inputs2[iii]))
-                    {
-                        std::cout << KRED
-                                  << "[ FAIL ] Cycle "
-                                  << std::hex
-                                  << std::setw(4) << cycle
-                                  << std::endl
-                                  << "    OP  : " << std::setw(8) << inputs1[ii] << " ^ " << std::setw(8) << inputs2[iii] << std::endl
-                                  << "    GOT : " << std::setw(8) << tb->res << std::endl
-                                  << RST
-                                  << std::endl;
-                        fail += 1;
-                    }
-                    else
-                    {
-                        pass += 1;
-                    }
+                    equality_print((char *)"Or ", cycle, tb->res, (inputs1[ii] ^ inputs2[iii]));
                     break;
                 }
 
@@ -184,23 +94,20 @@ int main(int argc, char **argv)
     tb->i_rd = 0x1F;
     tb->arg0 = 0xFFFFFFFF;
     tb->arg1 = 0xFFFFFFFF;
+    cycle += 1;
     stick(tb, tfp);
     stick(tb, tfp);
     stick(tb, tfp);
     stick(tb, tfp);
 
-    if (tb->o_error != 1)
-    {
-        fail += 1;
-    }
-    else
-    {
-        pass += 1;
-    }
+    equality_print((char *)"Overflow", cycle, tb->o_error, 1);
 
-    final_print(pass, fail, module);
+    final_print(module);
 
     tfp->close();
+
+    uint64_t fail, pass;
+    get_counts(&pass, &fail);
 
     delete tb;
     return fail;

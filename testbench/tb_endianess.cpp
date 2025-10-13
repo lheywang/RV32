@@ -8,7 +8,7 @@
 #include "utils/colors.h"
 #include "utils/utils.h"
 
-char *module = (char*)"Endianess";
+char *module = (char *)"Endianess";
 
 // Main
 int main(int argc, char **argv)
@@ -46,27 +46,21 @@ int main(int argc, char **argv)
 
     initial_print(module);
 
-    int pass = 0;
-    int fail = 0;
-
     for (int k = 0; k < 8; k++)
     {
         tb->in = to_rev[k];
         tb->eval();
 
-        if (tb->out == reversed[k])
-        {
-            pass += 1;
-        }
-        else
-        {
-            pass += 1;
-        }
+        equality_print((char *)"Endianness", k, tb->out, reversed[k]);
     }
 
-    final_print(pass, fail, module);
+    final_print(module);
 
     tfp->close();
+
+    uint64_t fail, pass;
+    get_counts(&pass, &fail);
+
     delete tb;
     return fail;
 }

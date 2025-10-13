@@ -1,8 +1,14 @@
 #include <iostream>
 #include "colors.h"
 #include <iomanip>
+#include <stdint.h>
 
-void final_print(int pass, int fail, char name[64])
+#include "utils.h"
+
+uint64_t __pass = 0;
+uint64_t __fail = 0;
+
+void final_print(char name[64])
 {
     std::cout << KMAG
               << "Simulation complete."
@@ -13,13 +19,13 @@ void final_print(int pass, int fail, char name[64])
               << "\n--------------------------------------------------------"
               << std::endl
               << KGRN << "\tPass : "
-              << std::setw(4) << pass
+              << std::setw(4) << __pass
               << KRED << "\n\tFail : "
-              << std::setw(4) << fail
+              << std::setw(4) << __fail
               << RST
               << std::endl;
 
-    if (fail == 0)
+    if (__fail == 0)
         std::cout << KGRN
                   << "Tests passed !"
                   << RST
@@ -35,9 +41,75 @@ void final_print(int pass, int fail, char name[64])
 
 void initial_print(char name[64])
 {
-    std::cout   << KMAG
-                << "--------------------------------------------------------" << std::endl
-                << "Starting " << name << " simulation..." << std::endl
-                << "--------------------------------------------------------" << std::endl
-                << RST;
+    std::cout << KMAG
+              << "--------------------------------------------------------" << std::endl
+              << "Starting " << name << " simulation..." << std::endl
+              << "--------------------------------------------------------" << std::endl
+              << RST;
+}
+
+void equality_print(char name[64], int cycle, int value, int reference, bool print)
+{
+    if (value == reference)
+    {
+        if (print)
+            std::cout << KGRN
+                      << "[ PASS ] Cycle "
+                      << std::hex
+                      << std::setw(8) << cycle
+                      << RST
+                      << std::dec
+                      << std::endl;
+        __pass += 1;
+    }
+    else
+    {
+        std::cout << KRED
+                  << "[ FAIL ] Cycle "
+                  << std::hex
+                  << std::setw(8) << cycle
+                  << "    Got [" << name << "] : 0x"
+                  << std::setw(8)
+                  << value
+                  << " waited : "
+                  << std::setw(8)
+                  << reference
+                  << " |"
+                  << RST
+                  << std::dec
+                  << std::endl;
+        __fail += 1;
+    }
+    return;
+}
+
+void equality_print_arg(char name[64], int value, int reference)
+{
+    if (value == reference)
+    {
+        __pass += 1;
+    }
+    else
+    {
+        std::cout << KRED
+                  << "    Got [" << name << "] : 0x"
+                  << std::setw(8)
+                  << value
+                  << " waited : "
+                  << std::setw(8)
+                  << reference
+                  << " |"
+                  << RST
+                  << std::dec
+                  << std::endl;
+        __fail += 1;
+    }
+    return;
+}
+
+void get_counts(uint64_t *passed, uint64_t *failed)
+{
+    *passed = __pass;
+    *failed = __fail;
+    return;
 }

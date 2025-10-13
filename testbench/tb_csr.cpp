@@ -8,7 +8,7 @@
 #include "utils/colors.h"
 #include "utils/utils.h"
 
-char *module = (char*)"CSR";
+char *module = (char *)"CSR";
 
 unsigned short int addresses[] = {
     0x300, 0x304, 0x305,
@@ -52,9 +52,6 @@ int main(int argc, char **argv)
 
     initial_print(module);
 
-    int pass = 0;
-    int fail = 0;
-
     // Count test
     for (uint64_t k = 0; k < 23; k++)
     {
@@ -70,31 +67,16 @@ int main(int argc, char **argv)
         tick(tb, tfp);
 
         // Read some data (without calling tick but only eval to register them without clock)
-
-        if ((tb->rd != readback[k]))
-        {
-            fail += 1;
-            std::cout << KRED
-                      << std::hex
-                      << " [ FAIL ] : Value readen : "
-                      << tb->rd
-                      << " Value waited : "
-                      << readback[k]
-                      << " At address : "
-                      << addresses[k]
-                      << RST
-                      << std::dec
-                      << std::endl;
-        }
-        else
-            pass += 1;
-
-        // tick(tb, tfp);
+        equality_print((char *)"CSR", k, tb->rd, readback[k]);
     }
 
-    final_print(pass, fail, module);
+    final_print(module);
 
     tfp->close();
+
+    uint64_t fail, pass;
+    get_counts(&pass, &fail);
+
     delete tb;
     return fail;
 }

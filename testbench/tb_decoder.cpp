@@ -8,10 +8,7 @@
 #include "utils/colors.h"
 #include "utils/utils.h"
 
-char *module = (char*)"Decoder";
-
-int pass;
-int fail;
+char *module = (char *)"Decoder";
 
 struct decoded
 {
@@ -185,51 +182,6 @@ decoded dinstructions[] = {
     {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0xFFE, .opcode = 0, .illegal = 1}       // BGE Based
 };
 
-bool compare_decoder(decoded source, decoded reference)
-{
-    if (reference.rs1 != source.rs1)
-        return false;
-    if (reference.rs2 != source.rs2)
-        return false;
-    if (reference.rd != source.rd)
-        return false;
-    if (reference.imm != source.imm)
-        return false;
-    if (reference.opcode != source.opcode)
-        return false;
-    if (reference.illegal != source.illegal)
-        return false;
-    return true;
-}
-
-bool compare_w_print(int cycleID, decoded source, decoded reference)
-{
-    if (compare_decoder(source, reference))
-    {
-        pass += 1;
-        return true;
-    }
-
-    else
-    {
-        std::cout << KRED
-                  << "[ FAIL ] Cycle "
-                  << std::hex
-                  << std::setw(4) << cycleID
-                  << std::endl
-                  << "    RS1     (ref | val) : " << std::setw(8) << reference.rs1 << " | " << std::setw(8) << source.rs1 << std::endl
-                  << "    RS2     (ref | val) : " << std::setw(8) << reference.rs2 << " | " << std::setw(8) << source.rs2 << std::endl
-                  << "    RD      (ref | val) : " << std::setw(8) << reference.rd << " | " << std::setw(8) << source.rd << std::endl
-                  << "    IMM     (ref | val) : " << std::setw(8) << reference.imm << " | " << std::setw(8) << source.imm << std::endl
-                  << "    OPCODE  (ref | val) : " << std::setw(8) << reference.opcode << " | " << std::setw(8) << source.opcode << std::endl
-                  << "    ILLEGAL (ref | val) : " << std::setw(8) << reference.illegal << " | " << std::setw(8) << source.illegal << std::endl
-                  << RST
-                  << std::endl;
-        fail += 1;
-        return false;
-    }
-}
-
 // Main
 int main(int argc, char **argv)
 {
@@ -272,12 +224,21 @@ int main(int argc, char **argv)
             .opcode = tb->opcode,
             .illegal = tb->illegal};
 
-        compare_w_print(i, res, dinstructions[i]);
+        equality_print((char *)"RS1", i, res.rs1, dinstructions[i].rs1);
+        equality_print_arg((char *)"RS2", res.rs2, dinstructions[i].rs2);
+        equality_print_arg((char *)"RD", res.rd, dinstructions[i].rd);
+        equality_print_arg((char *)"IMM", res.imm, dinstructions[i].imm);
+        equality_print_arg((char *)"OPCODE", res.opcode, dinstructions[i].opcode);
+        equality_print_arg((char *)"ILLEGAL", res.illegal, dinstructions[i].illegal);
     }
 
-    final_print(pass, fail, module);
+    final_print(module);
 
     tfp->close();
+
+    uint64_t fail, pass;
+    get_counts(&pass, &fail);
+
     delete tb;
     return fail;
 }
