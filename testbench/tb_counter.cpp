@@ -8,7 +8,7 @@
 #include "utils/colors.h"
 #include "utils/utils.h"
 
-char *module = "Counter";
+char *module = (char*)"Counter";
 
 // Main
 int main(int argc, char **argv)
@@ -25,6 +25,7 @@ int main(int argc, char **argv)
     tfp->open("simout/counter.vcd");
 
     // Reset sequence
+    stick(tb, tfp);
     tb->rst_n = 0;
     tb->clk_en = 1;
     tb->enable = 0;
@@ -68,7 +69,7 @@ int main(int argc, char **argv)
     }
 
     final_print(pass, fail, module);
-    
+
     tfp->close();
     delete tb;
     return fail;

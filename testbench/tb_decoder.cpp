@@ -8,7 +8,7 @@
 #include "utils/colors.h"
 #include "utils/utils.h"
 
-char *module = "Decoder";
+char *module = (char*)"Decoder";
 
 int pass;
 int fail;
@@ -251,6 +251,7 @@ int main(int argc, char **argv)
     tfp->open("simout/decoder.vcd");
 
     // Reset sequence
+    stick(tb, tfp);
     tb->rst_n = 0;
     tb->clk_en = 1;
     tick(tb, tfp);

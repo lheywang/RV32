@@ -8,7 +8,7 @@
 #include "utils/colors.h"
 #include "utils/utils.h"
 
-char *module = "Registers";
+char *module = (char*)"Registers";
 
 unsigned int data[65] =
     {
@@ -41,6 +41,7 @@ int main(int argc, char **argv)
     tb->trace(tfp, 99);
     tfp->open("simout/registers.vcd");
 
+    stick(tb, tfp);
     tb->we = 1;
     tick(tb, tfp);
 

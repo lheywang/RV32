@@ -8,7 +8,7 @@
 #include "utils/colors.h"
 #include "utils/utils.h"
 
-char *module = "PCounter";
+char *module = (char*)"PCounter";
 
 // Main
 int main(int argc, char **argv)
@@ -25,6 +25,7 @@ int main(int argc, char **argv)
     tfp->open("simout/pcounter.vcd");
 
     // Reset sequence
+    stick(tb, tfp);
     tb->rst_n = 0;
     tb->clk_en = 1;
     tb->enable = 0;

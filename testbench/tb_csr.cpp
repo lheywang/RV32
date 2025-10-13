@@ -8,7 +8,7 @@
 #include "utils/colors.h"
 #include "utils/utils.h"
 
-char *module = "CSR";
+char *module = (char*)"CSR";
 
 unsigned short int addresses[] = {
     0x300, 0x304, 0x305,
@@ -46,6 +46,7 @@ int main(int argc, char **argv)
     tb->trace(tfp, 99);
     tfp->open("simout/csr.vcd");
 
+    stick(tb, tfp);
     tb->wd = 0xFFFFFFFF;
     tick(tb, tfp);
 

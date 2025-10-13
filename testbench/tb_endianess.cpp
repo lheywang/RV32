@@ -8,7 +8,7 @@
 #include "utils/colors.h"
 #include "utils/utils.h"
 
-char *module = "Endianess";
+char *module = (char*)"Endianess";
 
 // Main
 int main(int argc, char **argv)
@@ -19,9 +19,9 @@ int main(int argc, char **argv)
     Vendianess *tb = new Vendianess;
 
     // Setup waveform tracing
+
     Verilated::traceEverOn(true);
     VerilatedVcdC *tfp = new VerilatedVcdC;
-    tb->trace(tfp, 99);
     tfp->open("simout/endianess.vcd");
 
     // Reset sequence
@@ -52,7 +52,7 @@ int main(int argc, char **argv)
     for (int k = 0; k < 8; k++)
     {
         tb->in = to_rev[k];
-        tick(tb, tfp);
+        tb->eval();
 
         if (tb->out == reversed[k])
         {

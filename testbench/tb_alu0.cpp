@@ -11,7 +11,7 @@
 unsigned int inputs1[5] = {10, 32, 48, 64, 1024};
 unsigned int inputs2[5] = {0x7FFFF000, 4096, 0xAAAAAAAA, 0x55555555, 0};
 
-char *module = "ALU0";
+char *module = (char*)"ALU0";
 
 // Main
 int main(int argc, char **argv)
@@ -231,7 +231,7 @@ int main(int argc, char **argv)
     final_print(pass, fail, module);
 
     tfp->close();
-    
+
     delete tb;
     return fail;
 }
