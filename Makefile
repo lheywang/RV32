@@ -76,7 +76,10 @@ clean:
 	rm -rf documentation/latex
 
 tests:
-	./tests.sh
+	./utils/tests.sh
+
+mount:
+	./utils/ramdisk.sh 
 
 doc: FORCE
 	doxygen DoxyFile && cd documentation/latex && make pdf

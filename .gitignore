@@ -24,7 +24,8 @@ obj_dir
 logs
 
 # Doxygen outputs
-documentation/*
+documentation/latex/
+documentation/html/
 
 # VSCode extensions
 .VSCodeCounter/*
