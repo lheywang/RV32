@@ -3,6 +3,11 @@
 import core_config_pkg::XLEN;
 import core_config_pkg::alu_commands_t;
 
+/* 
+ *  ALU 1 : Used for evalutating conditions before branches, and setting bits
+        - Set less than
+        - Branchs conditions
+ */
 
 module alu1 (
     // Standard interface

@@ -3,6 +3,15 @@
 import core_config_pkg::XLEN;
 import core_config_pkg::alu_commands_t;
 
+/* 
+ *  ALU 0 : Used for doing simple logic and maths 
+        - Additions
+        - Substractions
+        - AND
+        - OR
+        - XOR
+ */
+
 
 module alu0 (
     // Standard interface

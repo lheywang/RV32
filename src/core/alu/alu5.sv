@@ -3,6 +3,11 @@
 import core_config_pkg::XLEN;
 import core_config_pkg::alu_commands_t;
 
+/* 
+ *  ALU 5 : Used for accessing memory and performing sext if needed.
+        - Writes
+        - Reads, truncating and extension
+ */
 
 module alu5 (
     // Standard interface

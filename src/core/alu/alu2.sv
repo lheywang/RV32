@@ -3,6 +3,13 @@
 import core_config_pkg::XLEN;
 import core_config_pkg::alu_commands_t;
 
+/* 
+ *  ALU 2 & 3 : Used for calculating advanced maths 
+        - Multiplications
+        - Divisions
+        - Bits shifts (multiple cycles to reduce logic cost)
+ */
+
 
 module alu2 (
     // Standard interface

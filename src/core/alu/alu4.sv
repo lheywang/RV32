@@ -3,6 +3,12 @@
 import core_config_pkg::XLEN;
 import core_config_pkg::alu_commands_t;
 
+/* 
+ *  ALU 4 : Used for accessing CSR registers, and perform the swap easily
+        - Reads & Writes
+        - Reads & Sets
+        - Reads & Clear
+ */
 
 module alu4 (
     // Standard interface
