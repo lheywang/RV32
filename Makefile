@@ -64,8 +64,15 @@ clean:
 	rm -rf simout/*.vcd
 	rm -rf logs/*.ans
 	rm -rf logs/*.log
+	rm -rf documentation/html
+	rm -rf documentation/latex
 
 tests:
 	./tests.sh
 
-.PHONY: all run clean tests
+doc: FORCE
+	doxygen DoxyFile && cd documentation/latex && make pdf
+
+FORCE: ;
+
+.PHONY: all run clean tests doc
