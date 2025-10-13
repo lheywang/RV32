@@ -3,6 +3,7 @@ TOP        ?= pcounter
 SRC_DIR    = src
 BUILD_DIR  = obj_dir
 CXX_TB     = testbench/tb_$(TOP).cpp
+CCX_UTILS  = testbench/utils/utils.cpp
 
 # Including all SV packages files 
 VERILOG_SRCS = $(SRC_DIR)/packages/core_config_pkg.sv 
@@ -42,7 +43,7 @@ NPROC = $(shell nproc)
 
 
 # --- Verilator options ---
-VERILATOR_FLAGS = -Wall --trace -j $(NPROC) --cc $(VERILOG_SRCS) --exe $(CXX_TB) --top-module $(TOP)
+VERILATOR_FLAGS = -Wall --trace -j $(NPROC) --cc $(VERILOG_SRCS) --top-module $(TOP) --exe $(CXX_TB) $(CCX_UTILS)
 
 # --- Default target ---
 all: run
