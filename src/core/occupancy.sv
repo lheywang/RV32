@@ -29,6 +29,13 @@ module occupancy(
     logic                               status2;
      
     /*
+     *  Using an assign block did show better results than always_comb logic.
+     */
+    assign status0 = reg_state[target];
+    assign status1 = reg_state[source1];
+    assign status2 = reg_state[source2];
+     
+    /*
      *  Synchronous set and reset logic to the state register
      */
     always_ff @( posedge clk or negedge rst_n) begin
@@ -41,9 +48,6 @@ module occupancy(
         end
         else begin
                 
-              status0 <= reg_state[target];
-              status1 <= reg_state[source1];
-              status2 <= reg_state[source2];
               exec_ok <= status0 && status1 && status2;
 
             /*
@@ -51,8 +55,10 @@ module occupancy(
              */
             if (exec_ok && lock) begin
 
-                if (target != 0) begin
+                if (target != 0) begin // protect against reserving the register 0
+
                     reg_state[target]   <= 1'b0;
+                    
                 end
 
             end 
