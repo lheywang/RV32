@@ -3,8 +3,8 @@
 import core_config_pkg::IF_LEN;
 import core_config_pkg::XLEN;
 import core_config_pkg::REG_ADDR_W;
-import core_config_pkg::opcodes;
-import core_config_pkg::decoders;
+import core_config_pkg::opcodes_t;
+import core_config_pkg::decoders_t;
 
 module decoder (
     input   logic                           clk,
@@ -24,7 +24,7 @@ module decoder (
 
     output  logic   [(XLEN - 1) : 0]        o_address,
 
-    output  opcodes                         opcode,
+    output  opcodes_t                       opcode,
     output  logic                           illegal
 );
 
@@ -73,7 +73,7 @@ module decoder (
      */
 
     logic                                   decoder_illegal;
-    decoders                                selected_decoder;
+    decoders_t                              selected_decoder;
 
     always_comb begin
 
@@ -106,7 +106,7 @@ module decoder (
      */
 
     logic           [(XLEN - 1) : 0]        r1_instruction;
-    decoders                                r_selected_decoder;
+    decoders_t                              r_selected_decoder;
     logic                                   r_decoder_illegal;
 
     always_ff @( posedge clk or negedge rst_n) begin
