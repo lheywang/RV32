@@ -29,4 +29,15 @@ void final_print(int pass, int fail, char name[64])
                   << "Tests failed !"
                   << RST
                   << std::endl;
+
+    return;
+}
+
+void initial_print(char name[64])
+{
+    std::cout   << KMAG
+                << "--------------------------------------------------------" << std::endl
+                << "Starting " << name << " simulation..." << std::endl
+                << "--------------------------------------------------------" << std::endl
+                << RST;
 }
