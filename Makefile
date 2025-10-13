@@ -8,11 +8,11 @@ CXX_TB     = testbench/tb_$(TOP).cpp
 VERILOG_SRCS = $(SRC_DIR)/packages/core_config_pkg.sv 
 
 # Including ALU files
-VERILOG_SRCS += $(SRC_DIR)/core/alu/alu_comp.sv
-VERILOG_SRCS += $(SRC_DIR)/core/alu/alu_logic.sv
-VERILOG_SRCS += $(SRC_DIR)/core/alu/alu_csr.sv
-VERILOG_SRCS += $(SRC_DIR)/core/alu/alu_int.sv
-VERILOG_SRCS += $(SRC_DIR)/core/alu/alu_mult.sv
+VERILOG_SRCS += $(SRC_DIR)/core/alu/alu0.sv
+VERILOG_SRCS += $(SRC_DIR)/core/alu/alu1.sv
+VERILOG_SRCS += $(SRC_DIR)/core/alu/alu2.sv
+VERILOG_SRCS += $(SRC_DIR)/core/alu/alu4.sv
+VERILOG_SRCS += $(SRC_DIR)/core/alu/alu5.sv
 
 # Including all core files
 VERILOG_SRCS += $(SRC_DIR)/core/pcounter.sv
