@@ -46,7 +46,7 @@ NPROC = $(shell nproc)
 
 
 # --- Verilator options ---
-VERILATOR_FLAGS = -Wall --trace -j 16 --cc $(VERILOG_SRCS) --top-module $(TOP) --exe $(CXX_TB) $(CCX_UTILS)
+VERILATOR_FLAGS = -Wall --trace -j $(NPROC) --cc $(VERILOG_SRCS) --top-module $(TOP) --exe $(CXX_TB) $(CCX_UTILS)
 
 # --- Default target ---
 all: run
@@ -59,7 +59,7 @@ run: $(BUILD_DIR)/V$(TOP)
 # Compile generated C++ from Verilator
 $(BUILD_DIR)/V$(TOP): $(VERILOG_SRCS) $(CXX_TB)
 	verilator $(VERILATOR_FLAGS)
-	make -C $(BUILD_DIR) -f V$(TOP).mk V$(TOP)
+	make -C $(BUILD_DIR) -f V$(TOP).mk V$(TOP) -j$(NPROC)
 
 # Clean
 clean:
