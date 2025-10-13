@@ -206,12 +206,6 @@ bool compare_w_print(int cycleID, decoded source, decoded reference)
 {
     if (compare_decoder(source, reference))
     {
-        std::cout << KGRN
-                  << "\t[ PASS ] Cycle "
-                  << std::hex
-                  << std::setw(4) << cycleID
-                  << RST
-                  << std::endl;
         pass += 1;
         return true;
     }

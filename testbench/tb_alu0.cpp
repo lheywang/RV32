@@ -89,12 +89,6 @@ int main(int argc, char **argv)
                     }
                     else
                     {
-                        std::cout << KGRN
-                                  << "\t[ PASS ] Cycle "
-                                  << std::hex
-                                  << std::setw(4) << cycle
-                                  << RST
-                                  << std::endl;
                         pass += 1;
                     }
                     break;
@@ -115,12 +109,6 @@ int main(int argc, char **argv)
                     }
                     else
                     {
-                        std::cout << KGRN
-                                  << "\t[ PASS ] Cycle "
-                                  << std::hex
-                                  << std::setw(4) << cycle
-                                  << RST
-                                  << std::endl;
                         pass += 1;
                     }
                     break;
@@ -141,12 +129,6 @@ int main(int argc, char **argv)
                     }
                     else
                     {
-                        std::cout << KGRN
-                                  << "\t[ PASS ] Cycle "
-                                  << std::hex
-                                  << std::setw(4) << cycle
-                                  << RST
-                                  << std::endl;
                         pass += 1;
                     }
                     break;
@@ -167,12 +149,6 @@ int main(int argc, char **argv)
                     }
                     else
                     {
-                        std::cout << KGRN
-                                  << "\t[ PASS ] Cycle "
-                                  << std::hex
-                                  << std::setw(4) << cycle
-                                  << RST
-                                  << std::endl;
                         pass += 1;
                     }
                     break;
@@ -193,12 +169,6 @@ int main(int argc, char **argv)
                     }
                     else
                     {
-                        std::cout << KGRN
-                                  << "\t[ PASS ] Cycle "
-                                  << std::hex
-                                  << std::setw(4) << cycle
-                                  << RST
-                                  << std::endl;
                         pass += 1;
                     }
                     break;
