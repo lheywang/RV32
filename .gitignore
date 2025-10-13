@@ -1,12 +1,5 @@
 # .gitignore
 
-# Remove files without extension
-*
-!*/
-!*.*
-!DoxyFile
-!Makefile
-
 # Then, removes some specifics patterns
 # Compiled files
 *.o
@@ -28,6 +21,7 @@
 
 # Verilator files
 obj_dir
+logs
 
 # Doxygen outputs
 documentation/*

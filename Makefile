@@ -61,5 +61,11 @@ $(BUILD_DIR)/V$(TOP): $(VERILOG_SRCS) $(CXX_TB)
 # Clean
 clean:
 	rm -rf $(BUILD_DIR) *.vcd
+	rm -rf simout/*.vcd
+	rm -rf logs/*.ans
+	rm -rf logs/*.log
 
-.PHONY: all run clean
+tests:
+	./tests.sh
+
+.PHONY: all run clean tests
