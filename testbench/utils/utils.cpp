@@ -71,7 +71,7 @@ void equality_print(char name[64], int cycle, int value, int reference, bool pri
                   << "    Got [" << name << "] : 0x"
                   << std::setw(8)
                   << value
-                  << " waited : "
+                  << " waited : 0x"
                   << std::setw(8)
                   << reference
                   << " |"
@@ -95,7 +95,7 @@ void equality_print_arg(char name[64], int value, int reference)
                   << "    Got [" << name << "] : 0x"
                   << std::setw(8)
                   << value
-                  << " waited : "
+                  << " waited : 0x"
                   << std::setw(8)
                   << reference
                   << " |"
