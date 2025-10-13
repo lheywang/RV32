@@ -1,152 +1,187 @@
 `timescale 1ns / 1ps
 
-import core_config_pkg::XLEN;
-import core_config_pkg::alu_commands_t;
+package core_config_pkg;
 
-/* 
- *  ALU 0 : Used for doing simple logic and maths 
-        - Additions
-        - Substractions
-        - AND
-        - OR
-        - XOR
- */
+    // Disabling unused param for verilator.
+    /* verilator lint_off UNUSEDPARAM */
+    // -------------------------------------------------------------------------
+    // Clocks and resets
+    // -------------------------------------------------------------------------
+    parameter int REF_CLK_FREQ      = 200_000_000;      // 200 MHz
+    parameter int CORE_CLK_FREQ     = 100_000_000;      // 100 MHz
+    parameter int CORE_CLK_DUTY     = 50;               // Duty cycle in percentage
+    parameter int RST_TICK_CNT      = 10;               // Number of reference clock cycles for reset
 
+    // -------------------------------------------------------------------------
+    // Data path widths
+    // -------------------------------------------------------------------------
+    parameter int XLEN              = 32;               // Register width (32-bit or 64-bit)
+    parameter int MEM_ADDR_W        = XLEN;             // Address width for memory
+    parameter int MEM_DATA_W        = XLEN;             // Data width
 
-module alu0 (
-    // Standard interface
-    input   logic                                           clk,
-    input   logic                                           rst_n,
+    // -------------------------------------------------------------------------
+    // Registers configuration
+    // -------------------------------------------------------------------------
+    parameter int REG_ADDR_W        = 5;                // Number of bits for register index (32 registers)
+    parameter int REG_COUNT         = 32;               // Number of general-purpose registers
+    parameter int CSR_ADDR_W        = 12;               // Number of bits for register index (32 registers)
+    parameter int CSR_COUNT         = 23;               // Number of CSR registers
 
-    // Issuer interface
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]       arg0,
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]       arg1,
-    input   alu_commands_t                                  cmd,
-    input   logic   [(core_config_pkg::REG_ADDR_W - 1) : 0] i_rd,
-    output  logic                                           busy,
-    output  logic                                           i_error,
+    // CSR Addresses
+    
+    // -------------------------------------------------------------------------
+    // Instruction fetch parameters
+    // -------------------------------------------------------------------------
+    parameter int IF_LEN            = 32;               // Instruction length
+    parameter int IF_INC            = 4;                // Offset between two memory addresses.
+    parameter int IF_MAX_ADDR       = 32'h1000_3FFF;    // Maximal address possible.
+    parameter int IF_BASE_ADDR      = 32'h1000_0000;    // Base address of IF stage.
 
-    // Commiter interface
-    output  logic   [(core_config_pkg::XLEN - 1) : 0]       res,
-    output  logic   [(core_config_pkg::REG_ADDR_W - 1) : 0] o_rd,
-    output  logic                                           valid,
-    output  logic                                           o_error,
-    output  logic                                           req,
-    input   logic                                           clear
+    // -------------------------------------------------------------------------
+    // Decoder internal settings
+    // -------------------------------------------------------------------------
+    // Define how to split an instruction
+    parameter int OPCODE_MSB        = 6;
+    parameter int OPCODE_LSB        = 0;
+    parameter int RD_MSB            = 11;
+    parameter int RD_LSB            = 7;
+    parameter int FUNCT3_MSB        = 14;
+    parameter int FUNCT3_LSB        = 12;
+    parameter int RS1_MSB           = 19;
+    parameter int RS1_LSB           = 15;
+    parameter int RS2_MSB           = 24;
+    parameter int RS2_LSB           = 20;
+    parameter int FUNCT7_MSB        = 31;
+    parameter int FUNCT7_LSB        = 25;
 
-    // Additionnal interface (optionnal)
-    // None for this ALU.                  
-);
+    // -------------------------------------------------------------------------
+    // CSR internal settings
+    // -------------------------------------------------------------------------
     /*
-     *  Storages types
+     * Writes masks
      */
-    logic   [(core_config_pkg::XLEN) : 0]           tmp_res; // One more bit to handle overflow.
-    logic                                           unknown_instr;
-    logic                                           int_req;
-    logic                                           end_of_op;
+    parameter logic [(XLEN - 1):0] CSR_WMASK [CSR_COUNT] = '{
+        32'h00007188, // MSTATUS
+        32'hFFFF0888, // MIE
+        32'hFFFFFF01, // MTVEC
+        32'hFFFFFFFF, // MSCRATCH
+        32'hFFFFFFFE, // MEPC
+        32'h8000001F, // MCAUSE
+        32'h00000000, // MTVAL
+        32'h00000000, // MIP
+        32'h00000000, // VENDORID
+        32'h00000000, // MARCHID
+        32'h00000000, // MIMPID
+        32'h00000000, // MHARTID
+        32'h00000000, // MISA
+        32'h00000000, // CYCLE
+        32'h00000000, // CYCLEH
+        32'h00000000, // INSTR
+        32'h00000000, // INSTRH
+        32'h00000000, // FLUSH
+        32'h00000000, // FLUSHH
+        32'h00000000, // WAIT
+        32'h00000000, // WAITH
+        32'h00000000, // DECOD
+        32'h00000000  // DECODH
+    };
 
+    // -------------------------------------------------------------------------
+    // Performance counter configuration
+    // -------------------------------------------------------------------------
+    parameter int PERF_CNT_LEN      = 64;               // Performance counters are 64 bits anyway.
+    parameter int PERF_CNT_INC      = 1;                // Increment on each tick
+
+    // -------------------------------------------------------------------------
+    // Enums
+    // -------------------------------------------------------------------------
     /*
-     *  First, perform calculations (outputs from issuer are synchronous to clock).
+     *  List all of the known opcodes for the system.
      */
-    always_comb begin
+    typedef enum {
+        i_NOP,
 
-        unique case (cmd)
+        i_LUI,  i_AUIPC,
 
-            core_config_pkg::c_ADD : begin
-                // Calculation
-                tmp_res = {1'b0, arg0} + {1'b0, arg1};
+        i_ADDI, i_SLTI, i_SLTIU,    i_XORI,
+        i_ANDI, i_SLLI, i_SRLI,     i_SRAI,
+        i_ORI,
 
-                // Setting flags
-                int_req = 1;
-                unknown_instr = 0;
-            end
-            core_config_pkg::c_SUB : begin
-                // Calculation
-                tmp_res = {1'b0, arg0} - {1'b0, arg1};
+        i_ADD,  i_SUB,  i_SLL,      i_SLT,      i_SLTU,
+        i_XOR,  i_SRL,  i_SRA,      i_OR,       i_AND,
 
-                // Setting flags
-                int_req = 1;
-                unknown_instr = 0;
-            end 
-            core_config_pkg::c_AND : begin
-                // Calculation
-                tmp_res = {1'b0, arg0} & {1'b0, arg1};
+        i_MUL,  i_MULH, i_MULHU,    i_MULHSU,
+        i_DIV,  i_DIVU, i_REM,      i_REMU,
 
-                // Setting flags
-                int_req = 1;
-                unknown_instr = 0;
-            end
-            core_config_pkg::c_OR : begin
-                // Calculation
-                tmp_res = {1'b0, arg0} | {1'b0, arg1};
+        i_FENCE,
 
-                // Setting flags
-                int_req = 1;
-                unknown_instr = 0;
-            end
-            core_config_pkg::c_XOR : begin
-                // Calculation
-                tmp_res = {1'b0, arg0} ^ {1'b0, arg1};
+        i_BEQ,  i_BNE,  i_BLT,      i_BGE, 
+        i_BLTU, i_BGEU,
 
-                // Setting flags
-                int_req = 1;
-                unknown_instr = 0;
-            end
-            default : begin
-                // Calculation
-                tmp_res = 0;
+        i_LB,   i_LH,   i_LW,       i_LBU,      i_LHU,
+        i_SB,   i_SH,   i_SW,
 
-                // Setting flags
-                int_req = 0;
-                unknown_instr = 1;
-            end
-        endcase
-    end
+        i_JAL,  i_JALR,
 
-    /*
-     *  Second, latching the first stage outputs before outputing them for the
-     *  commiter stage.
-     */
-    always_ff @( posedge clk or negedge rst_n) begin
+        i_ECALL, 
+        i_EBREAK, 
+        i_MRET,
 
-        if (!rst_n) begin
+        i_CSRRW, i_CSRRS, i_CSRRC, i_CSRRWI,
+        i_CSRRSI, i_CSRRCI
+    } opcodes_t;
 
-            busy <= 0;
-            res <= 0;
-            i_error <= 0;
-            o_error <= 0;
-            req <= 0;
-            o_rd <= 0;
-            valid <= 0;
-            end_of_op <= 0;
+    typedef enum {
+        DEC_U, DEC_I, DEC_R, DEC_B, DEC_S, DEC_J, DEC_NONE
+    } decoders_t;
 
-        end
-        else if (clear && end_of_op) begin
-		  
-				busy <= 0;
-            res <= 0;
-            i_error <= 0;
-            o_error <= 0;
-            req <= 0;
-            o_rd <= 0;
-            valid <= 0;
-            end_of_op <= 0;
-				
-			end
-			else begin
+    typedef enum {
+        r_MSTATUS, r_MIE, r_MTVEC, r_MSCRATCH, r_MEPC, r_MCAUSE,
+        r_MTVAL, r_MIP, 
+        
+        r_MVENDORID, r_MARCHID, r_MIMPID, r_MHARTID, r_MISA,
 
-            busy <= int_req;
-            res <= tmp_res[(core_config_pkg::XLEN - 1) : 0];
-            i_error <= unknown_instr;
-            o_error <= tmp_res[(core_config_pkg::XLEN)];
-            req <= 0;
-            o_rd <= i_rd;
-            valid <= 1;
-            end_of_op <= 1;
+        r_CYCLE, r_CYCLEH,  // CPU Cycle counters
+        r_INSTR, r_INSTRH,  // CPU Commited instructions
+        r_FLUSH, r_FLUSHH,  // CPU Pipeline flush counters
+        r_WAIT, r_WAITH,    // CPU Number of waited cycles
+        r_DECOD, r_DECODH,  // CPU Number of decoded instructions.
 
-        end
-    end
+        r_NONE              // Must be the last
+    } csr_t;
 
+    typedef enum {
+        // ALU 0 (basic arithemetic)
+        c_ADD, c_SUB,
+        c_AND, c_OR,  c_XOR,
 
+        // ALU 1 (branches and conditions)
+        c_SLT, c_SLTU,
+        c_BEQ, c_BNE, c_BLT, c_BGE, c_BLTU, c_BGEU,
 
-endmodule
+        // ALU 2 & 3 (multiplications and divisions, multi cycles)
+        c_SLL, c_SRL, c_SRA,
+        c_MUL, 
+        c_MULH, c_MULHSU, c_MULHU,
+        c_DIV, c_DIVU,
+        c_REM, c_REMU,
+
+        // ALU 4 (CSR)
+        c_CSRRW, c_CSRRS, c_CSRRC,
+
+        // ALU 5 (Memory)
+        c_SB, c_SH, c_SW,
+        c_LB, c_LH, c_LW, c_LBU, c_LHU,
+
+        // Common
+        c_NONE
+    } alu_commands_t;
+
+    // -------------------------------------------------------------------------
+    // Automated parameters
+    // -------------------------------------------------------------------------
+    parameter int PERF_CNT_PORT     = (XLEN < 64) ? 1 : 0;
+
+    // Re-enabling used parameters of Verilator.
+    /* verilator lint_on UNUSEDPARAM */
+endpackage

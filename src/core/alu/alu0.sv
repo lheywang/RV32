@@ -109,7 +109,19 @@ module alu0 (
      */
     always_ff @( posedge clk or negedge rst_n) begin
 
-        if (!rst_n || (clear && end_of_op)) begin
+        if (!rst_n) begin
+
+            busy <= 0;
+            res <= 0;
+            i_error <= 0;
+            o_error <= 0;
+            req <= 0;
+            o_rd <= 0;
+            valid <= 0;
+            end_of_op <= 0;
+
+        end
+        else if (clear && end_of_op) begin
 
             busy <= 0;
             res <= 0;
@@ -134,7 +146,4 @@ module alu0 (
 
         end
     end
-
-
-
 endmodule
