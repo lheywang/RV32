@@ -47,8 +47,50 @@ int main(int argc, char **argv)
         tb->target = i;
         tb->lock = 1;
         tick(tb, tfp);
+        tick(tb, tfp);
 
-        equality_print(cycle, tb->exec_ok, 1);
+        equality_print((char *)"Execution status bit (1)", cycle, tb->exec_ok, 1);
+        cycle += 1;
+    }
+
+    // Then, try to overwrite the same registers (shall be blocked).
+    for (int i = 1; i < 32; i += 2)
+    {
+        tb->source1 = 0;
+        tb->source2 = 0;
+        tb->target = i;
+        tb->lock = 1;
+        tick(tb, tfp);
+        tick(tb, tfp);
+
+        equality_print((char *)"Execution status bit (0)", cycle, tb->exec_ok, 0);
+        cycle += 1;
+    }
+    tb->lock = 0;
+
+    // Then, free them
+    for (int i = 1; i < 32; i += 2)
+    {
+        tb->address = i;
+        tb->write = 1;
+        tick(tb, tfp);
+        tick(tb, tfp);
+        cycle += 1;
+    }
+    tb->write = 0;
+
+    // Finally, relock them
+    for (int i = 1; i < 32; i += 2)
+    {
+        tb->source1 = 0;
+        tb->source2 = 0;
+        tb->target = i;
+        tb->lock = 1;
+        tick(tb, tfp);
+        tick(tb, tfp);
+
+        equality_print((char *)"Execution status bit (1)", cycle, tb->exec_ok, 1);
+        cycle += 1;
     }
 
     final_print(module);

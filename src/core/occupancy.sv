@@ -24,18 +24,10 @@ module occupancy(
      *  Storage type
      */
     logic   [(REG_COUNT - 1) : 0]       reg_state;          // 1 is available, 0 is locked.
-    logic                               int_ok;
-
-    /*
-     *  Combinational logic to see if the current set of arguments / target is not 
-     *  currently under an execution lock.
-     */
-    always_comb begin
-
-        int_ok = reg_state[target] && reg_state[source1] && reg_state[source2];
-
-    end
-
+    logic                               status0;
+    logic                               status1;
+    logic                               status2;
+     
     /*
      *  Synchronous set and reset logic to the state register
      */
@@ -48,21 +40,22 @@ module occupancy(
 
         end
         else begin
+                
+              status0 <= reg_state[target];
+              status1 <= reg_state[source1];
+              status2 <= reg_state[source2];
+              exec_ok <= status0 && status1 && status2;
 
             /*
              *  Set logic, if we're OK to lock this register
              */
-            if (int_ok && lock) begin
+            if (exec_ok && lock) begin
 
-                reg_state[target]   <= 1'b0;
-                exec_ok             <= 1;
+                if (target != 0) begin
+                    reg_state[target]   <= 1'b0;
+                end
 
             end 
-            else begin
-
-                exec_ok             <= 0;
-
-            end
 
             /*
              *  Reset logic, only based on the register access signals.
