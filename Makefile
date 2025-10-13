@@ -1,9 +1,9 @@
 # --- Variables ---
 TOP        ?= pcounter
 SRC_DIR    = src
-BUILD_DIR  = obj_dir
-CXX_TB     = testbench/tb_$(TOP).cpp
-CCX_UTILS  = testbench/utils/utils.cpp
+BUILD_DIR  = /mnt/ramdisk/
+CXX_TB     = $(abspath testbench/tb_$(TOP).cpp)
+CCX_UTILS  = $(abspath testbench/utils/utils.cpp)
 
 # Including all SV packages files 
 VERILOG_SRCS = $(SRC_DIR)/packages/core_config_pkg.sv 
@@ -43,10 +43,15 @@ VERILOG_SRCS += $(SRC_DIR)/peripherals/ulpi.sv
 VERILOG_SRCS += $(SRC_DIR)/rv32.sv
 
 NPROC = $(shell nproc)
-
+export CXX="ccache clang++"
 
 # --- Verilator options ---
-VERILATOR_FLAGS = -Wall --trace -j $(NPROC) --cc $(VERILOG_SRCS) --top-module $(TOP) --exe $(CXX_TB) $(CCX_UTILS)
+VERILATOR_FLAGS = -Wall --trace -j 8 \
+				  --cc $(VERILOG_SRCS) \
+				  -O3 --output-split 0 \
+				  --top-module $(TOP) \
+				  --exe $(CXX_TB) $(CCX_UTILS) \
+				  -Mdir $(BUILD_DIR)
 
 # --- Default target ---
 all: run
@@ -54,16 +59,16 @@ all: run
 # Build and run simulation
 run: $(BUILD_DIR)/V$(TOP)
 	@echo "Running simulation..."
-	@./$(BUILD_DIR)/V$(TOP)
+	@$(BUILD_DIR)V$(TOP)
 
 # Compile generated C++ from Verilator
 $(BUILD_DIR)/V$(TOP): $(VERILOG_SRCS) $(CXX_TB)
 	verilator $(VERILATOR_FLAGS)
-	make -C $(BUILD_DIR) -f V$(TOP).mk V$(TOP) -j$(NPROC)
+	make -C $(BUILD_DIR) -f V$(TOP).mk V$(TOP) -j8 CXX="ccache clang++"
 
 # Clean
 clean:
-	rm -rf $(BUILD_DIR) *.vcd
+	rm -rf $(BUILD_DIR)/*
 	rm -rf simout/*.vcd
 	rm -rf logs/*.ans
 	rm -rf logs/*.log

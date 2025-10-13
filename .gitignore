@@ -29,3 +29,6 @@ documentation/*
 # VSCode extensions
 .VSCodeCounter/*
 .vscode/*
+
+# Ramdisk files
+*.swp
