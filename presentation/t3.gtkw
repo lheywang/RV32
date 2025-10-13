@@ -1,0 +1,30 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Mon Oct 13 09:22:39 2025
+[*]
+[dumpfile] "/home/user/RV32/simout/alu0.vcd"
+[dumpfile_mtime] "Mon Oct 13 09:21:22 2025"
+[dumpfile_size] 23045
+[savefile] "/home/user/RV32/presentation/t3.gtkw"
+[timestart] 0
+[size] 3840 2053
+[pos] -27 -24
+*-1.579294 4 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] TOP.
+[sst_width] 273
+[signals_width] 134
+[sst_expanded] 1
+[sst_vpaned_height] 360
+@28
+TOP.alu0.clk
+TOP.alu0.rst_n
+TOP.alu0.busy
+TOP.alu0.req
+TOP.alu0.end_of_op
+@22
+TOP.alu0.arg0[31:0]
+TOP.alu0.arg1[31:0]
+TOP.alu0.tmp_res[32:0]
+TOP.alu0.res[31:0]
+[pattern_trace] 1
+[pattern_trace] 0
