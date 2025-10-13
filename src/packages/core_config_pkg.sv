@@ -93,48 +93,47 @@ package core_config_pkg;
     parameter int PERF_CNT_INC      = 1;                // Increment on each tick
 
     // -------------------------------------------------------------------------
-    // Automated parameters
-    // -------------------------------------------------------------------------
-    parameter int PERF_CNT_PORT     = (XLEN < 64) ? 1 : 0;
-
-    // -------------------------------------------------------------------------
     // Enums
     // -------------------------------------------------------------------------
-    // Handled opcodes
+    /*
+     *  List all of the known opcodes for the system.
+     */
     typedef enum {
         i_NOP,
 
-        i_LUI, i_AUIPC,
+        i_LUI,  i_AUIPC,
 
-        i_ADDI, i_SLTI, i_SLTIU, i_XORI,
-        i_ANDI, i_SLLI, i_SRLI, i_SRAI,
+        i_ADDI, i_SLTI, i_SLTIU,    i_XORI,
+        i_ANDI, i_SLLI, i_SRLI,     i_SRAI,
         i_ORI,
 
-        i_ADD, i_SUB, i_SLL, i_SLT, i_SLTU,
-        i_XOR, i_SRL, i_SRA, i_OR, i_AND,
+        i_ADD,  i_SUB,  i_SLL,      i_SLT,      i_SLTU,
+        i_XOR,  i_SRL,  i_SRA,      i_OR,       i_AND,
 
-        i_MUL, i_MULH, i_MULHU, i_MULHSU,
-        i_DIV, i_DIVU, i_REM, i_REMU,
+        i_MUL,  i_MULH, i_MULHU,    i_MULHSU,
+        i_DIV,  i_DIVU, i_REM,      i_REMU,
 
         i_FENCE,
 
-        i_BEQ, i_BNE, i_BLT, i_BGE, 
+        i_BEQ,  i_BNE,  i_BLT,      i_BGE, 
         i_BLTU, i_BGEU,
 
-        i_LB, i_LH, i_LW, i_LBU, i_LHU,
-        i_SB, i_SH, i_SW,
+        i_LB,   i_LH,   i_LW,       i_LBU,      i_LHU,
+        i_SB,   i_SH,   i_SW,
 
-        i_JAL, i_JALR,
+        i_JAL,  i_JALR,
 
-        i_ECALL, i_EBREAK, i_MRET,
+        i_ECALL, 
+        i_EBREAK, 
+        i_MRET,
 
         i_CSRRW, i_CSRRS, i_CSRRC, i_CSRRWI,
         i_CSRRSI, i_CSRRCI
-    } opcodes;
+    } opcodes_t;
 
     typedef enum {
         DEC_U, DEC_I, DEC_R, DEC_B, DEC_S, DEC_J, DEC_NONE
-    } decoders;
+    } decoders_t;
 
     typedef enum {
         r_MSTATUS, r_MIE, r_MTVEC, r_MSCRATCH, r_MEPC, r_MCAUSE,
@@ -150,6 +149,38 @@ package core_config_pkg;
 
         r_NONE              // Must be the last
     } csr_t;
+
+    typedef enum {
+        // ALU 0 (basic arithemetic)
+        c_ADD, c_SUB,
+        c_AND, c_OR,  c_XOR,
+
+        // ALU 1 (branches and conditions)
+        c_SLT, c_SLTU,
+        c_BEQ, c_BNE, c_BLT, c_BGE, c_BLTU, c_BGEU,
+
+        // ALU 2 & 3 (multiplications and divisions, multi cycles)
+        c_SLL, c_SRL, c_SRA,
+        c_MUL, 
+        c_MULH, c_MULHSU, c_MULHU,
+        c_DIV, c_DIVU,
+        c_REM, c_REMU,
+
+        // ALU 4 (CSR)
+        c_CSRRW, c_CSRRS, c_CSRRC,
+
+        // ALU 5 (Memory)
+        c_SB, c_SH, c_SW,
+        c_LB, c_LH, c_LW, c_LBU, c_LHU,
+
+        // Common
+        c_NONE
+    } alu_commands_t;
+
+    // -------------------------------------------------------------------------
+    // Automated parameters
+    // -------------------------------------------------------------------------
+    parameter int PERF_CNT_PORT     = (XLEN < 64) ? 1 : 0;
 
     // Re-enabling used parameters of Verilator.
     /* verilator lint_on UNUSEDPARAM */
