@@ -3,7 +3,7 @@
 #include "verilated_vcd_c.h"
 #include <iostream>
 #include <iomanip>
-#include "colors.h"
+#include "utils/colors.h"
 
 // Simulation time
 vluint64_t sim_time = 0;
@@ -119,31 +119,6 @@ int main(int argc, char **argv)
             fail += 1;
         }
     }
-
-    std::cout << KMAG
-              << "Simulation complete."
-              << std::endl
-              << KYEL << "--------------------------------------------------------\n"
-              << "Results : (PCounter)"
-              << "\n--------------------------------------------------------"
-              << std::endl
-              << KGRN << "\tPass : "
-              << std::setw(4) << pass
-              << KRED << "\n\tFail : "
-              << std::setw(4) << fail
-              << RST
-              << std::endl;
-
-    if (fail == 0)
-        std::cout << KGRN
-                  << "Tests passed !"
-                  << RST
-                  << std::endl;
-    else
-        std::cout << KRED
-                  << "Tests failed !"
-                  << RST
-                  << std::endl;
 
     tfp->close();
     delete tb;

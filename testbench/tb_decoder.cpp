@@ -3,7 +3,7 @@
 #include "verilated_vcd_c.h"
 #include <iostream>
 #include <iomanip>
-#include "colors.h"
+#include "utils/colors.h"
 
 // Simulation time
 vluint64_t sim_time = 0;
@@ -295,6 +295,7 @@ int main(int argc, char **argv)
     std::cout << KMAG
               << "Simulation complete."
               << std::endl
+              << std::dec
               << KYEL << "--------------------------------------------------------\n"
               << "Results : (Decoder)"
               << "\n--------------------------------------------------------"
