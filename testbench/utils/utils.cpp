@@ -55,8 +55,8 @@ void equality_print(char name[64], int cycle, int value, int reference, bool pri
         if (print)
             std::cout << KGRN
                       << "[ PASS ] Cycle "
-                      << std::hex
                       << std::setw(8) << cycle
+                      << "    [ " << name << " ]"
                       << RST
                       << std::dec
                       << std::endl;
@@ -66,9 +66,9 @@ void equality_print(char name[64], int cycle, int value, int reference, bool pri
     {
         std::cout << KRED
                   << "[ FAIL ] Cycle "
-                  << std::hex
                   << std::setw(8) << cycle
-                  << "    [" << name << "] Got : 0x"
+                  << std::hex
+                  << "    [ " << name << " ] Got : 0x"
                   << std::setw(8)
                   << value
                   << " waited : 0x"
@@ -92,7 +92,8 @@ void equality_print_arg(char name[64], int value, int reference)
     else
     {
         std::cout << KRED
-                  << "    [" << name << "] Got : 0x"
+                  << std::hex
+                  << "    [ " << name << " ] Got : 0x"
                   << std::setw(8)
                   << value
                   << " waited : 0x"
