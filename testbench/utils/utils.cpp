@@ -68,7 +68,7 @@ void equality_print(char name[64], int cycle, int value, int reference, bool pri
                   << "[ FAIL ] Cycle "
                   << std::hex
                   << std::setw(8) << cycle
-                  << "    Got [" << name << "] : 0x"
+                  << "    [" << name << "] Got : 0x"
                   << std::setw(8)
                   << value
                   << " waited : 0x"
@@ -92,7 +92,7 @@ void equality_print_arg(char name[64], int value, int reference)
     else
     {
         std::cout << KRED
-                  << "    Got [" << name << "] : 0x"
+                  << "    [" << name << "] Got : 0x"
                   << std::setw(8)
                   << value
                   << " waited : 0x"

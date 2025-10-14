@@ -37,6 +37,10 @@ VERILOG_SRCS += $(SRC_DIR)/peripherals/serial.sv
 VERILOG_SRCS += $(SRC_DIR)/peripherals/timer.sv
 VERILOG_SRCS += $(SRC_DIR)/peripherals/ulpi.sv
 
+# Top files
+VERILOG_SRCS += $(SRC_DIR)/reset.sv
+VERILOG_SRCS += $(SRC_DIR)/rv32.sv
+
 # Including memory files
 
 # Including top file 
