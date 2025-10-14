@@ -15,6 +15,7 @@ targets=(
     reset
     occupancy
     alu0
+    alu1
 )
 
 # Create a logs folder
