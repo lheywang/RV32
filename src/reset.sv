@@ -3,9 +3,9 @@
 import core_config_pkg::RST_TICK_CNT;
 
 module reset (
-    input   logic                       clk,          // system clock
-    input   logic                       rst_in,     // async active-low input reset (from button, POR, etc.)
-    output  logic                       rst_out       // sync active-high reset output
+    input   logic                       clk,                // system clock
+    input   logic                       rst_in,             // async active-low input reset (from button, POR, etc.)
+    output  logic                       rst_out             // sync active-high reset output
 );
 
     // -------------------------------------------------------------------------
