@@ -10,6 +10,11 @@
 
 char *module = (char *)"ALU5";
 
+unsigned writedata[10] = {
+    0xFFFFFFFF, 0x55555555, 0x12345678, 0x9ABCDEF0, 0x11111111,
+    0x33333333, 0xdeadbeef, 0xcafecafe, 0xbeefdead, 0xAAAAAAAA // Buffer of data to be sent to write.
+};
+
 // Main
 int main(int argc, char **argv)
 {
@@ -31,15 +36,222 @@ int main(int argc, char **argv)
     stick(tb, tfp);
     tb->rst_n = 1;
     stick(tb, tfp);
-    stick(tb, tfp);
-    stick(tb, tfp);
+    tick(tb, tfp);
+
+    tb->i_rd = 0x1F;
+    tb->arg0 = 0x1000F0F0;
 
     int cycle = 0;
 
-    // Formal calculation test
-    for (int i = 0; i < 64; i++)
+    // Performing writes
+    for (int i = 27; i < 30; i++)
     {
+        tb->cmd = i;
+
+        // Iterate over some data
+        for (int ii = 0; ii < 10; ii++)
+        {
+            // First, apply signals
+            tb->arg1 = writedata[ii];
+
+            // Iterate over sub-addresses
+            for (int iii = 0; iii < 4; iii++)
+            {
+
+                int target_addr = 0x1000F0F0; // We want a constant address, and only move the byte enable signals
+                tb->imm = iii;
+
+                tick(tb, tfp);
+                tick(tb, tfp);
+
+                equality_print((char *)"Write-memaddr", cycle, tb->mem_addr, target_addr);
+                equality_print((char *)"Write-we     ", cycle, tb->mem_we, 1);
+                equality_print((char *)"Write-req    ", cycle, tb->mem_req, 1);
+
+                switch (i)
+                {
+                case 27: // SB
+                    switch (iii)
+                    {
+                    case 0:
+                        equality_print((char *)"Write-wdata  ", cycle, tb->mem_wdata, (writedata[ii] & 0x000000FF));
+                        break;
+
+                    case 1:
+                        equality_print((char *)"Write-wdata  ", cycle, tb->mem_wdata, (writedata[ii] & 0x000000FF) << 8);
+                        break;
+
+                    case 2:
+                        equality_print((char *)"Write-wdata  ", cycle, tb->mem_wdata, (writedata[ii] & 0x000000FF) << 16);
+                        break;
+
+                    case 3:
+                        equality_print((char *)"Write-wdata  ", cycle, tb->mem_wdata, (writedata[ii] & 0x000000FF) << 24);
+                        break;
+                    }
+                    break;
+
+                case 28: // SH
+                    switch (iii)
+                    {
+                    case 0:
+                    case 1:
+                        equality_print((char *)"Write-wdata  ", cycle, tb->mem_wdata, writedata[ii] & 0x0000FFFF);
+                        break;
+
+                    case 2:
+                    case 3:
+                        equality_print((char *)"Write-wdata  ", cycle, tb->mem_wdata, (writedata[ii] & 0x0000FFFF) << 16);
+                        break;
+                    }
+                    break;
+
+                case 29: // SW
+                    equality_print((char *)"Write-wdata  ", cycle, tb->mem_wdata, writedata[ii]);
+                    break;
+                }
+
+                tick(tb, tfp);
+
+                equality_print((char *)"Write-valid  ", cycle, tb->valid, 1);
+                equality_print((char *)"Write-res    ", cycle, tb->res, 0);
+                equality_print((char *)"Write-res    ", cycle, tb->req, 0);
+
+                tb->clear = 1;
+                tick(tb, tfp);
+                tb->clear = 0;
+
+                cycle += 1;
+            }
+        }
+    }
+
+    tb->i_rd = 0x1F;
+    tb->arg0 = 0x1000F0F0;
+
+    // Performing reads
+    for (int i = 30; i < 35; i++)
+    {
+        tb->cmd = i;
+
+        // Iterate over some data
+        for (int ii = 0; ii < 10; ii++)
+        {
+            // First, apply signals
+            tb->mem_rdata = writedata[ii];
+
+            // Iterate over sub-addresses
+            for (int iii = 0; iii < 4; iii++)
+            {
+
+                int target_addr = 0x1000F0F0; // We want a constant address, and only move the byte enable signals
+                tb->imm = iii;
+                tb->clear = 0;
+
+                tick(tb, tfp);
+                tick(tb, tfp);
+
+                equality_print((char *)"Read-memaddr ", cycle, tb->mem_addr, target_addr);
+                equality_print((char *)"Read-we      ", cycle, tb->mem_we, 0);
+                equality_print((char *)"Read-req     ", cycle, tb->mem_req, 1);
+
+                tick(tb, tfp);
+                tb->clear = 1;
+
+                switch (i)
+                {
+                case 27: // SB
+                    switch (iii)
+                    {
+                    case 0:
+                        equality_print((char *)"Read-res     ", cycle, tb->res, (writedata[ii] & 0x000000FF));
+                        break;
+
+                    case 1:
+                        equality_print((char *)"Read-res     ", cycle, tb->res, (writedata[ii] & 0x000000FF) << 8); // No ?
+                        break;
+
+                    case 2:
+                        equality_print((char *)"Read-res     ", cycle, tb->res, (writedata[ii] & 0x000000FF) << 16); // No ?
+                        break;
+
+                    case 3:
+                        equality_print((char *)"Read-res     ", cycle, tb->res, (writedata[ii] & 0x000000FF) << 24); // No ?
+                        break;
+                    }
+                    break;
+
+                case 28: // SH
+                    switch (iii)
+                    {
+                    case 0:
+                    case 1:
+                        equality_print((char *)"Read-res     ", cycle, tb->res, writedata[ii] & 0x0000FFFF);
+                        break;
+
+                    case 2:
+                    case 3:
+                        equality_print((char *)"Read-res     ", cycle, tb->res, (writedata[ii] & 0x0000FFFF) << 16); // No ??
+                        break;
+                    }
+                    break;
+
+                case 29: // SW
+                    equality_print((char *)"Read-res     ", cycle, tb->res, writedata[ii]);
+                    break;
+                }
+
+                equality_print((char *)"Read-res     ", cycle, tb->valid, 1);
+                tick(tb, tfp);
+
+                cycle += 1;
+            }
+        }
+    }
+
+    tb->mem_err = 1;
+    tb->imm = 0;
+
+    // Checking that the ALU does perform the feedback of errors
+    for (int i = 27; i < 35; i++)
+    {
+        tb->cmd = i;
+
         tick(tb, tfp);
+        tick(tb, tfp);
+        tick(tb, tfp);
+        tick(tb, tfp);
+        tick(tb, tfp);
+        tick(tb, tfp);
+
+        tb->clear = 1;
+        equality_print((char *)"Read-o_error ", cycle, tb->o_error, 1);
+        tick(tb, tfp);
+        tb->clear = 0;
+
+        cycle += 1;
+    }
+
+    // Checking that the ALU does perform the feedback of errors
+    for (int i = 10; i < 14; i++)
+    {
+        tb->cmd = i;
+
+        int target_addr = 0x1000F0F0; // We want a constant address, and only move the byte enable signals
+        tb->mem_err = 0;
+        tb->imm = 0;
+
+        tick(tb, tfp);
+        tick(tb, tfp);
+        tick(tb, tfp);
+        tick(tb, tfp);
+
+        equality_print((char *)"Read-i_error ", cycle, tb->i_error, 1);
+        tb->clear = 1;
+        tick(tb, tfp);
+        tb->clear = 0;
+
+        cycle += 1;
     }
 
     final_print(module);

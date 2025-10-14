@@ -1,38 +1,48 @@
 [*]
 [*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
-[*] Tue Oct 14 19:47:24 2025
+[*] Tue Oct 14 22:01:44 2025
 [*]
 [dumpfile] "/home/user/RV32/simout/alu5.vcd"
-[dumpfile_mtime] "Tue Oct 14 19:43:52 2025"
-[dumpfile_size] 7923
+[dumpfile_mtime] "Tue Oct 14 22:00:59 2025"
+[dumpfile_size] 238002
 [savefile] "/home/user/RV32/presentation/t5.gtkw"
-[timestart] 0
+[timestart] 2501
 [size] 2560 985
 [pos] -27 -24
-*-5.409801 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-4.409801 2508 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [sst_width] 273
-[signals_width] 158
+[signals_width] 247
 [sst_expanded] 1
-[sst_vpaned_height] 291
+[sst_vpaned_height] 455
 @28
 TOP.alu5.clk
 TOP.alu5.rst_n
 @200
 -
 @22
+TOP.alu5.arg0[31:0]
+TOP.alu5.imm[31:0]
+TOP.alu5.tmp_res[31:0]
+@200
+-
+@22
+TOP.alu5.arg1[31:0]
+@24
+TOP.alu5.cmd[31:0]
+@22
 TOP.alu5.bytes[3:0]
 @28
 TOP.alu5.we
 TOP.alu5.sext_req
-@22
+@23
 TOP.alu5.data[31:0]
 @28
 TOP.alu5.inp_req
 TOP.alu5.unknown_instr
 @200
 -
-@22
+@24
 TOP.alu5.state[31:0]
 TOP.alu5.next_state[31:0]
 @200
@@ -67,7 +77,7 @@ TOP.alu5.mem_req
 @22
 TOP.alu5.mem_wdata[31:0]
 TOP.alu5.mem_rdata[31:0]
-@29
+@28
 TOP.alu5.mem_err
 [pattern_trace] 1
 [pattern_trace] 0

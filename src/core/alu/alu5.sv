@@ -19,8 +19,8 @@ module alu5 (
     input   logic   [(core_config_pkg::XLEN - 1) : 0]       arg1,
     /* verilator lint_off UNUSEDSIGNAL */
     input   logic   [(core_config_pkg::XLEN - 1) : 0]       addr,
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]       imm,
     /* verilator lint_on UNUSEDSIGNAL */
+    input   logic   [(core_config_pkg::XLEN - 1) : 0]       imm,
     input   alu_commands_t                                  cmd,
     input   logic   [(core_config_pkg::REG_ADDR_W - 1) : 0] i_rd,
     output  logic                                           busy,
@@ -36,6 +36,7 @@ module alu5 (
 
     // Additionnal interface for the memory (which perform IO trough this ALU and only THIS ALU.)
     output  logic   [(core_config_pkg::XLEN - 1) : 0]       mem_addr,
+    output  logic   [((core_config_pkg::XLEN / 8) - 1) : 0] mem_byteen,
     output  logic                                           mem_we,
     output  logic                                           mem_req,
     output  logic   [(core_config_pkg::XLEN - 1) : 0]       mem_wdata,
@@ -64,7 +65,7 @@ module alu5 (
     logic   [((core_config_pkg::XLEN / 8) - 1) : 0] r_bytes;
     logic   [(core_config_pkg::XLEN - 1) : 0]       r_address;
     logic   [(core_config_pkg::XLEN - 1) : 0]       r_data;
-     logic   [(core_config_pkg::XLEN - 1) : 0]       r_data2;
+    logic   [(core_config_pkg::XLEN - 1) : 0]       r_data2;
     logic                                           r_sext_req;
     logic                                           r_we;
     logic                                           r_err;
@@ -81,7 +82,7 @@ module alu5 (
      */
     always_comb begin
 
-        tmp_res = arg0 + arg1;
+        tmp_res = arg0 + imm;
         address = {tmp_res[(core_config_pkg::XLEN - 1) : 2], 2'b0};
 
         unique case (cmd)
@@ -146,7 +147,15 @@ module alu5 (
                 bytes = 4'b0001 << tmp_res[1:0];
                 sext_req = 0;
                 we = 1;
-                data = arg1 & 32'h000000FF << (tmp_res[1:0] * 8);
+                case (tmp_res[1:0])
+
+                    2'b00 : data = {24'b0, arg1[7 : 0]};
+                    2'b01 : data = {16'b0, arg1[7 : 0], 8'b0};
+                    2'b10 : data = {8'b0, arg1[7 : 0], 16'b0};
+                    2'b11 : data = {arg1[7 : 0], 24'b0};
+                    default : data = 0;
+                    
+                endcase
                 inp_req = 0;
 
                 // Setting flags
@@ -157,7 +166,13 @@ module alu5 (
                 bytes = 4'b0011 << (tmp_res[1] * 2);
                 sext_req = 0;
                 we = 1;
-                data = (arg1 & 32'h0000FFFF) << (tmp_res[1] * 16);
+                
+                if (tmp_res[1]) begin
+                    data = {arg1[15 : 0], 16'b0};
+                end 
+                else begin
+                    data = {16'b0, arg1[15 : 0]};
+                end
                 inp_req = 0;
 
                 // Setting flags
@@ -216,6 +231,7 @@ module alu5 (
             else if (state == WAIT) begin
 
                 r_data2 <= data2;
+                r_err <= mem_err;
 
             end
         end
@@ -229,7 +245,7 @@ module alu5 (
                 if (!unknown_instr) begin
 
                     next_state = REQ;
-                    
+
                 end
                 else begin
 
@@ -273,7 +289,7 @@ module alu5 (
                 mem_we = 0;
                 mem_req = 0;
                 mem_wdata = 0;
-                r_err = 0;
+                mem_byteen = 0;
                 
                 half_val = 0;
                 byte_val = 0;
@@ -294,7 +310,7 @@ module alu5 (
                 mem_we = r_we;
                 mem_req = 1;
                 mem_wdata = r_data;
-                r_err = 0;
+                mem_byteen = 0;
                 
                 half_val = 0;
                 byte_val = 0;
@@ -315,7 +331,7 @@ module alu5 (
                 mem_we = r_we;
                 mem_req = 1;
                 mem_wdata = r_data;
-                r_err = mem_err;
+                mem_byteen = r_bytes;
 
                 if (r_inp_req) begin
                     data2 = mem_rdata;
@@ -341,7 +357,7 @@ module alu5 (
                 mem_we = 0;
                 mem_req = 0;
                 mem_wdata = 0;
-                r_err = 0;
+                mem_byteen = 0;
                 
                 half_val = 0;
                 byte_val = 0;
@@ -367,7 +383,7 @@ module alu5 (
                           
                         half_val = 0;
                         byte_val = 0;
-                         res = 0;
+                        res = 0;
                           
                     end
 
@@ -379,7 +395,7 @@ module alu5 (
                 if (r_sext_req) begin
 
                     casez(r_bytes)
-                        4'b1111: res = tmp_res;                                                 // full word
+                        4'b1111: res = r_data2;                                                 // full word
                         4'b0011, 4'b1100: res = {{16{half_val[15]}}, half_val};                 // LH
                         4'b0001,4'b0010,4'b0100,4'b1000: res = {{24{byte_val[7]}}, byte_val};   // LB
                         default: res = 0;
@@ -389,12 +405,11 @@ module alu5 (
                 else begin
 
                     casez(r_bytes)
-                        4'b1111: res = tmp_res;                                                 // LW
+                        4'b1111: res = r_data2;                                                 // LW
                         4'b0011, 4'b1100: res = {16'b0, half_val};                              // LHU
                         4'b0001,4'b0010,4'b0100,4'b1000: res = {24'b0, byte_val};               // LBU
                         default: res = 0;
                     endcase
-                    
                 end
             end
         endcase
