@@ -12,8 +12,9 @@ targets=(
     endianess
     registers
     csr
-    alu0
+    reset
     occupancy
+    alu0
 )
 
 # Create a logs folder
