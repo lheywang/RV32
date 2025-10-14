@@ -3,17 +3,17 @@
 import core_config_pkg::RST_TICK_CNT;
 
 module reset (
-    input  logic clk,          // system clock
-    input  logic rst_in,     // async active-low input reset (from button, POR, etc.)
-    output logic rst_out       // sync active-high reset output
+    input   logic                       clk,          // system clock
+    input   logic                       rst_in,     // async active-low input reset (from button, POR, etc.)
+    output  logic                       rst_out       // sync active-high reset output
 );
 
     // -------------------------------------------------------------------------
     // Internal signals
     // -------------------------------------------------------------------------
-    logic [1:0] sync_rst;          // two-flop synchronizer
-    logic       reset_active;      // internal "we are in reset" flag
-    integer     counter;           // countdown register
+    logic   [1:0]                       sync_rst;          // two-flop synchronizer
+    logic                               reset_active;      // internal "we are in reset" flag
+    integer                             counter;           // countdown register
 
     // -------------------------------------------------------------------------
     // Power-up initialization (for simulation and synthesis)
@@ -21,7 +21,7 @@ module reset (
     initial begin
         sync_rst      = 2'b00;
         reset_active  = 1'b1;
-        counter       = RST_TICK_CNT;
+        counter       = core_config_pkg::RST_TICK_CNT;
         rst_out       = 1'b1;
     end
 
