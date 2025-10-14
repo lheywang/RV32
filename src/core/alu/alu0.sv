@@ -2,6 +2,7 @@
 
 import core_config_pkg::XLEN;
 import core_config_pkg::alu_commands_t;
+import core_config_pkg::REG_ADDR_W;
 
 /* 
  *  ALU 0 : Used for doing simple logic and maths 
