@@ -57,7 +57,7 @@ module alu1 (
              */
             core_config_pkg::c_SLT : begin
                 // Calculation
-                tmp_res = ($unsigned(arg0) < $unsigned(arg1)) ? 1 : 0;
+                tmp_res = ($signed(arg0) < $signed(arg1)) ? 1 : 0;
 
                 // Setting flags
                 int_req = 1;
@@ -65,7 +65,7 @@ module alu1 (
             end
             core_config_pkg::c_SLTU : begin
                 // Calculation
-                tmp_res = ($signed(arg0) < $signed(arg1)) ? 1 : 0;
+                tmp_res = ($unsigned(arg0) < $unsigned(arg1)) ? 1 : 0;
 
                 // Setting flags
                 int_req = 1;

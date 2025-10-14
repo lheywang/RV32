@@ -8,8 +8,8 @@
 #include "utils/colors.h"
 #include "utils/utils.h"
 
-unsigned int inputs1[5] = {10, 32, 48, 64, 1024};
-unsigned int inputs2[5] = {0x7FFFF000, 4096, 0xAAAAAAAA, 0x55555555, 0};
+int inputs1[5] = {10, 32, 48, 64, 1024};
+int inputs2[5] = {10, -32, 48, 64, 1024};
 
 char *module = (char *)"ALU1";
 
@@ -25,7 +25,7 @@ int main(int argc, char **argv)
     Verilated::traceEverOn(true);
     VerilatedVcdC *tfp = new VerilatedVcdC;
     tb->trace(tfp, 99);
-    tfp->open("simout/alu0.vcd");
+    tfp->open("simout/alu1.vcd");
 
     initial_print(module);
 
@@ -40,47 +40,62 @@ int main(int argc, char **argv)
     int cycle = 0;
 
     // Formal calculation test
-    for (int i = 0; i < 5; i++)
+    for (int i = 5; i < 13; i++)
     {
         tb->cmd = i;
-        tb->i_rd = 0x1F;
+        tb->addr = 0x00001FFF;
+        tb->imm = 0x00001FFF;
 
         for (int ii = 0; ii < 5; ii++)
         {
             for (int iii = 0; iii < 5; iii++)
             {
                 cycle += 1;
-                tb->arg0 = inputs1[ii];
-                tb->arg1 = inputs2[iii];
-                stick(tb, tfp);
-                stick(tb, tfp);
-                stick(tb, tfp);
-                stick(tb, tfp);
+                tb->arg0 = (uint32_t)inputs1[ii];
+                tb->arg1 = (uint32_t)inputs2[iii];
+                tick(tb, tfp);
+                tick(tb, tfp);
 
                 equality_print((char *)"Busy", cycle, tb->busy, 1);
                 equality_print((char *)"Valid", cycle, tb->valid, 1);
-                equality_print((char *)"RD", cycle, tb->o_rd, 0x1F);
 
                 switch (i)
                 {
-                case 0: // ADD
-                    equality_print((char *)"Add", cycle, tb->res, (inputs1[ii] + inputs2[iii]));
+                case 5: // SLT
+                    equality_print((char *)"SLT - res", cycle, tb->res, (static_cast<int32_t>(inputs1[ii]) < static_cast<int32_t>(inputs2[iii])) ? 1 : 0);
+                    equality_print((char *)"SLT - req", cycle, tb->req, 0);
                     break;
 
-                case 1: // SUB
-                    equality_print((char *)"Sub", cycle, tb->res, (inputs1[ii] - inputs2[iii]));
+                case 6: // SLTU
+                    equality_print((char *)"SLTU - res", cycle, tb->res, (static_cast<uint32_t>(inputs1[ii]) < static_cast<uint32_t>(inputs2[iii]) ? 1 : 0));
+                    equality_print((char *)"SLTU - req", cycle, tb->req, 0);
                     break;
 
-                case 2: // AND
-                    equality_print((char *)"And", cycle, tb->res, (inputs1[ii] & inputs2[iii]));
+                case 7: // BEQ
+                    equality_print((char *)"BEQ - res", cycle, tb->res, 16382);
+                    equality_print((char *)"BEQ - req", cycle, tb->req, ((static_cast<int32_t>(inputs1[ii]) == static_cast<int32_t>(inputs2[iii])) ? 1 : 0));
                     break;
 
-                case 3: // OR
-                    equality_print((char *)"Or ", cycle, tb->res, (inputs1[ii] | inputs2[iii]));
+                case 8: // BNE
+                    equality_print((char *)"BNE - res", cycle, tb->res, 16382);
+                    equality_print((char *)"BNE - req", cycle, tb->req, ((static_cast<int32_t>(inputs1[ii]) == static_cast<int32_t>(inputs2[iii])) ? 0 : 1));
                     break;
 
-                case 4: // XOR
-                    equality_print((char *)"Or ", cycle, tb->res, (inputs1[ii] ^ inputs2[iii]));
+                case 9: // BLT
+                    equality_print((char *)"BLT - res", cycle, tb->res, 16382);
+                    equality_print((char *)"BLT - req", cycle, tb->req, ((static_cast<int32_t>(inputs1[ii]) < static_cast<int32_t>(inputs2[iii])) ? 1 : 0));
+                    break;
+                case 10: // BGE
+                    equality_print((char *)"BGE - res", cycle, tb->res, 16382);
+                    equality_print((char *)"BGE - req", cycle, tb->req, ((static_cast<int32_t>(inputs1[ii]) >= static_cast<int32_t>(inputs2[iii])) ? 1 : 0));
+                    break;
+                case 11: // BLTU
+                    equality_print((char *)"BLTU - res", cycle, tb->res, 16382);
+                    equality_print((char *)"BLTU - req", cycle, tb->req, (static_cast<uint32_t>(inputs1[ii]) < static_cast<uint32_t>(inputs2[iii])) ? 1 : 0);
+                    break;                
+                case 12: // BGEU
+                    equality_print((char *)"BGEU - res", cycle, tb->res, 16382);
+                    equality_print((char *)"BGEU - req", cycle, tb->req, (static_cast<uint32_t>(inputs1[ii]) >= static_cast<uint32_t>(inputs2[iii])) ? 1 : 0);
                     break;
                 }
 
@@ -88,19 +103,6 @@ int main(int argc, char **argv)
             }
         }
     }
-
-    // Overflow test
-    tb->cmd = 0;
-    tb->i_rd = 0x1F;
-    tb->arg0 = 0xFFFFFFFF;
-    tb->arg1 = 0xFFFFFFFF;
-    cycle += 1;
-    stick(tb, tfp);
-    stick(tb, tfp);
-    stick(tb, tfp);
-    stick(tb, tfp);
-
-    equality_print((char *)"Overflow", cycle, tb->o_error, 1);
 
     final_print(module);
 
