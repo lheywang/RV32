@@ -10,7 +10,7 @@ package core_config_pkg;
     parameter int REF_CLK_FREQ      = 200_000_000;      // 200 MHz
     parameter int CORE_CLK_FREQ     = 100_000_000;      // 100 MHz
     parameter int CORE_CLK_DUTY     = 50;               // Duty cycle in percentage
-    parameter int RST_TICK_CNT      = 10;               // Number of reference clock cycles for reset
+    parameter int RST_TICK_CNT      = 8;                // Number of reference clock cycles for reset
 
     // -------------------------------------------------------------------------
     // Data path widths

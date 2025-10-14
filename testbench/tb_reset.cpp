@@ -26,8 +26,16 @@ int main(int argc, char **argv)
 
     // Reset sequence
     tb->rst_in = 1;
+    tick(tb, tfp); // First tick not valid, but taht's fine
+    tick(tb, tfp);
 
     // Idle state
+    for (uint64_t k = 0; k < 10; k++)
+    {
+        equality_print((char *)"Active", k, tb->rst_out, 0);
+        tick(tb, tfp);
+    }
+
     for (uint64_t k = 0; k < 10; k++)
     {
         equality_print((char *)"Idle", k, tb->rst_out, 1);
@@ -37,18 +45,19 @@ int main(int argc, char **argv)
     tb->rst_in = 0;
     tick(tb, tfp);
     tb->rst_in = 1;
+    tick(tb, tfp);
 
     // Active state
     for (uint64_t k = 0; k < 10; k++)
     {
-        equality_print((char *)"Reset", 10 + k, tb->rst_out, 0);
+        equality_print((char *)"Reset", k, tb->rst_out, 0);
         tick(tb, tfp);
     }
 
     // Idle state
     for (uint64_t k = 0; k < 10; k++)
     {
-        equality_print((char *)"Idle", 20 + k, tb->rst_out, 1);
+        equality_print((char *)"Idle", k, tb->rst_out, 1);
         tick(tb, tfp);
     }
 
