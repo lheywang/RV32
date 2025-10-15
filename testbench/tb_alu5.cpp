@@ -8,11 +8,32 @@
 #include "utils/colors.h"
 #include "utils/utils.h"
 
+/*
+ *  Note for the future :
+ *
+ *  The testbench does test the logic within a certain timing, that
+ *  has not been fixed with the RAM IP at this point.
+ *
+ *  For the future, the ALU need some timings arrangements, and thus,
+ *  the testbench may fail. Just adapt the tick(tb, tfp) functions
+ *  calls accordingly.
+ */
+
 char *module = (char *)"ALU5";
+
+static inline int32_t sext8(uint32_t x)
+{
+    return (int32_t)((int8_t)(x & 0xFF));
+}
+
+static inline int32_t sext16(uint32_t x)
+{
+    return (int32_t)((int16_t)(x & 0xFFFF));
+}
 
 unsigned writedata[10] = {
     0xFFFFFFFF, 0x55555555, 0x12345678, 0x9ABCDEF0, 0x11111111,
-    0x33333333, 0xdeadbeef, 0xcafecafe, 0xbeefdead, 0xAAAAAAAA // Buffer of data to be sent to write.
+    0x33333333, 0xdeadbeef, 0xcafecafe, 0xbeefdead, 0xAAAAAAAA // Buffer of data to be used as IO
 };
 
 // Main
@@ -57,16 +78,29 @@ int main(int argc, char **argv)
             // Iterate over sub-addresses
             for (int iii = 0; iii < 4; iii++)
             {
-
-                int target_addr = 0x1000F0F0; // We want a constant address, and only move the byte enable signals
+                // We want a constant address, and only move the byte enable signals
+                int target_addr = tb->arg0;
                 tb->imm = iii;
 
                 tick(tb, tfp);
                 tick(tb, tfp);
 
-                equality_print((char *)"Write-memaddr", cycle, tb->mem_addr, target_addr);
-                equality_print((char *)"Write-we     ", cycle, tb->mem_we, 1);
-                equality_print((char *)"Write-req    ", cycle, tb->mem_req, 1);
+                equality_print((char *)"Write-memaddr",
+                               cycle,
+                               tb->mem_addr,
+                               target_addr);
+                equality_print((char *)"Write-we     ",
+                               cycle,
+                               tb->mem_we,
+                               1);
+                equality_print((char *)"Write-req    ",
+                               cycle,
+                               tb->mem_req,
+                               1);
+                equality_print((char *)"Write-busy   ",
+                               cycle,
+                               tb->busy,
+                               1);
 
                 switch (i)
                 {
@@ -74,19 +108,31 @@ int main(int argc, char **argv)
                     switch (iii)
                     {
                     case 0:
-                        equality_print((char *)"Write-wdata  ", cycle, tb->mem_wdata, (writedata[ii] & 0x000000FF));
+                        equality_print((char *)"Write-wdata  ",
+                                       cycle,
+                                       tb->mem_wdata,
+                                       (writedata[ii] & 0x000000FF));
                         break;
 
                     case 1:
-                        equality_print((char *)"Write-wdata  ", cycle, tb->mem_wdata, (writedata[ii] & 0x000000FF) << 8);
+                        equality_print((char *)"Write-wdata  ",
+                                       cycle,
+                                       tb->mem_wdata,
+                                       (writedata[ii] & 0x000000FF) << 8);
                         break;
 
                     case 2:
-                        equality_print((char *)"Write-wdata  ", cycle, tb->mem_wdata, (writedata[ii] & 0x000000FF) << 16);
+                        equality_print((char *)"Write-wdata  ",
+                                       cycle,
+                                       tb->mem_wdata,
+                                       (writedata[ii] & 0x000000FF) << 16);
                         break;
 
                     case 3:
-                        equality_print((char *)"Write-wdata  ", cycle, tb->mem_wdata, (writedata[ii] & 0x000000FF) << 24);
+                        equality_print((char *)"Write-wdata  ",
+                                       cycle,
+                                       tb->mem_wdata,
+                                       (writedata[ii] & 0x000000FF) << 24);
                         break;
                     }
                     break;
@@ -96,26 +142,44 @@ int main(int argc, char **argv)
                     {
                     case 0:
                     case 1:
-                        equality_print((char *)"Write-wdata  ", cycle, tb->mem_wdata, writedata[ii] & 0x0000FFFF);
+                        equality_print((char *)"Write-wdata  ",
+                                       cycle,
+                                       tb->mem_wdata,
+                                       writedata[ii] & 0x0000FFFF);
                         break;
 
                     case 2:
                     case 3:
-                        equality_print((char *)"Write-wdata  ", cycle, tb->mem_wdata, (writedata[ii] & 0x0000FFFF) << 16);
+                        equality_print((char *)"Write-wdata  ",
+                                       cycle,
+                                       tb->mem_wdata,
+                                       (writedata[ii] & 0x0000FFFF) << 16);
                         break;
                     }
                     break;
 
                 case 29: // SW
-                    equality_print((char *)"Write-wdata  ", cycle, tb->mem_wdata, writedata[ii]);
+                    equality_print((char *)"Write-wdata  ",
+                                   cycle,
+                                   tb->mem_wdata,
+                                   writedata[ii]);
                     break;
                 }
 
                 tick(tb, tfp);
 
-                equality_print((char *)"Write-valid  ", cycle, tb->valid, 1);
-                equality_print((char *)"Write-res    ", cycle, tb->res, 0);
-                equality_print((char *)"Write-res    ", cycle, tb->req, 0);
+                equality_print((char *)"Write-valid  ",
+                               cycle,
+                               tb->valid,
+                               1);
+                equality_print((char *)"Write-res    ",
+                               cycle,
+                               tb->res,
+                               0);
+                equality_print((char *)"Write-res    ",
+                               cycle,
+                               tb->req,
+                               0);
 
                 tb->clear = 1;
                 tick(tb, tfp);
@@ -144,64 +208,157 @@ int main(int argc, char **argv)
             for (int iii = 0; iii < 4; iii++)
             {
 
-                int target_addr = 0x1000F0F0; // We want a constant address, and only move the byte enable signals
+                // We want a constant address, and only move the byte enable signals
+                int target_addr = tb->arg0;
+
                 tb->imm = iii;
                 tb->clear = 0;
 
                 tick(tb, tfp);
                 tick(tb, tfp);
 
-                equality_print((char *)"Read-memaddr ", cycle, tb->mem_addr, target_addr);
-                equality_print((char *)"Read-we      ", cycle, tb->mem_we, 0);
-                equality_print((char *)"Read-req     ", cycle, tb->mem_req, 1);
+                equality_print((char *)"Read-memaddr ",
+                               cycle,
+                               tb->mem_addr,
+                               target_addr);
+                equality_print((char *)"Read-we      ",
+                               cycle,
+                               tb->mem_we,
+                               0);
+                equality_print((char *)"Read-req     ",
+                               cycle,
+                               tb->mem_req,
+                               1);
+                equality_print((char *)"Read-busy    ",
+                               cycle,
+                               tb->busy,
+                               1);
 
                 tick(tb, tfp);
                 tb->clear = 1;
 
                 switch (i)
                 {
-                case 27: // SB
+                case 30: // LB
                     switch (iii)
                     {
                     case 0:
-                        equality_print((char *)"Read-res     ", cycle, tb->res, (writedata[ii] & 0x000000FF));
+                        equality_print((char *)"Read-res     ",
+                                       cycle,
+                                       tb->res,
+                                       sext8((writedata[ii] >> 0) & 0x000000FF));
                         break;
 
                     case 1:
-                        equality_print((char *)"Read-res     ", cycle, tb->res, (writedata[ii] & 0x000000FF) << 8); // No ?
+                        equality_print((char *)"Read-res     ",
+                                       cycle,
+                                       tb->res,
+                                       sext8((writedata[ii] >> 8) & 0x000000FF));
                         break;
 
                     case 2:
-                        equality_print((char *)"Read-res     ", cycle, tb->res, (writedata[ii] & 0x000000FF) << 16); // No ?
+                        equality_print((char *)"Read-res     ",
+                                       cycle,
+                                       tb->res,
+                                       sext8((writedata[ii] >> 16) & 0x000000FF));
                         break;
 
                     case 3:
-                        equality_print((char *)"Read-res     ", cycle, tb->res, (writedata[ii] & 0x000000FF) << 24); // No ?
+                        equality_print((char *)"Read-res     ",
+                                       cycle,
+                                       tb->res,
+                                       sext8((writedata[ii] >> 24) & 0x000000FF));
                         break;
                     }
                     break;
 
-                case 28: // SH
+                case 31: // LH
                     switch (iii)
                     {
                     case 0:
                     case 1:
-                        equality_print((char *)"Read-res     ", cycle, tb->res, writedata[ii] & 0x0000FFFF);
+                        equality_print((char *)"Read-res     ",
+                                       cycle,
+                                       tb->res,
+                                       sext16((writedata[ii] >> 0) & 0x0000FFFF));
                         break;
 
                     case 2:
                     case 3:
-                        equality_print((char *)"Read-res     ", cycle, tb->res, (writedata[ii] & 0x0000FFFF) << 16); // No ??
+                        equality_print((char *)"Read-res     ",
+                                       cycle,
+                                       tb->res,
+                                       sext16((writedata[ii] >> 16) & 0x0000FFFF));
                         break;
                     }
                     break;
 
-                case 29: // SW
-                    equality_print((char *)"Read-res     ", cycle, tb->res, writedata[ii]);
+                case 32: // LW
+                    equality_print((char *)"Read-res     ",
+                                   cycle,
+                                   tb->res,
+                                   writedata[ii]);
+                    break;
+
+                case 33: // LBU
+                    switch (iii)
+                    {
+                    case 0:
+                        equality_print((char *)"Read-res     ",
+                                       cycle,
+                                       tb->res,
+                                       (writedata[ii] >> 0) & 0x000000FF);
+                        break;
+
+                    case 1:
+                        equality_print((char *)"Read-res     ",
+                                       cycle,
+                                       tb->res,
+                                       (writedata[ii] >> 8) & 0x000000FF);
+                        break;
+
+                    case 2:
+                        equality_print((char *)"Read-res     ",
+                                       cycle,
+                                       tb->res,
+                                       (writedata[ii] >> 16) & 0x000000FF);
+                        break;
+
+                    case 3:
+                        equality_print((char *)"Read-res     ",
+                                       cycle,
+                                       tb->res,
+                                       (writedata[ii] >> 24) & 0x000000FF);
+                        break;
+                    }
+                    break;
+
+                case 34: // LHU
+                    switch (iii)
+                    {
+                    case 0:
+                    case 1:
+                        equality_print((char *)"Read-res     ",
+                                       cycle,
+                                       tb->res,
+                                       writedata[ii] & 0x0000FFFF);
+                        break;
+
+                    case 2:
+                    case 3:
+                        equality_print((char *)"Read-res     ",
+                                       cycle,
+                                       tb->res,
+                                       (writedata[ii] >> 16) & 0x0000FFFF);
+                        break;
+                    }
                     break;
                 }
 
-                equality_print((char *)"Read-res     ", cycle, tb->valid, 1);
+                equality_print((char *)"Read-valid   ",
+                               cycle,
+                               tb->valid,
+                               1);
                 tick(tb, tfp);
 
                 cycle += 1;
@@ -211,11 +368,17 @@ int main(int argc, char **argv)
 
     tb->mem_err = 1;
     tb->imm = 0;
+    tb->clear = 0;
+
+    tick(tb, tfp);
+    tick(tb, tfp);
+    tick(tb, tfp);
+    tick(tb, tfp);
 
     // Checking that the ALU does perform the feedback of errors
     for (int i = 27; i < 35; i++)
     {
-        tb->cmd = i;
+        tb->cmd = 30;
 
         tick(tb, tfp);
         tick(tb, tfp);
@@ -224,20 +387,23 @@ int main(int argc, char **argv)
         tick(tb, tfp);
         tick(tb, tfp);
 
-        tb->clear = 1;
         equality_print((char *)"Read-o_error ", cycle, tb->o_error, 1);
+        tick(tb, tfp);
+        tb->clear = 1;
         tick(tb, tfp);
         tb->clear = 0;
 
         cycle += 1;
     }
 
+    tb->mem_err = 0;
+    tb->clear = 0;
+
     // Checking that the ALU does perform the feedback of errors
     for (int i = 10; i < 14; i++)
     {
-        tb->cmd = i;
+        tb->cmd = 0;
 
-        int target_addr = 0x1000F0F0; // We want a constant address, and only move the byte enable signals
         tb->mem_err = 0;
         tb->imm = 0;
 
@@ -247,6 +413,7 @@ int main(int argc, char **argv)
         tick(tb, tfp);
 
         equality_print((char *)"Read-i_error ", cycle, tb->i_error, 1);
+        tick(tb, tfp);
         tb->clear = 1;
         tick(tb, tfp);
         tb->clear = 0;

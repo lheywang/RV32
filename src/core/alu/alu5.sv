@@ -239,17 +239,21 @@ module alu5 (
 
     always_comb begin
 
+        i_error = 0;
+
         unique case (state)
 
             IDLE :  begin
                 if (!unknown_instr) begin
 
                     next_state = REQ;
+                    i_error = 0;
 
                 end
                 else begin
 
                     next_state = IDLE;
+                    i_error = 1;
 
                 end
             end 
@@ -283,7 +287,6 @@ module alu5 (
                 o_error = 0;
                 req = 0;
                 busy = 0;
-                i_error = 0;
 
                 mem_addr = 0;
                 mem_we = 0;
@@ -304,13 +307,12 @@ module alu5 (
                 o_error = 0;
                 req = 0;
                 busy = 1;
-                i_error = 0;
 
                 mem_addr = r_address;
                 mem_we = r_we;
                 mem_req = 1;
                 mem_wdata = r_data;
-                mem_byteen = 0;
+                mem_byteen = r_bytes;
                 
                 half_val = 0;
                 byte_val = 0;
@@ -325,7 +327,6 @@ module alu5 (
                 o_error = 0;
                 req = 0;
                 busy = 1;
-                i_error = 0;
 
                 mem_addr = r_address;
                 mem_we = r_we;
@@ -351,7 +352,6 @@ module alu5 (
                 o_error = r_err;
                 req = 0;
                 busy = 1;
-                i_error = unknown_instr;
 
                 mem_addr = 0;
                 mem_we = 0;
