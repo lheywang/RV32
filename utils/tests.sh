@@ -16,6 +16,7 @@ targets=(
     occupancy
     alu0
     alu1
+    alu5
 )
 
 # Create a logs folder
