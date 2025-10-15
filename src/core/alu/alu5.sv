@@ -44,38 +44,38 @@ module alu5 (
     input   logic                                           mem_err              
 );
 
-    typedef enum {IDLE, REQ, WAIT, OUT} MEM_FSM;
+    typedef enum logic [1:0] {IDLE, REQ, WAIT, OUT} MEM_FSM;
 
     /*
      *  Storages types
      */
-    logic   [(core_config_pkg::XLEN - 1) : 0]       tmp_res;
-    logic                                           sext_req;
-    logic   [(core_config_pkg::XLEN - 1) : 0]       address;
-    logic   [(core_config_pkg::XLEN - 1) : 0]       data;
-    logic   [(core_config_pkg::XLEN - 1) : 0]       data2;
-    logic   [((core_config_pkg::XLEN / 8) - 1) : 0] bytes;
-    logic                                           we;
-    logic   [(core_config_pkg::REG_ADDR_W - 1) : 0] r_rd;
-    logic                                           inp_req;
-    logic   [15 : 0]                                half_val;
-    logic   [7 : 0]                                 byte_val;
+    logic   [(core_config_pkg::XLEN - 1) : 0]               tmp_res;
+    logic                                                   sext_req;
+    logic   [(core_config_pkg::XLEN - 1) : 0]               address;
+    logic   [(core_config_pkg::XLEN - 1) : 0]               data;
+    logic   [(core_config_pkg::XLEN - 1) : 0]               data2;
+    logic   [((core_config_pkg::XLEN / 8) - 1) : 0]         bytes;
+    logic                                                   we;
+    logic   [(core_config_pkg::REG_ADDR_W - 1) : 0]         r_rd;
+    logic                                                   inp_req;
+    logic   [15 : 0]                                        half_val;
+    logic   [7 : 0]                                         byte_val;
 
     // Registered logic
-    logic   [((core_config_pkg::XLEN / 8) - 1) : 0] r_bytes;
-    logic   [(core_config_pkg::XLEN - 1) : 0]       r_address;
-    logic   [(core_config_pkg::XLEN - 1) : 0]       r_data;
-    logic   [(core_config_pkg::XLEN - 1) : 0]       r_data2;
-    logic                                           r_sext_req;
-    logic                                           r_we;
-    logic                                           r_err;
-    logic                                           r_inp_req;
+    logic   [((core_config_pkg::XLEN / 8) - 1) : 0]         r_bytes;
+    logic   [(core_config_pkg::XLEN - 1) : 0]               r_address;
+    logic   [(core_config_pkg::XLEN - 1) : 0]               r_data;
+    logic   [(core_config_pkg::XLEN - 1) : 0]               r_data2;
+    logic                                                   r_sext_req;
+    logic                                                   r_we;
+    logic                                                   r_err;
+    logic                                                   r_inp_req;
 
 
     // FSM sync
-    MEM_FSM                                         state;
-    MEM_FSM                                         next_state;
-    logic                                           unknown_instr;
+    MEM_FSM                                                 state;
+    MEM_FSM                                                 next_state;
+    logic                                                   unknown_instr;
 
     /*
      *  First, configure the different parameters of the request
@@ -194,7 +194,7 @@ module alu5 (
                 bytes = 0;
                 sext_req = 0;
                 we = 0;
-                     data = 0;
+                data = 0;
                 inp_req = 0;
 
                 // Setting flags
@@ -211,6 +211,15 @@ module alu5 (
         if (!rst_n) begin
 
             state <= IDLE;
+            r_bytes     <= 0;
+            r_address   <= 0;
+            r_sext_req  <= 0;
+            r_we        <= 0;
+            r_data      <= 0;
+            r_rd        <= 0;
+            r_inp_req   <= 0;
+            r_data2     <= 0;
+            r_err       <= 0;
 
         end
         else begin
@@ -219,13 +228,13 @@ module alu5 (
 
             if (state == IDLE) begin
 
-                r_bytes <= bytes;
-                r_address <= address;
-                r_sext_req <= sext_req;
-                r_we <= we;
-                r_data <= data;
-                r_rd <= i_rd;
-                r_inp_req <= inp_req;
+                r_bytes     <= bytes;
+                r_address   <= address;
+                r_sext_req  <= sext_req;
+                r_we        <= we;
+                r_data      <= data;
+                r_rd        <= i_rd;
+                r_inp_req   <= inp_req;
 
             end
             else if (state == WAIT) begin

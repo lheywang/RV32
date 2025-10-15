@@ -98,7 +98,7 @@ package core_config_pkg;
     /*
      *  List all of the known opcodes for the system.
      */
-    typedef enum {
+    typedef enum logic [6:0] {
         i_NOP,
 
         i_LUI,  i_AUIPC,
@@ -131,11 +131,11 @@ package core_config_pkg;
         i_CSRRSI, i_CSRRCI
     } opcodes_t;
 
-    typedef enum {
+    typedef enum logic [2:0] {
         DEC_U, DEC_I, DEC_R, DEC_B, DEC_S, DEC_J, DEC_NONE
     } decoders_t;
 
-    typedef enum {
+    typedef enum logic [5:0] {
         r_MSTATUS, r_MIE, r_MTVEC, r_MSCRATCH, r_MEPC, r_MCAUSE,
         r_MTVAL, r_MIP, 
         
@@ -150,7 +150,7 @@ package core_config_pkg;
         r_NONE              // Must be the last
     } csr_t;
 
-    typedef enum {
+    typedef enum logic [6:0] {
         // ALU 0 (basic arithemetic)
         c_ADD, c_SUB,
         c_AND, c_OR,  c_XOR,
