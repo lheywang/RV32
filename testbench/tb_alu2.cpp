@@ -8,7 +8,7 @@
 #include "utils/colors.h"
 #include "utils/utils.h"
 
-int input1[10] = {0, 1, 10, 100, 1000, -1, -10, -100, -1000, 0xFFFFFFFF};
+int input1[10] = {0, 1, 10, 100, 1000, -1, -10, -100, -1000, -2000000000};
 int input2[10] = {2, 5, 8, 17, 22, -32, -39, 1024, 18, 42};
 
 char *module = (char *)"ALU5";
