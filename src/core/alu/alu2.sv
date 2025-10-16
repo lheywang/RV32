@@ -94,30 +94,30 @@ module alu2 (
         shift_arithmetic            = 1'b0;
         unknown_instr               = 1'b0;
 
-        case (cmd)
+        unique case (cmd)
             // Multiplication operations
-            core_config_pkg::i_MUL: begin
+            core_config_pkg::c_MUL: begin
                 mul_start           = 1'b1;
                 mul_signed_a        = 1'b1;
                 mul_signed_b        = 1'b1;
                 unknown_instr       = 1'b0;
 
             end
-            core_config_pkg::i_MULH: begin
+            core_config_pkg::c_MULH: begin
                 mul_start           = 1'b1;
                 mul_signed_a        = 1'b1;
                 mul_signed_b        = 1'b1;
                 unknown_instr       = 1'b0;
 
             end
-            core_config_pkg::i_MULHSU: begin
+            core_config_pkg::c_MULHSU: begin
                 mul_start           = 1'b1;
                 mul_signed_a        = 1'b1;
                 mul_signed_b        = 1'b0;
                 unknown_instr       = 1'b0;
 
             end
-            core_config_pkg::i_MULHU: begin
+            core_config_pkg::c_MULHU: begin
                 mul_start           = 1'b1;
                 mul_signed_a        = 1'b0;
                 mul_signed_b        = 1'b0;
@@ -125,46 +125,46 @@ module alu2 (
 
             end
             // Division operations
-            core_config_pkg::i_DIV: begin
+            core_config_pkg::c_DIV: begin
                 div_start           = 1'b1;
                 div_signed          = 1'b1;
                 unknown_instr       = 1'b0;
 
             end
-            core_config_pkg::i_DIVU: begin
+            core_config_pkg::c_DIVU: begin
                 div_start           = 1'b1;
                 div_signed          = 1'b0;
                 unknown_instr       = 1'b0;
 
             end
-            core_config_pkg::i_REM: begin
+            core_config_pkg::c_REM: begin
                 div_start           = 1'b1;
                 div_signed          = 1'b1;
                 unknown_instr       = 1'b0;
 
             end
-            core_config_pkg::i_REMU: begin
+            core_config_pkg::c_REMU: begin
                 div_start           = 1'b1;
                 div_signed          = 1'b0;
                 unknown_instr       = 1'b0;
 
             end
             // Shift operations
-            core_config_pkg::i_SLL: begin
+            core_config_pkg::c_SLL: begin
                 shift_start         = 1'b1;
                 shift_left          = 1'b1;
                 shift_arithmetic    = 1'b0;
                 unknown_instr       = 1'b0;
 
             end
-            core_config_pkg::i_SRL: begin
+            core_config_pkg::c_SRL: begin
                 shift_start         = 1'b1;
                 shift_left          = 1'b0;
                 shift_arithmetic    = 1'b0;
                 unknown_instr       = 1'b0;
 
             end
-            core_config_pkg::i_SRA: begin
+            core_config_pkg::c_SRA: begin
                 shift_start         = 1'b1;
                 shift_left          = 1'b0;
                 shift_arithmetic    = 1'b1;
