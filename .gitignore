@@ -33,3 +33,4 @@ documentation/html/
 
 # Ramdisk files
 *.swp
+build/ramdisk
