@@ -1,0 +1,12 @@
+# RiscV decoders types
+
+[decoders_t]
+type = logic
+
+DEC_U
+DEC_I
+DEC_R
+DEC_B
+DEC_S
+DEC_J
+DEC_NONE

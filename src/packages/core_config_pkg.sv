@@ -103,84 +103,10 @@ package core_config_pkg;
     /*
      *  List all of the known opcodes for the system.
      */
-    typedef enum logic [6:0] {
-        i_NOP,
-
-        i_LUI,  i_AUIPC,
-
-        i_ADDI, i_SLTI, i_SLTIU,    i_XORI,
-        i_ANDI, i_SLLI, i_SRLI,     i_SRAI,
-        i_ORI,
-
-        i_ADD,  i_SUB,  i_SLL,      i_SLT,      i_SLTU,
-        i_XOR,  i_SRL,  i_SRA,      i_OR,       i_AND,
-
-        i_MUL,  i_MULH, i_MULHU,    i_MULHSU,
-        i_DIV,  i_DIVU, i_REM,      i_REMU,
-
-        i_FENCE,
-
-        i_BEQ,  i_BNE,  i_BLT,      i_BGE, 
-        i_BLTU, i_BGEU,
-
-        i_LB,   i_LH,   i_LW,       i_LBU,      i_LHU,
-        i_SB,   i_SH,   i_SW,
-
-        i_JAL,  i_JALR,
-
-        i_ECALL, 
-        i_EBREAK, 
-        i_MRET,
-
-        i_CSRRW, i_CSRRS, i_CSRRC, i_CSRRWI,
-        i_CSRRSI, i_CSRRCI
-    } opcodes_t;
-
-    typedef enum logic [2:0] {
-        DEC_U, DEC_I, DEC_R, DEC_B, DEC_S, DEC_J, DEC_NONE
-    } decoders_t;
-
-    typedef enum logic [4:0] {
-        r_MSTATUS, r_MIE, r_MTVEC, r_MSCRATCH, r_MEPC, r_MCAUSE,
-        r_MTVAL, r_MIP, 
-        
-        r_MVENDORID, r_MARCHID, r_MIMPID, r_MHARTID, r_MISA,
-
-        r_CYCLE, r_CYCLEH,  // CPU Cycle counters
-        r_INSTR, r_INSTRH,  // CPU Commited instructions
-        r_FLUSH, r_FLUSHH,  // CPU Pipeline flush counters
-        r_WAIT, r_WAITH,    // CPU Number of waited cycles
-        r_DECOD, r_DECODH,  // CPU Number of decoded instructions.
-
-        r_NONE              // Must be the last
-    } csr_t;
-
-    typedef enum logic [6:0] {
-        // ALU 0 (basic arithemetic) (0)
-        c_ADD, c_SUB,
-        c_AND, c_OR,  c_XOR,
-
-        // ALU 1 (branches and conditions) (5)
-        c_SLT, c_SLTU,
-        c_BEQ, c_BNE, c_BLT, c_BGE, c_BLTU, c_BGEU,
-
-        // ALU 2 & 3 (multiplications and divisions, multi cycles) (13)
-        c_SLL, c_SRL, c_SRA,
-        c_MUL, 
-        c_MULH, c_MULHSU, c_MULHU,
-        c_DIV, c_DIVU,
-        c_REM, c_REMU,
-
-        // ALU 4 (CSR) (24)
-        c_CSRRW, c_CSRRS, c_CSRRC,
-
-        // ALU 5 (Memory) (27)
-        c_SB, c_SH, c_SW,
-        c_LB, c_LH, c_LW, c_LBU, c_LHU,
-
-        // Common (35)
-        c_NONE
-    } alu_commands_t;
+    `include "generated_opcodes.svh"
+    `include "generated_decoders.svh"
+    `include "generated_csr.svh"
+    `include "generated_commands.svh"
 
     // -------------------------------------------------------------------------
     // Automated parameters
