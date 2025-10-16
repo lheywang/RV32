@@ -1,4 +1,6 @@
-# --- Variables ---
+# =======================================================
+# Variables
+# =======================================================
 TOP        ?= pcounter
 SRC_DIR    = src
 BUILD_DIR  = /mnt/ramdisk/
@@ -50,16 +52,34 @@ VERILOG_SRCS += $(SRC_DIR)/rv32.sv
 # Including top file 
 VERILOG_SRCS += $(SRC_DIR)/rv32.sv
 
+
+# =======================================================
+# Parameters and public recipes
+# =======================================================
 NPROC = $(shell nproc)
 export CXX="ccache clang++"
 
 # --- Verilator options ---
-VERILATOR_FLAGS = -Wall --trace -j 8 \
+VERILATOR_FLAGS = -Wall \
+				  --trace \
+				  -j 8 \
 				  --cc $(VERILOG_SRCS) \
-				  -O3 --output-split 0 \
+				  -O3 \
+				  --output-split 0 \
 				  --top-module $(TOP) \
 				  --exe $(CXX_TB) $(CCX_UTILS) \
-				  -Mdir $(BUILD_DIR)
+				  -Mdir $(BUILD_DIR) \
+				  -I$(BUILD_DIR)
+
+SYSTEMVERILOG_HEADERS = $(BUILD_DIR)/generated_opcodes.svh \
+						$(BUILD_DIR)/generated_decoders.svh \
+						$(BUILD_DIR)/generated_csr.svh \
+						$(BUILD_DIR)/generated_commands.svh
+
+CXX_HEADERS = $(BUILD_DIR)/generated_opcodes.h \
+			  $(BUILD_DIR)/generated_decoders.h \
+			  $(BUILD_DIR)/generated_csr.h \
+			  $(BUILD_DIR)/generated_commands.h
 
 # --- Default target ---
 all: run
@@ -70,13 +90,13 @@ run: $(BUILD_DIR)/V$(TOP)
 	@$(BUILD_DIR)V$(TOP)
 
 # Compile generated C++ from Verilator
-$(BUILD_DIR)/V$(TOP): $(VERILOG_SRCS) $(CXX_TB)
+$(BUILD_DIR)/V$(TOP): $(VERILOG_SRCS) $(CXX_TB) $(CXX_HEADERS) $(SYSTEMVERILOG_HEADERS)
 	verilator $(VERILATOR_FLAGS)
 	make -C $(BUILD_DIR) -f V$(TOP).mk V$(TOP) -j8 CXX="ccache clang++"
 
 # Clean
 clean:
-	rm -rf $(BUILD_DIR)/*
+	rm -rf $(BUILD_DIR)*
 	rm -rf simout/*.vcd
 	rm -rf logs/*.ans
 	rm -rf logs/*.log
@@ -87,7 +107,10 @@ tests:
 	@./utils/tests.sh
 
 mount:
+	@mkdir -p /mnt/ramdisk
+	@mkdir -p build/
 	@./utils/ramdisk.sh 
+	@ln -s /mnt/ramdisk/ build/
 
 doc: FORCE
 	doxygen DoxyFile && cd documentation/latex && make pdf
@@ -95,3 +118,28 @@ doc: FORCE
 FORCE: ;
 
 .PHONY: all run clean tests doc
+
+
+# =======================================================
+# Private recipes
+# =======================================================
+
+# Opcodes
+$(BUILD_DIR)/generated_opcodes.svh $(BUILD_DIR)/generated_opcodes.h : src/packages/def/opcodes.def
+	@echo "Generating opcodes enums ..."
+	./utils/def2header.py -s $(BUILD_DIR)/generated_opcodes.svh -c $(BUILD_DIR)/generated_opcodes.h $< 
+
+# Decoders
+$(BUILD_DIR)/generated_decoders.svh $(BUILD_DIR)/generated_decoders.h : src/packages/def/decoders.def
+	@echo "Generating decoders enums ..."
+	./utils/def2header.py -s $(BUILD_DIR)/generated_decoders.svh -c $(BUILD_DIR)/generated_decoders.h $<
+
+# CSRs
+$(BUILD_DIR)/generated_csr.svh $(BUILD_DIR)/generated_csr.h : src/packages/def/csr.def
+	@echo "Generating CSR enums ..."
+	./utils/def2header.py -s $(BUILD_DIR)/generated_csr.svh -c $(BUILD_DIR)/generated_csr.h $<
+
+# Commands
+$(BUILD_DIR)/generated_commands.svh $(BUILD_DIR)/generated_commands.h : src/packages/def/commands.def
+	@echo "Generating commands ..."
+	./utils/def2header.py -s $(BUILD_DIR)/generated_commands.svh -c $(BUILD_DIR)/generated_commands.h $<
