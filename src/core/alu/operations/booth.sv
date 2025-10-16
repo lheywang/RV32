@@ -118,7 +118,7 @@ module booth (
                     endcase
                     
                     // Arithmetic right shift by 2
-                    partial_product <= $signed(temp_pp) >>> 2;
+                    partial_product <= $signed(temp_pp) >>> 2; // Critical path here !!
                     counter         <= counter + 1;
                     
                     if (counter == max_iterations - 1) begin

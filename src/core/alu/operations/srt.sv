@@ -28,7 +28,6 @@ module srt(
     logic signed    [(core_config_pkg::XLEN + 2) : 0]       partial_remainder;
     logic signed    [(core_config_pkg::XLEN - 1) : 0]       partial_quotient;
     logic signed    [(core_config_pkg::XLEN + 2) : 0]       divisor_ext;
-    logic signed    [(core_config_pkg::XLEN + 2) : 0]       divisor_x2;
     logic           [5:0]                                   counter;
     logic           [5:0]                                   max_iterations;
     logic                                                   dividend_negative;
@@ -44,7 +43,6 @@ module srt(
             partial_remainder   <= '0;
             partial_quotient    <= '0;
             divisor_ext         <= '0;
-            divisor_x2          <= '0;
             counter             <= '0;
             max_iterations      <= '0;
             quotient            <= '0;
@@ -52,7 +50,6 @@ module srt(
             done                <= 1'b0;
             div_by_zero         <= 1'b0;
             dividend_negative   <= 1'b0;
-            // divisor_negative    <= 1'b0;
             quotient_negative   <= 1'b0;
 
         end else begin
@@ -105,13 +102,11 @@ module srt(
                         if (divisor[(core_config_pkg::XLEN - 1)]) begin
 
                             divisor_ext         <= {{3{1'b0}}, (~divisor + 1'b1)};
-                            divisor_x2          <= {{3{1'b0}}, (~divisor + 1'b1)} << 1;
 
                         end 
                         else begin
 
                             divisor_ext         <= {{3{1'b0}}, divisor};
-                            divisor_x2          <= {{3{1'b0}}, divisor} << 1;
                             
                         end
                     end 
@@ -119,11 +114,9 @@ module srt(
 
                         // Unsigned: just zero extend
                         dividend_negative       <= 1'b0;
-                        // divisor_negative        <= 1'b0;
                         quotient_negative       <= 1'b0;
                         partial_remainder       <= {{3{1'b0}}, dividend};
                         divisor_ext             <= {{3{1'b0}}, divisor};
-                        divisor_x2              <= {{3{1'b0}}, divisor} << 1;
 
                     end
                     
@@ -135,32 +128,30 @@ module srt(
                 
                 COMPUTE: begin
 
-                    logic signed [(core_config_pkg::XLEN + 2) : 0] temp_rem;
                     logic [1:0] q_digit;
                     
-                    // Left shift by 2
-                    temp_rem                    = partial_remainder << 2; // Partial reminder is on the critical path. To change !! (use top 50 critical path)
+                    // Partial reminder is on the critical path. To change !! (use top 50 critical path)
                     
                     // Radix-4 quotient selection (simplified)
-                    if (temp_rem >= divisor_x2) begin
-
-                        temp_rem                = temp_rem - divisor_x2;
+                    if ((partial_remainder << 2) >= (divisor_ext << 1)) begin
+                        
+                        partial_remainder       <= (partial_remainder << 2) - (divisor_ext << 1);
                         q_digit                 = 2'b10;
 
                     end 
-                    else if (temp_rem >= divisor_ext) begin
+                    else if ((partial_remainder << 2) >= divisor_ext) begin
 
-                        temp_rem                = temp_rem - divisor_ext;
+                        partial_remainder       <= (partial_remainder << 2) - divisor_ext;
                         q_digit                 = 2'b01;
 
                     end 
                     else begin
                         
+                        partial_remainder       <= (partial_remainder << 2);
                         q_digit                 = 2'b00;
 
                     end
                     
-                    partial_remainder           <= temp_rem;
                     partial_quotient            <= {partial_quotient[(core_config_pkg::XLEN - 3) : 0], q_digit};
                     counter                     <= counter + 1;
                     
@@ -185,14 +176,6 @@ module srt(
                         state                   <= ADJUST_SIGN;
 
                     end
-
-                    // while (partial_remainder >= divisor_ext) begin                  // Change this thing with a sync loop --> Critical path
-
-                    //     partial_remainder <= partial_remainder - divisor_ext;
-                    //     partial_quotient <= partial_quotient + 1;
-
-                    // end
-                    // state <= ADJUST_SIGN;
                 end
                 
                 ADJUST_SIGN: begin
