@@ -102,6 +102,9 @@ package core_config_pkg;
     // -------------------------------------------------------------------------
     /*
      *  List all of the known opcodes for the system.
+     *  Theses are included from a dynamically generated file, from the def/*.def files.
+     *  This enable the ability to share a single file between the systemverilog and C++ files,
+     *  to make easier the debugging.
      */
     `include "generated_opcodes.svh"
     `include "generated_decoders.svh"
