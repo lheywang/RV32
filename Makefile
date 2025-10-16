@@ -9,6 +9,9 @@ CCX_UTILS  = $(abspath testbench/utils/utils.cpp)
 VERILOG_SRCS = $(SRC_DIR)/packages/core_config_pkg.sv 
 
 # Including ALU files
+VERILOG_SRCS += $(SRC_DIR)/core/alu/operations/booth.sv
+VERILOG_SRCS += $(SRC_DIR)/core/alu/operations/srt.sv
+VERILOG_SRCS += $(SRC_DIR)/core/alu/operations/shift.sv
 VERILOG_SRCS += $(SRC_DIR)/core/alu/alu0.sv
 VERILOG_SRCS += $(SRC_DIR)/core/alu/alu1.sv
 VERILOG_SRCS += $(SRC_DIR)/core/alu/alu2.sv
