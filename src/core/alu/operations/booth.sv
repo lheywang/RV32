@@ -91,7 +91,7 @@ module booth (
                     extended_multiplicand   <= sign_extend_multiplicand(multiplicand, signed_multiplicand);
                     multiplicand_x2         <= sign_extend_multiplicand(multiplicand, signed_multiplicand) << 1;
                     
-                    max_iterations          <= {(core_config_pkg::XLEN + 1) / 2}[5 : 0];
+                    max_iterations          <= {6'((core_config_pkg::XLEN + 1) / 2)};
                     counter                 <= '0;
                     state                   <= COMPUTE;
 

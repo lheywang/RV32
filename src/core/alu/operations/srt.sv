@@ -128,7 +128,7 @@ module srt(
                     end
                     
                     partial_quotient            <= '0;
-                    max_iterations              <= {(core_config_pkg::XLEN + 1) / 2}[5 : 0];
+                    max_iterations              <= {6'((core_config_pkg::XLEN + 1) / 2)};
                     counter                     <= '0;
                     state                       <= COMPUTE;
                 end
@@ -139,7 +139,7 @@ module srt(
                     logic [1:0] q_digit;
                     
                     // Left shift by 2
-                    temp_rem                    = partial_remainder << 2;
+                    temp_rem                    = partial_remainder << 2; // Partial reminder is on the critical path. To change !! (use top 50 critical path)
                     
                     // Radix-4 quotient selection (simplified)
                     if (temp_rem >= divisor_x2) begin

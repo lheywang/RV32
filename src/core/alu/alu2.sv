@@ -289,7 +289,7 @@ module alu2 (
                     core_config_pkg::i_DIVU,
                     core_config_pkg::i_REM,
                     core_config_pkg::i_REMU :   o_error = div_by_zero;
-                    default:                    o_error = 0'b0;
+                    default:                    o_error = 1'b0;
 
                 endcase
 
