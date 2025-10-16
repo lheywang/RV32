@@ -7,6 +7,7 @@
 
 #include "utils/colors.h"
 #include "utils/utils.h"
+#include "generated_commands.h"
 
 int input1[10] = {0, 1, 10, 100, 1000, -1, -10, -100, -1000, -2000000000};
 int input2[10] = {2, 5, 8, 17, 22, -32, -39, 1024, 18, 42};
@@ -37,38 +38,61 @@ int main(int argc, char **argv)
     stick(tb, tfp);
     stick(tb, tfp);
 
+    /*
+     *  Since theses operations won't be taking the same time, using a single
+     *  loop as before isn't "easy". Thus, we split them into different smaller
+     *  loops, longer code but easier to understand.
+     */
+
     // MUL
-    tb->cmd = 16;
+    tb->cmd = alu_commands_t::c_MUL;
+
+    for (int i = 0; i < 10; i++)
+    {
+        for (int ii = 0; ii < 10; ii++)
+        {
+            tb->arg0 = input1[i];
+            tb->arg1 = input2[ii];
+
+            // Compute the results
+            for (int k = 0; k < 32; k++)
+            {
+                tick(tb, tfp);
+            }
+
+            // Asserts for results
+        }
+    }
 
     // MULH
-    tb->cmd = 17;
+    tb->cmd = alu_commands_t::c_MULH;
 
     // MULHSU
-    tb->cmd = 18;
+    tb->cmd = alu_commands_t::c_MULHSU;
 
     // MULHU
-    tb->cmd = 19;
+    tb->cmd = alu_commands_t::c_MULHU;
 
     // DIV
-    tb->cmd = 20;
+    tb->cmd = alu_commands_t::c_DIV;
 
     // DIVU
-    tb->cmd = 21;
+    tb->cmd = alu_commands_t::c_DIVU;
 
     // REM
-    tb->cmd = 22;
+    tb->cmd = alu_commands_t::c_REM;
 
     // REMU
-    tb->cmd = 23;
+    tb->cmd = alu_commands_t::c_REMU;
 
     // SLL
-    tb->cmd = 13;
+    tb->cmd = alu_commands_t::c_SLL;
 
     // SRL
-    tb->cmd = 14;
+    tb->cmd = alu_commands_t::c_SRL;
 
     // SRA
-    tb->cmd = 15;
+    tb->cmd = alu_commands_t::c_SRA;
 
     int cycle = 0;
 
