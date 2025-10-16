@@ -62,14 +62,14 @@ module shift (
 
         if (!rst_n) begin
 
-            state                   <= IDLE;
-            shift_reg               <= '0;
-            remaining_shift         <= '0;
-            current_shift           <= '0;
-            stored_left             <= '0;
-            stored_arith            <= '0;
-            data_out                <= '0;
-            done                    <= 1'b0;
+            state                       <= IDLE;
+            shift_reg                   <= '0;
+            remaining_shift             <= '0;
+            current_shift               <= '0;
+            stored_left                 <= '0;
+            stored_arith                <= '0;
+            data_out                    <= '0;
+            done                        <= 1'b0;
 
         end else begin
 
@@ -77,29 +77,29 @@ module shift (
 
                 IDLE: begin
 
-                    done            <= 1'b0;
+                    done                <= 1'b0;
 
                     if (start) begin
 
-                        state       <= INIT;
+                        state           <= INIT;
 
                     end
                 end
                 
                 INIT: begin
 
-                    shift_reg       <= data_in;
-                    remaining_shift <= shift_amount;
-                    stored_left     <= shift_left;
-                    stored_arith    <= arithmetic;
+                    shift_reg           <= data_in;
+                    remaining_shift     <= shift_amount;
+                    stored_left         <= shift_left;
+                    stored_arith        <= arithmetic;
                     
                     if (shift_amount == 0) begin
 
-                        state       <= DONE;
+                        state           <= DONE;
 
                     end else begin
 
-                        state       <= SHIFT;
+                        state           <= SHIFT;
 
                     end
                 end
@@ -108,36 +108,36 @@ module shift (
 
                     if (remaining_shift > core_config_pkg::MAX_SHIFT_PER_CYCLE) begin
 
-                        current_shift = core_config_pkg::MAX_SHIFT_PER_CYCLE;
+                        current_shift   <= core_config_pkg::MAX_SHIFT_PER_CYCLE;
 
                     end 
                     else begin
 
-                        current_shift = remaining_shift;
+                        current_shift   <= remaining_shift;
 
                     end
                     
-                    shift_reg       <= barrel_shift_comb(
-                                        shift_reg, 
-                                        current_shift[2:0],
-                                        stored_left,
-                                        stored_arith
-                                    );
+                    shift_reg           <= barrel_shift_comb(
+                                            shift_reg, 
+                                            current_shift[2:0],
+                                            stored_left,
+                                            stored_arith
+                                        );
                     
                     remaining_shift <= remaining_shift - current_shift;
                     
-                    if (remaining_shift <= MAX_SHIFT_PER_CYCLE) begin
+                    if (remaining_shift == MAX_SHIFT_PER_CYCLE) begin
 
-                        state <= DONE;
+                        state           <= DONE;
 
                     end
                 end
                 
                 DONE: begin
 
-                    data_out    <= shift_reg;
-                    done        <= 1'b1;
-                    state       <= IDLE;
+                    data_out            <= shift_reg;
+                    done                <= 1'b1;
+                    state               <= IDLE;
 
                 end
             endcase

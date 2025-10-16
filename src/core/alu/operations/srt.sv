@@ -32,7 +32,7 @@ module srt(
     logic           [5:0]                                   counter;
     logic           [5:0]                                   max_iterations;
     logic                                                   dividend_negative;
-    logic                                                   divisor_negative;
+    // logic                                                   divisor_negative;
     logic                                                   quotient_negative;
     
     // FSM and Datapath
@@ -52,7 +52,7 @@ module srt(
             done                <= 1'b0;
             div_by_zero         <= 1'b0;
             dividend_negative   <= 1'b0;
-            divisor_negative    <= 1'b0;
+            // divisor_negative    <= 1'b0;
             quotient_negative   <= 1'b0;
 
         end else begin
@@ -87,7 +87,7 @@ module srt(
                     if (is_signed) begin
                         
                         dividend_negative       <= dividend[(core_config_pkg::XLEN - 1)];
-                        divisor_negative        <= divisor[(core_config_pkg::XLEN - 1)];
+                        // divisor_negative        <= divisor[(core_config_pkg::XLEN - 1)];
                         quotient_negative       <= dividend[(core_config_pkg::XLEN - 1)] ^ divisor[(core_config_pkg::XLEN - 1)];
                         
                         // Convert to positive for computation
@@ -119,7 +119,7 @@ module srt(
 
                         // Unsigned: just zero extend
                         dividend_negative       <= 1'b0;
-                        divisor_negative        <= 1'b0;
+                        // divisor_negative        <= 1'b0;
                         quotient_negative       <= 1'b0;
                         partial_remainder       <= {{3{1'b0}}, dividend};
                         divisor_ext             <= {{3{1'b0}}, divisor};
@@ -128,7 +128,7 @@ module srt(
                     end
                     
                     partial_quotient            <= '0;
-                    max_iterations              <= (core_config_pkg::XLEN + 1) / 2;
+                    max_iterations              <= {(core_config_pkg::XLEN + 1) / 2}[5 : 0];
                     counter                     <= '0;
                     state                       <= COMPUTE;
                 end
@@ -232,6 +232,10 @@ module srt(
                     end
 
                     done                        <= 1'b1;
+                    state                       <= IDLE;
+                end
+
+                default begin
                     state                       <= IDLE;
                 end
             endcase

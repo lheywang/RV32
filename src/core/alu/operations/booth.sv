@@ -24,7 +24,7 @@ module booth (
 
     state_t                                                     state;
     
-    logic signed    [((2 * core_config_pkg::XLEN) - 1) : 0]     partial_product;
+    logic signed    [((2 * core_config_pkg::XLEN) + 1) : 0]     partial_product;
     logic signed    [((2 * core_config_pkg::XLEN) - 1) : 0]     extended_multiplicand;
     logic signed    [((2 * core_config_pkg::XLEN) - 1) : 0]     multiplicand_x2;
     logic           [5:0]                                       counter;
@@ -91,7 +91,7 @@ module booth (
                     extended_multiplicand   <= sign_extend_multiplicand(multiplicand, signed_multiplicand);
                     multiplicand_x2         <= sign_extend_multiplicand(multiplicand, signed_multiplicand) << 1;
                     
-                    max_iterations          <= (core_config_pkg::XLEN + 1) / 2;
+                    max_iterations          <= {(core_config_pkg::XLEN + 1) / 2}[5 : 0];
                     counter                 <= '0;
                     state                   <= COMPUTE;
 
@@ -130,9 +130,9 @@ module booth (
                 
                 DONE: begin
 
-                    product         <= partial_product[((2 * core_config_pkg::XLEN) + 1) : 1];
-                    product_low     <= partial_product[(core_config_pkg::XLEN - 1) : 0];        // MUL result
-                    product_high    <= partial_product[((2 * core_config_pkg::XLEN) - 1): (2 * core_config_pkg::XLEN)]; // MULH/MULHU/MULHSU result
+                    product         <= partial_product[(2 * core_config_pkg::XLEN) : 1];
+                    product_low     <= partial_product[(core_config_pkg::XLEN - 1) : 0];                            // MUL result
+                    product_high    <= partial_product[((2 * core_config_pkg::XLEN) - 1): core_config_pkg::XLEN];   // MULH/MULHU/MULHSU result
                     done            <= 1'b1;
                     state           <= IDLE;
 
