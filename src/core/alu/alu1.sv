@@ -60,6 +60,7 @@ module alu1 (
                 tmp_res         = ($signed(arg0) < $signed(arg1)) ? 33'b1 : 33'b0;
 
                 // Setting flags
+                act_needed      = 1'b0;
                 int_req         = 1'b1;
                 unknown_instr   = 1'b0;
             end
@@ -81,7 +82,7 @@ module alu1 (
                 tmp_res         = {1'b0, addr} + {1'b0, imm};
 
                 // Setting flags
-                act_needed      = (arg0 == arg1) ? 33'b1 : 33'b0;
+                act_needed      = (arg0 == arg1) ? 1'b1 : 1'b0;
                 int_req         = 1'b1;
                 unknown_instr   = 1'b0;
             end
@@ -108,7 +109,7 @@ module alu1 (
                 tmp_res         = {1'b0, addr} + {1'b0, imm};
 
                 // Setting flags
-                act_needed      = ($signed(arg0) < $signed(arg1)) ? 33'b1 : 33'b0;
+                act_needed      = ($signed(arg0) < $signed(arg1)) ? 1'b1 : 1'b0;
                 int_req         = 1'b1;
                 unknown_instr   = 1'b0;
             end
@@ -117,7 +118,7 @@ module alu1 (
                 tmp_res         = {1'b0, addr} + {1'b0, imm};
 
                 // Setting flags
-                act_needed      = ($unsigned(arg0) >= $unsigned(arg1)) ? 33'b1 : 33'b0;
+                act_needed      = ($unsigned(arg0) >= $unsigned(arg1)) ? 1'b1 : 1'b0;
                 int_req         = 1'b1;
                 unknown_instr   = 1'b0;
             end
@@ -126,7 +127,7 @@ module alu1 (
                 tmp_res         = {1'b0, addr} + {1'b0, imm};
 
                 // Setting flags
-                act_needed      = ($unsigned(arg0) < $unsigned(arg1)) ? 33'b1 : 33'b0;
+                act_needed      = ($unsigned(arg0) < $unsigned(arg1)) ? 1'b1 : 1'b0;
                 int_req         = 1'b1;
                 unknown_instr   = 1'b0;
             end
@@ -151,11 +152,11 @@ module alu1 (
         if (!rst_n) begin
 
             busy                <= 1'b0;
-            res                 <= 1'b0;
+            res                 <= 32'b0;
             i_error             <= 1'b0;
             o_error             <= 1'b0;
             req                 <= 1'b0;
-            o_rd                <= 1'b0;
+            o_rd                <= 5'b0;
             valid               <= 1'b0;
             end_of_op           <= 1'b0;
 
@@ -163,11 +164,11 @@ module alu1 (
         else if (clear && end_of_op) begin
 
             busy                <= 1'b0;
-            res                 <= 1'b0;
+            res                 <= 32'b0;
             i_error             <= 1'b0;
             o_error             <= 1'b0;
             req                 <= 1'b0;
-            o_rd                <= 1'b0;
+            o_rd                <= 5'b0;
             valid               <= 1'b0;
             end_of_op           <= 1'b0;
 

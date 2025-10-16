@@ -92,7 +92,7 @@ module alu5 (
                 bytes           = 4'b0001 << tmp_res[1:0];
                 sext_req        = 1'b1;
                 we              = 1'b0;
-                data            = 1'b0;
+                data            = 32'b0;
                 inp_req         = 1'b1;
 
                 // Setting flags
@@ -103,7 +103,7 @@ module alu5 (
                 bytes           = 4'b0011 << (tmp_res[1] * 2);
                 sext_req        = 1'b1;
                 we              = 1'b0;
-                data            = 1'b0;
+                data            = 32'b0;
                 inp_req         = 1'b1;
 
                 // Setting flags
@@ -114,7 +114,7 @@ module alu5 (
                 bytes           = 4'b1111;
                 sext_req        = 1'b1;
                 we              = 1'b0;
-                data            = 1'b0;
+                data            = 32'b0;
                 inp_req         = 1'b1;
 
                 // Setting flags
@@ -125,7 +125,7 @@ module alu5 (
                 bytes           = 4'b0001 << tmp_res[1:0];
                 sext_req        = 1'b0;
                 we              = 1'b0;
-                data            = 1'b0;
+                data            = 32'b0;
                 inp_req         = 1'b1;
 
                 // Setting flags
@@ -136,7 +136,7 @@ module alu5 (
                 bytes           = 4'b0011 << (tmp_res[1] * 2);
                 sext_req        = 1'b0;
                 we              = 1'b0;
-                data            = 1'b0;
+                data            = 32'b0;
                 inp_req         = 1'b1;
 
                 // Setting flags
@@ -191,10 +191,10 @@ module alu5 (
             end
             default : begin
                 // Calculation
-                bytes           = 1'b0;
+                bytes           = 4'b0;
                 sext_req        = 1'b0;
                 we              = 1'b0;
-                data            = 1'b0;
+                data            = 32'b0;
                 inp_req         = 1'b0;
 
                 // Setting flags
@@ -211,14 +211,14 @@ module alu5 (
         if (!rst_n) begin
 
             state               <= IDLE;
-            r_bytes             <= 1'b0;
-            r_address           <= 1'b0;
+            r_bytes             <= 4'b0;
+            r_address           <= 32'b0;
             r_sext_req          <= 1'b0;
             r_we                <= 1'b0;
-            r_data              <= 1'b0;
-            r_rd                <= 1'b0;
+            r_data              <= 32'b0;
+            r_rd                <= 5'b0;
             r_inp_req           <= 1'b0;
-            r_data2             <= 1'b0;
+            r_data2             <= 32'b0;
             r_err               <= 1'b0;
 
         end
@@ -290,28 +290,28 @@ module alu5 (
 
             IDLE : begin
 
-                res             = 1'b0;
-                o_rd            = 1'b0;
+                res             = 32'b0;
+                o_rd            = 5'b0;
                 valid           = 1'b0;
                 o_error         = 1'b0;
                 req             = 1'b0;
                 busy            = 1'b0;
 
-                mem_addr        = 1'b0;
+                mem_addr        = 32'b0;
                 mem_we          = 1'b0;
                 mem_req         = 1'b0;
-                mem_wdata       = 1'b0;
-                mem_byteen      = 1'b0;
+                mem_wdata       = 32'b0;
+                mem_byteen      = 4'b0;
                 
-                half_val        = 1'b0;
-                byte_val        = 1'b0;
-                data2           = 1'b0;
+                half_val        = 16'b0;
+                byte_val        = 8'b0;
+                data2           = 32'b0;
                      
             end
             REQ : begin
 
-                res             = 1'b0;
-                o_rd            = 1'b0;
+                res             = 32'b0;
+                o_rd            = 5'b0;
                 valid           = 1'b0;
                 o_error         = 1'b0;
                 req             = 1'b0;
@@ -323,14 +323,14 @@ module alu5 (
                 mem_wdata       = r_data;
                 mem_byteen      = r_bytes;
                 
-                half_val        = 1'b0;
-                byte_val        = 1'b0;
-                data2           = 1'b0;
+                half_val        = 16'b0;
+                byte_val        = 8'b0;
+                data2           = 32'b0;
 
             end
             WAIT : begin
 
-                res             = 1'b0;
+                res             = 32'b0;
                 o_rd            = r_rd;
                 valid           = 1'b0;
                 o_error         = 1'b0;
@@ -347,11 +347,11 @@ module alu5 (
                     data2       = mem_rdata;
                 end
                 else begin
-                    data2       = 1'b0;
+                    data2       = 32'b0;
                 end
                      
-                half_val        = 1'b0;
-                byte_val        = 1'b0;
+                half_val        = 16'b0;
+                byte_val        = 8'b0;
 
             end
             OUT : begin
@@ -362,16 +362,16 @@ module alu5 (
                 req             = 1'b0;
                 busy            = 1'b1;
 
-                mem_addr        = 1'b0;
+                mem_addr        = 32'b0;
                 mem_we          = 1'b0;
                 mem_req         = 1'b0;
-                mem_wdata       = 1'b0;
-                mem_byteen      = 1'b0;
+                mem_wdata       = 32'b0;
+                mem_byteen      = 4'b0;
                 
-                half_val        = 1'b0;
-                byte_val        = 1'b0;
-                res             = 1'b0;
-                data2           = 1'b0;
+                half_val        = 16'b0;
+                byte_val        = 8'b0;
+                res             = 32'b0;
+                data2           = 32'b0;
 
                 case (r_bytes)
 
@@ -390,9 +390,9 @@ module alu5 (
                           
                     default : begin
                           
-                        half_val        = 1'b0;
-                        byte_val        = 1'b0;
-                        res             = 1'b0;
+                        half_val        = 16'b0;
+                        byte_val        = 8'b0;
+                        res             = 32'b0;
                           
                     end
 

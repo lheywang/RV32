@@ -137,11 +137,11 @@ module decoder (
 
         // Default assignments (avoid latch inference)
         opcode                              = core_config_pkg::i_NOP;
-        dec_illegal2                   = 1'b0;
-        rd                                  = 1'b0;
-        rs1                                 = 1'b0;
-        rs2                                 = 1'b0;
-        imm                                 = 1'b0;
+        dec_illegal2                        = 1'b0;
+        rd                                  = 5'b0;
+        rs1                                 = 5'b0;
+        rs2                                 = 5'b0;
+        imm                                 = 32'b0;
 
         // Using the right decoder...
         unique case (r_selected_decoder)

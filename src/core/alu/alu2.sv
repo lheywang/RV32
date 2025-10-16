@@ -100,45 +100,53 @@ module alu2 (
                 mul_start           = 1'b1;
                 mul_signed_a        = 1'b1;
                 mul_signed_b        = 1'b1;
+                unknown_instr       = 1'b0;
 
             end
             core_config_pkg::i_MULH: begin
                 mul_start           = 1'b1;
                 mul_signed_a        = 1'b1;
                 mul_signed_b        = 1'b1;
+                unknown_instr       = 1'b0;
 
             end
             core_config_pkg::i_MULHSU: begin
                 mul_start           = 1'b1;
                 mul_signed_a        = 1'b1;
                 mul_signed_b        = 1'b0;
+                unknown_instr       = 1'b0;
 
             end
             core_config_pkg::i_MULHU: begin
                 mul_start           = 1'b1;
                 mul_signed_a        = 1'b0;
                 mul_signed_b        = 1'b0;
+                unknown_instr       = 1'b0;
 
             end
             // Division operations
             core_config_pkg::i_DIV: begin
                 div_start           = 1'b1;
                 div_signed          = 1'b1;
+                unknown_instr       = 1'b0;
 
             end
             core_config_pkg::i_DIVU: begin
                 div_start           = 1'b1;
                 div_signed          = 1'b0;
+                unknown_instr       = 1'b0;
 
             end
             core_config_pkg::i_REM: begin
                 div_start           = 1'b1;
                 div_signed          = 1'b1;
+                unknown_instr       = 1'b0;
 
             end
             core_config_pkg::i_REMU: begin
                 div_start           = 1'b1;
                 div_signed          = 1'b0;
+                unknown_instr       = 1'b0;
 
             end
             // Shift operations
@@ -146,18 +154,21 @@ module alu2 (
                 shift_start         = 1'b1;
                 shift_left          = 1'b1;
                 shift_arithmetic    = 1'b0;
+                unknown_instr       = 1'b0;
 
             end
             core_config_pkg::i_SRL: begin
                 shift_start         = 1'b1;
                 shift_left          = 1'b0;
                 shift_arithmetic    = 1'b0;
+                unknown_instr       = 1'b0;
 
             end
             core_config_pkg::i_SRA: begin
                 shift_start         = 1'b1;
                 shift_left          = 1'b0;
                 shift_arithmetic    = 1'b1;
+                unknown_instr       = 1'b0;
 
             end
             default: 

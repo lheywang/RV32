@@ -117,11 +117,11 @@ module alu0 (
         if (!rst_n) begin
 
             busy                <= 1'b0;
-            res                 <= 1'b0;
+            res                 <= 32'b0;
             i_error             <= 1'b0;
             o_error             <= 1'b0;
             req                 <= 1'b0;
-            o_rd                <= 1'b0;
+            o_rd                <= 5'b0;
             valid               <= 1'b0;
             end_of_op           <= 1'b0;
 
@@ -129,11 +129,11 @@ module alu0 (
         else if (clear && end_of_op) begin
 
             busy                <= 1'b0;
-            res                 <= 1'b0;
+            res                 <= 32'b0;
             i_error             <= 1'b0;
             o_error             <= 1'b0;
             req                 <= 1'b0;
-            o_rd                <= 1'b0;
+            o_rd                <= 5'b0;
             valid               <= 1'b0;
             end_of_op           <= 1'b0;
 
