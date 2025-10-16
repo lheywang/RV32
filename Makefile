@@ -29,6 +29,7 @@ VERILOG_SRCS += $(SRC_DIR)/core/registers.sv
 VERILOG_SRCS += $(SRC_DIR)/core/occupancy.sv
 VERILOG_SRCS += $(SRC_DIR)/core/issuer.sv
 VERILOG_SRCS += $(SRC_DIR)/core/commiter.sv
+VERILOG_SRCS += $(SRC_DIR)/core/prediction.sv
 VERILOG_SRCS += $(SRC_DIR)/core/core.sv
 
 # Including all peripherals files
