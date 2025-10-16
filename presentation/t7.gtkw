@@ -1,0 +1,99 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Thu Oct 16 18:16:54 2025
+[*]
+[dumpfile] "/home/user/RV32/simout/alu2.vcd"
+[dumpfile_mtime] "Thu Oct 16 18:12:50 2025"
+[dumpfile_size] 74939
+[savefile] "/home/user/RV32/presentation/t7.gtkw"
+[timestart] 0
+[size] 2560 985
+[pos] -27 -24
+*0.000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] TOP.
+[sst_width] 273
+[signals_width] 182
+[sst_expanded] 1
+[sst_vpaned_height] 291
+@28
+TOP.alu2.clk
+TOP.alu2.rst_n
+@200
+-
+@22
+[color] 2
+TOP.alu2.arg0[31:0]
+[color] 2
+TOP.alu2.arg1[31:0]
+[color] 2
+TOP.alu2.cmd[6:0]
+@200
+-
+@28
+[color] 7
+TOP.alu2.i_error
+[color] 7
+TOP.alu2.o_error
+@22
+[color] 7
+TOP.alu2.o_rd[4:0]
+@28
+[color] 7
+TOP.alu2.valid
+[color] 7
+TOP.alu2.unknown_instr
+[color] 7
+TOP.alu2.busy
+@22
+[color] 7
+TOP.alu2.res[31:0]
+@200
+-
+@28
+[color] 3
+TOP.alu2.state[1:0]
+[color] 3
+TOP.alu2.next_state[1:0]
+@200
+-
+@28
+[color] 3
+TOP.alu2.shift_start
+[color] 5
+TOP.alu2.div_start
+[color] 3
+TOP.alu2.mul_start
+[color] 3
+TOP.alu2.shift_done
+[color] 5
+TOP.alu2.div_done
+[color] 2
+TOP.alu2.mul_done
+[color] 5
+TOP.alu2.div_signed
+[color] 5
+TOP.alu2.div_by_zero
+[color] 3
+TOP.alu2.shift_left
+[color] 3
+TOP.alu2.shift_arithmetic
+[color] 2
+TOP.alu2.mul_signed_b
+@29
+[color] 2
+TOP.alu2.mul_signed_a
+@22
+[color] 5
+TOP.alu2.div_quotient[31:0]
+[color] 5
+TOP.alu2.div_remainder[31:0]
+[color] 3
+TOP.alu2.shift_result[31:0]
+[color] 2
+TOP.alu2.mul_product[63:0]
+[color] 2
+TOP.alu2.mul_low[31:0]
+[color] 2
+TOP.alu2.mul_high[31:0]
+[pattern_trace] 1
+[pattern_trace] 0
