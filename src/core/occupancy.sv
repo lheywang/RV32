@@ -42,8 +42,8 @@ module occupancy(
 
         if (!rst_n) begin
 
-            reg_state   <= 32'hFFFFFFFF; // all availables.
-            exec_ok     <= 0;
+            reg_state                   <= 32'hFFFFFFFF; // all availables.
+            exec_ok                     <= 0;
 
         end
         else begin
@@ -68,7 +68,7 @@ module occupancy(
              */
             if (write) begin
 
-                reg_state[address]  <= 1'b1;
+                reg_state[address]      <= 1'b1;
 
             end
         end

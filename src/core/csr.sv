@@ -78,9 +78,7 @@ module csr (
     logic [(core_config_pkg::XLEN - 1) : 0] csrs [(core_config_pkg::r_MVENDORID - 1) : 0];
     core_config_pkg::csr_t wid;
     core_config_pkg::csr_t rid;
-    /* verilator lint_off UNUSEDSIGNAL */
     core_config_pkg::csr_t r_wid;
-    /* verilator lint_on UNUSEDSIGNAL */
 
     logic [(core_config_pkg::XLEN - 1) : 0] r_wd;
     logic [(core_config_pkg::XLEN - 1) : 0] r_readback;
@@ -114,7 +112,7 @@ module csr (
             if (wid != core_config_pkg::r_NONE) begin
 
                 if (!write_state) begin
-                    r_readback <= csrs[wid];
+                    r_readback <= csrs[wid[2 : 0]]; // Theses registers are all located within the three LSB, thus this expression is correct.
                     write_state <= 1'b1;
                     r_wd <= wd;
                     r_wid <= wid;
@@ -124,7 +122,7 @@ module csr (
 
         if (write_state) begin
 
-            csrs[r_wid] <= update_bits(
+            csrs[r_wid[2 : 0]] <= update_bits( // Theses registers are all located within the three LSB, thus this expression is correct.
                     r_readback, 
                     core_config_pkg::CSR_WMASK[r_wid], 
                     r_wd
@@ -142,7 +140,7 @@ module csr (
                 core_config_pkg::r_MEPC,
                 core_config_pkg::r_MCAUSE,
                 core_config_pkg::r_MTVAL,
-                core_config_pkg::r_MIP :    rd <= csrs[rid];
+                core_config_pkg::r_MIP :    rd <= csrs[rid[2 : 0]]; // Theses registers are all located within the three LSB, thus this expression is correct.
 
                 core_config_pkg::r_CYCLE :  rd <= cycleL;
                 core_config_pkg::r_CYCLEH : rd <= cycleH;
@@ -160,6 +158,7 @@ module csr (
                 core_config_pkg::r_MIMPID,
                 core_config_pkg::r_MHARTID,
                 core_config_pkg::r_MISA :   rd <= 32'h0; // Default value on simple impl.
+                core_config_pkg::r_NONE :   rd <= 32'h0;
             endcase
         end  
      end

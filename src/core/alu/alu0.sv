@@ -59,51 +59,51 @@ module alu0 (
 
             core_config_pkg::c_ADD : begin
                 // Calculation
-                tmp_res = {1'b0, arg0} + {1'b0, arg1};
+                tmp_res         = {1'b0, arg0} + {1'b0, arg1};
 
                 // Setting flags
-                int_req = 1;
-                unknown_instr = 0;
+                int_req         = 1'b1;
+                unknown_instr   = 1'b0;
             end
             core_config_pkg::c_SUB : begin
                 // Calculation
-                tmp_res = {1'b0, arg0} - {1'b0, arg1};
+                tmp_res         = {1'b0, arg0} - {1'b0, arg1};
 
                 // Setting flags
-                int_req = 1;
-                unknown_instr = 0;
+                int_req         = 1'b1;
+                unknown_instr   = 1'b0;
             end 
             core_config_pkg::c_AND : begin
                 // Calculation
-                tmp_res = {1'b0, arg0} & {1'b0, arg1};
+                tmp_res         = {1'b0, arg0} & {1'b0, arg1};
 
                 // Setting flags
-                int_req = 1;
-                unknown_instr = 0;
+                int_req         = 1'b1;
+                unknown_instr   = 1'b0;
             end
             core_config_pkg::c_OR : begin
                 // Calculation
-                tmp_res = {1'b0, arg0} | {1'b0, arg1};
+                tmp_res         = {1'b0, arg0} | {1'b0, arg1};
 
                 // Setting flags
-                int_req = 1;
-                unknown_instr = 0;
+                int_req         = 1'b1;
+                unknown_instr   = 1'b0;
             end
             core_config_pkg::c_XOR : begin
                 // Calculation
-                tmp_res = {1'b0, arg0} ^ {1'b0, arg1};
+                tmp_res         = {1'b0, arg0} ^ {1'b0, arg1};
 
                 // Setting flags
-                int_req = 1;
-                unknown_instr = 0;
+                int_req         = 1'b1;
+                unknown_instr   = 1'b0;
             end
             default : begin
                 // Calculation
-                tmp_res = 0;
+                tmp_res         = 33'b0;
 
                 // Setting flags
-                int_req = 0;
-                unknown_instr = 1;
+                int_req         = 1'b0;
+                unknown_instr   = 1'b1;
             end
         endcase
     end
@@ -116,38 +116,38 @@ module alu0 (
 
         if (!rst_n) begin
 
-            busy <= 0;
-            res <= 0;
-            i_error <= 0;
-            o_error <= 0;
-            req <= 0;
-            o_rd <= 0;
-            valid <= 0;
-            end_of_op <= 0;
+            busy                <= 1'b0;
+            res                 <= 1'b0;
+            i_error             <= 1'b0;
+            o_error             <= 1'b0;
+            req                 <= 1'b0;
+            o_rd                <= 1'b0;
+            valid               <= 1'b0;
+            end_of_op           <= 1'b0;
 
         end
         else if (clear && end_of_op) begin
 
-            busy <= 0;
-            res <= 0;
-            i_error <= 0;
-            o_error <= 0;
-            req <= 0;
-            o_rd <= 0;
-            valid <= 0;
-            end_of_op <= 0;
+            busy                <= 1'b0;
+            res                 <= 1'b0;
+            i_error             <= 1'b0;
+            o_error             <= 1'b0;
+            req                 <= 1'b0;
+            o_rd                <= 1'b0;
+            valid               <= 1'b0;
+            end_of_op           <= 1'b0;
 
         end
         else begin
 
-            busy <= int_req;
-            res <= tmp_res[(core_config_pkg::XLEN - 1) : 0];
-            i_error <= unknown_instr;
-            o_error <= tmp_res[(core_config_pkg::XLEN)];
-            req <= 0;
-            o_rd <= i_rd;
-            valid <= 1;
-            end_of_op <= 1;
+            busy                <= int_req;
+            res                 <= tmp_res[(core_config_pkg::XLEN - 1) : 0];
+            i_error             <= unknown_instr;
+            o_error             <= tmp_res[(core_config_pkg::XLEN)];
+            req                 <= 1'b0;
+            o_rd                <= i_rd;
+            valid               <= 1'b1;
+            end_of_op           <= 1'b1;
 
         end
     end

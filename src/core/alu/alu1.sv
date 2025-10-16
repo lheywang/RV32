@@ -57,19 +57,20 @@ module alu1 (
              */
             core_config_pkg::c_SLT : begin
                 // Calculation
-                tmp_res = ($signed(arg0) < $signed(arg1)) ? 1 : 0;
+                tmp_res         = ($signed(arg0) < $signed(arg1)) ? 33'b1 : 33'b0;
 
                 // Setting flags
-                int_req = 1;
-                unknown_instr = 0;
+                int_req         = 1'b1;
+                unknown_instr   = 1'b0;
             end
             core_config_pkg::c_SLTU : begin
                 // Calculation
-                tmp_res = ($unsigned(arg0) < $unsigned(arg1)) ? 1 : 0;
+                tmp_res         = ($unsigned(arg0) < $unsigned(arg1)) ? 33'b1 : 33'b0;
 
                 // Setting flags
-                int_req = 1;
-                unknown_instr = 0;
+                act_needed      = 1'b0;
+                int_req         = 1'b1;
+                unknown_instr   = 1'b0;
             end 
 
             /*
@@ -77,66 +78,66 @@ module alu1 (
              */
             core_config_pkg::c_BEQ : begin
                 // Calculation
-                tmp_res = {1'b0, addr} + {1'b0, imm};
+                tmp_res         = {1'b0, addr} + {1'b0, imm};
 
                 // Setting flags
-                act_needed = (arg0 == arg1) ? 1 : 0;
-                int_req = 1;
-                unknown_instr = 0;
+                act_needed      = (arg0 == arg1) ? 33'b1 : 33'b0;
+                int_req         = 1'b1;
+                unknown_instr   = 1'b0;
             end
             core_config_pkg::c_BNE : begin
                 // Calculation
-                tmp_res = {1'b0, addr} + {1'b0, imm};
+                tmp_res         = {1'b0, addr} + {1'b0, imm};
 
                 // Setting flags
-                act_needed = (arg0 == arg1) ? 0 : 1;
-                int_req = 1;
-                unknown_instr = 0;
+                act_needed      = (arg0 == arg1) ? 1'b0 : 1'b1;
+                int_req         = 1'b1;
+                unknown_instr   = 1'b0;
             end
             core_config_pkg::c_BGE : begin
                 // Calculation
-                tmp_res = {1'b0, addr} + {1'b0, imm};
+                tmp_res         = {1'b0, addr} + {1'b0, imm};
 
                 // Setting flags
-                act_needed = ($signed(arg0) >= $signed(arg1)) ? 1 : 0;
-                int_req = 1;
-                unknown_instr = 0;
+                act_needed      = ($signed(arg0) >= $signed(arg1)) ? 1'b1 : 1'b0;
+                int_req         = 1'b1;
+                unknown_instr   = 1'b0;
             end
             core_config_pkg::c_BLT : begin
                 // Calculation
-                tmp_res = {1'b0, addr} + {1'b0, imm};
+                tmp_res         = {1'b0, addr} + {1'b0, imm};
 
                 // Setting flags
-                act_needed = ($signed(arg0) < $signed(arg1)) ? 1 : 0;
-                int_req = 1;
-                unknown_instr = 0;
+                act_needed      = ($signed(arg0) < $signed(arg1)) ? 33'b1 : 33'b0;
+                int_req         = 1'b1;
+                unknown_instr   = 1'b0;
             end
             core_config_pkg::c_BGEU : begin
                 // Calculation
-                tmp_res = {1'b0, addr} + {1'b0, imm};
+                tmp_res         = {1'b0, addr} + {1'b0, imm};
 
                 // Setting flags
-                act_needed = ($unsigned(arg0) >= $unsigned(arg1)) ? 1 : 0;
-                int_req = 1;
-                unknown_instr = 0;
+                act_needed      = ($unsigned(arg0) >= $unsigned(arg1)) ? 33'b1 : 33'b0;
+                int_req         = 1'b1;
+                unknown_instr   = 1'b0;
             end
             core_config_pkg::c_BLTU : begin
                 // Calculation
-                tmp_res = {1'b0, addr} + {1'b0, imm};
+                tmp_res         = {1'b0, addr} + {1'b0, imm};
 
                 // Setting flags
-                act_needed = ($unsigned(arg0) < $unsigned(arg1)) ? 1 : 0;
-                int_req = 1;
-                unknown_instr = 0;
+                act_needed      = ($unsigned(arg0) < $unsigned(arg1)) ? 33'b1 : 33'b0;
+                int_req         = 1'b1;
+                unknown_instr   = 1'b0;
             end
             default : begin
                 // Calculation
-                tmp_res = 0;
+                tmp_res         = 33'b0;
 
                 // Setting flags
-                act_needed = 0;
-                int_req = 0;
-                unknown_instr = 1;
+                act_needed      = 1'b0;
+                int_req         = 1'b0;
+                unknown_instr   = 1'b1;
             end
         endcase
     end
@@ -149,38 +150,38 @@ module alu1 (
 
         if (!rst_n) begin
 
-            busy <= 0;
-            res <= 0;
-            i_error <= 0;
-            o_error <= 0;
-            req <= 0;
-            o_rd <= 0;
-            valid <= 0;
-            end_of_op <= 0;
+            busy                <= 1'b0;
+            res                 <= 1'b0;
+            i_error             <= 1'b0;
+            o_error             <= 1'b0;
+            req                 <= 1'b0;
+            o_rd                <= 1'b0;
+            valid               <= 1'b0;
+            end_of_op           <= 1'b0;
 
         end
         else if (clear && end_of_op) begin
 
-            busy <= 0;
-            res <= 0;
-            i_error <= 0;
-            o_error <= 0;
-            req <= 0;
-            o_rd <= 0;
-            valid <= 0;
-            end_of_op <= 0;
+            busy                <= 1'b0;
+            res                 <= 1'b0;
+            i_error             <= 1'b0;
+            o_error             <= 1'b0;
+            req                 <= 1'b0;
+            o_rd                <= 1'b0;
+            valid               <= 1'b0;
+            end_of_op           <= 1'b0;
 
         end
         else begin
 
-            busy <= int_req;
-            res <= tmp_res[(core_config_pkg::XLEN - 1) : 0];
-            i_error <= unknown_instr;
-            o_error <= tmp_res[(core_config_pkg::XLEN)];
-            req <= act_needed;
-            o_rd <= i_rd;
-            valid <= 1;
-            end_of_op <= 1;
+            busy                <= int_req;
+            res                 <= tmp_res[(core_config_pkg::XLEN - 1) : 0];
+            i_error             <= unknown_instr;
+            o_error             <= tmp_res[(core_config_pkg::XLEN)];
+            req                 <= act_needed;
+            o_rd                <= i_rd;
+            valid               <= 1'b1;
+            end_of_op           <= 1'b1;
 
         end
     end

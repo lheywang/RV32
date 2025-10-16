@@ -9,7 +9,9 @@ module endianess (
 
     always_comb begin
         for (int i = 0; i < (XLEN / 8); i++) begin
+
             out[i*8 +: 8] = in[((XLEN/8 - 1 - i) * 8) +: 8];
+            
         end
     end
     

@@ -11,8 +11,8 @@ module clock (
 );
 
     // Defining parameters :
-    localparam int max = (REF_CLK_FREQ / CORE_CLK_FREQ) - 1;
-    localparam int thres = (max * CORE_CLK_DUTY) / 100 + 1;
+    localparam int max      = (REF_CLK_FREQ / CORE_CLK_FREQ) - 1;
+    localparam int thres    = (max * CORE_CLK_DUTY) / 100 + 1;
 
     // Storages signals
     logic   [$clog2(max):0]   cnt;
@@ -21,8 +21,8 @@ module clock (
     
         if (!rst_n) begin
 
-            cnt <= 0;
-            clk_en <= 0;
+            cnt         <= 0;
+            clk_en      <= 0;
         
         end 
         else begin
@@ -30,22 +30,22 @@ module clock (
             // Handle counter evolution
             if (cnt >= logic'(max)) begin
                 
-                cnt <= 0;
+                cnt     <= 0;
 
             end else begin
 
-                cnt <= cnt + 1;
+                cnt     <= cnt + 1;
 
             end
 
             // Handle output state
             if (cnt < logic'(thres)) begin
 
-                clk_en <= 1;
+                clk_en  <= 1;
 
             end else begin
 
-                clk_en <= 0;
+                clk_en  <= 0;
 
             end
         end

@@ -89,64 +89,64 @@ module alu5 (
 
             core_config_pkg::c_LB : begin
                 // Calculation
-                bytes = 4'b0001 << tmp_res[1:0];
-                sext_req = 1;
-                we = 0;
-                data = 0;
-                inp_req = 1;
+                bytes           = 4'b0001 << tmp_res[1:0];
+                sext_req        = 1'b1;
+                we              = 1'b0;
+                data            = 1'b0;
+                inp_req         = 1'b1;
 
                 // Setting flags
-                unknown_instr = 0;
+                unknown_instr   = 1'b0;
             end
             core_config_pkg::c_LH : begin
                 // Calculation
-                bytes = 4'b0011 << (tmp_res[1] * 2);
-                sext_req = 1;
-                we = 0;
-                data = 0;
-                inp_req = 1;
+                bytes           = 4'b0011 << (tmp_res[1] * 2);
+                sext_req        = 1'b1;
+                we              = 1'b0;
+                data            = 1'b0;
+                inp_req         = 1'b1;
 
                 // Setting flags
-                unknown_instr = 0;
+                unknown_instr   = 0;
             end 
             core_config_pkg::c_LW : begin
                 // Calculation
-                bytes = 4'b1111;
-                sext_req = 1;
-                we = 0;
-                data = 0;
-                inp_req = 1;
+                bytes           = 4'b1111;
+                sext_req        = 1'b1;
+                we              = 1'b0;
+                data            = 1'b0;
+                inp_req         = 1'b1;
 
                 // Setting flags
                 unknown_instr = 0;
             end
             core_config_pkg::c_LBU : begin
                 // Calculation
-                bytes = 4'b0001 << tmp_res[1:0];
-                sext_req = 0;
-                we = 0;
-                data = 0;
-                inp_req = 1;
+                bytes           = 4'b0001 << tmp_res[1:0];
+                sext_req        = 1'b0;
+                we              = 1'b0;
+                data            = 1'b0;
+                inp_req         = 1'b1;
 
                 // Setting flags
-                unknown_instr = 0;
+                unknown_instr   = 1'b0;
             end
             core_config_pkg::c_LHU : begin
                 // Calculation
-                bytes = 4'b0011 << (tmp_res[1] * 2);
-                sext_req = 0;
-                we = 0;
-                data = 0;
-                inp_req = 1;
+                bytes           = 4'b0011 << (tmp_res[1] * 2);
+                sext_req        = 1'b0;
+                we              = 1'b0;
+                data            = 1'b0;
+                inp_req         = 1'b1;
 
                 // Setting flags
-                unknown_instr = 0;
+                unknown_instr   = 0;
             end
             core_config_pkg::c_SB : begin
                 // Calculation
-                bytes = 4'b0001 << tmp_res[1:0];
-                sext_req = 0;
-                we = 1;
+                bytes           = 4'b0001 << tmp_res[1:0];
+                sext_req        = 1'b0;
+                we              = 1'b1;
                 case (tmp_res[1:0])
 
                     2'b00 : data = {24'b0, arg1[7 : 0]};
@@ -156,49 +156,49 @@ module alu5 (
                     default : data = 0;
                     
                 endcase
-                inp_req = 0;
+                inp_req         = 1'b0;
 
                 // Setting flags
-                unknown_instr = 0;
+                unknown_instr   = 1'b0;
             end
             core_config_pkg::c_SH : begin
                 // Calculation
-                bytes = 4'b0011 << (tmp_res[1] * 2);
-                sext_req = 0;
-                we = 1;
+                bytes           = 4'b0011 << (tmp_res[1] * 2);
+                sext_req        = 1'b0;
+                we              = 1'b1;
                 
                 if (tmp_res[1]) begin
-                    data = {arg1[15 : 0], 16'b0};
+                    data        = {arg1[15 : 0], 16'b0};
                 end 
                 else begin
-                    data = {16'b0, arg1[15 : 0]};
+                    data        = {16'b0, arg1[15 : 0]};
                 end
-                inp_req = 0;
+                inp_req         = 1'b0;
 
                 // Setting flags
-                unknown_instr = 0;
+                unknown_instr   = 1'b0;
             end
             core_config_pkg::c_SW : begin
                 // Calculation
-                bytes = 4'b1111;
-                sext_req = 0;
-                we = 1;
-                data = arg1;
-                inp_req = 0;
+                bytes           = 4'b1111;
+                sext_req        = 1'b0;
+                we              = 1'b1;
+                data            = arg1;
+                inp_req         = 1'b0;
 
                 // Setting flags
-                unknown_instr = 0;
+                unknown_instr   = 1'b0;
             end
             default : begin
                 // Calculation
-                bytes = 0;
-                sext_req = 0;
-                we = 0;
-                data = 0;
-                inp_req = 0;
+                bytes           = 1'b0;
+                sext_req        = 1'b0;
+                we              = 1'b0;
+                data            = 1'b0;
+                inp_req         = 1'b0;
 
                 // Setting flags
-                unknown_instr = 1;
+                unknown_instr   = 1'b1;
             end
         endcase
     end
@@ -210,16 +210,16 @@ module alu5 (
 
         if (!rst_n) begin
 
-            state <= IDLE;
-            r_bytes     <= 0;
-            r_address   <= 0;
-            r_sext_req  <= 0;
-            r_we        <= 0;
-            r_data      <= 0;
-            r_rd        <= 0;
-            r_inp_req   <= 0;
-            r_data2     <= 0;
-            r_err       <= 0;
+            state               <= IDLE;
+            r_bytes             <= 1'b0;
+            r_address           <= 1'b0;
+            r_sext_req          <= 1'b0;
+            r_we                <= 1'b0;
+            r_data              <= 1'b0;
+            r_rd                <= 1'b0;
+            r_inp_req           <= 1'b0;
+            r_data2             <= 1'b0;
+            r_err               <= 1'b0;
 
         end
         else begin
@@ -228,19 +228,19 @@ module alu5 (
 
             if (state == IDLE) begin
 
-                r_bytes     <= bytes;
-                r_address   <= address;
-                r_sext_req  <= sext_req;
-                r_we        <= we;
-                r_data      <= data;
-                r_rd        <= i_rd;
-                r_inp_req   <= inp_req;
+                r_bytes         <= bytes;
+                r_address       <= address;
+                r_sext_req      <= sext_req;
+                r_we            <= we;
+                r_data          <= data;
+                r_rd            <= i_rd;
+                r_inp_req       <= inp_req;
 
             end
             else if (state == WAIT) begin
 
-                r_data2 <= data2;
-                r_err <= mem_err;
+                r_data2         <= data2;
+                r_err           <= mem_err;
 
             end
         end
@@ -255,28 +255,28 @@ module alu5 (
             IDLE :  begin
                 if (!unknown_instr) begin
 
-                    next_state = REQ;
-                    i_error = 0;
+                    next_state  = REQ;
+                    i_error     = 1'b0;
 
                 end
                 else begin
 
-                    next_state = IDLE;
-                    i_error = 1;
+                    next_state  = IDLE;
+                    i_error     = 1'b1;
 
                 end
             end 
-            REQ : next_state = WAIT;
-            WAIT : next_state = OUT;
+            REQ : next_state    = WAIT;
+            WAIT : next_state   = OUT;
             OUT : begin
                 if (clear) begin
 
-                    next_state = IDLE;
+                    next_state  = IDLE;
 
                 end
                 else begin
 
-                    next_state = OUT;
+                    next_state  = OUT;
 
                 end
             end
@@ -290,109 +290,109 @@ module alu5 (
 
             IDLE : begin
 
-                res = 0;
-                o_rd = 0;
-                valid = 0;
-                o_error = 0;
-                req = 0;
-                busy = 0;
+                res             = 1'b0;
+                o_rd            = 1'b0;
+                valid           = 1'b0;
+                o_error         = 1'b0;
+                req             = 1'b0;
+                busy            = 1'b0;
 
-                mem_addr = 0;
-                mem_we = 0;
-                mem_req = 0;
-                mem_wdata = 0;
-                mem_byteen = 0;
+                mem_addr        = 1'b0;
+                mem_we          = 1'b0;
+                mem_req         = 1'b0;
+                mem_wdata       = 1'b0;
+                mem_byteen      = 1'b0;
                 
-                half_val = 0;
-                byte_val = 0;
-                data2 = 0;
+                half_val        = 1'b0;
+                byte_val        = 1'b0;
+                data2           = 1'b0;
                      
             end
             REQ : begin
 
-                res = 0;
-                o_rd = 0;
-                valid = 0;
-                o_error = 0;
-                req = 0;
-                busy = 1;
+                res             = 1'b0;
+                o_rd            = 1'b0;
+                valid           = 1'b0;
+                o_error         = 1'b0;
+                req             = 1'b0;
+                busy            = 1'b1;
 
-                mem_addr = r_address;
-                mem_we = r_we;
-                mem_req = 1;
-                mem_wdata = r_data;
-                mem_byteen = r_bytes;
+                mem_addr        = r_address;
+                mem_we          = r_we;
+                mem_req         = 1'b1;
+                mem_wdata       = r_data;
+                mem_byteen      = r_bytes;
                 
-                half_val = 0;
-                byte_val = 0;
-                data2 = 0;
+                half_val        = 1'b0;
+                byte_val        = 1'b0;
+                data2           = 1'b0;
 
             end
             WAIT : begin
 
-                res = 0;
-                o_rd = r_rd;
-                valid = 0;
-                o_error = 0;
-                req = 0;
-                busy = 1;
+                res             = 1'b0;
+                o_rd            = r_rd;
+                valid           = 1'b0;
+                o_error         = 1'b0;
+                req             = 1'b0;
+                busy            = 1'b1;
 
-                mem_addr = r_address;
-                mem_we = r_we;
-                mem_req = 1;
-                mem_wdata = r_data;
-                mem_byteen = r_bytes;
+                mem_addr        = r_address;
+                mem_we          = r_we;
+                mem_req         = 1'b1;
+                mem_wdata       = r_data;
+                mem_byteen      = r_bytes;
 
                 if (r_inp_req) begin
-                    data2 = mem_rdata;
+                    data2       = mem_rdata;
                 end
                 else begin
-                    data2 = 0;
+                    data2       = 1'b0;
                 end
                      
-                half_val = 0;
-                byte_val = 0;
+                half_val        = 1'b0;
+                byte_val        = 1'b0;
 
             end
             OUT : begin
 
-                o_rd = r_rd;
-                valid = 1;
-                o_error = r_err;
-                req = 0;
-                busy = 1;
+                o_rd            = r_rd;
+                valid           = 1'b1;
+                o_error         = r_err;
+                req             = 1'b0;
+                busy            = 1'b1;
 
-                mem_addr = 0;
-                mem_we = 0;
-                mem_req = 0;
-                mem_wdata = 0;
-                mem_byteen = 0;
+                mem_addr        = 1'b0;
+                mem_we          = 1'b0;
+                mem_req         = 1'b0;
+                mem_wdata       = 1'b0;
+                mem_byteen      = 1'b0;
                 
-                half_val = 0;
-                byte_val = 0;
-                res = 0;
-                data2 = 0;
+                half_val        = 1'b0;
+                byte_val        = 1'b0;
+                res             = 1'b0;
+                data2           = 1'b0;
 
                 case (r_bytes)
 
                     // LB
-                    4'b1111 : res = r_data2;
+                    4'b1111 : res       = r_data2;
 
                     // LH
-                    4'b0011 : half_val = r_data2[15 : 0];
-                    4'b1100 : half_val = r_data2[31 : 16];
+                    4'b0011 : half_val  = r_data2[15 : 0];
+                    4'b1100 : half_val  = r_data2[31 : 16];
 
                     // LB
-                    4'b0001 : byte_val = r_data2[7  : 0];
-                    4'b0010 : byte_val = r_data2[15 : 8];
-                    4'b0100 : byte_val = r_data2[23 : 16];
-                    4'b1000 : byte_val = r_data2[31 : 24];
+                    4'b0001 : byte_val  = r_data2[7  : 0];
+                    4'b0010 : byte_val  = r_data2[15 : 8];
+                    4'b0100 : byte_val  = r_data2[23 : 16];
+                    4'b1000 : byte_val  = r_data2[31 : 24];
                           
                     default : begin
                           
-                        half_val = 0;
-                        byte_val = 0;
-                        res = 0;
+                        half_val        = 1'b0;
+                        byte_val        = 1'b0;
+                        res             = 1'b0;
                           
                     end
 
@@ -404,20 +404,20 @@ module alu5 (
                 if (r_sext_req) begin
 
                     casez(r_bytes)
-                        4'b1111: res = r_data2;                                                 // full word
-                        4'b0011, 4'b1100: res = {{16{half_val[15]}}, half_val};                 // LH
-                        4'b0001,4'b0010,4'b0100,4'b1000: res = {{24{byte_val[7]}}, byte_val};   // LB
-                        default: res = 0;
+                        4'b1111: res                            = r_data2;                          // full word
+                        4'b0011, 4'b1100: res                   = {{16{half_val[15]}}, half_val};   // LH
+                        4'b0001,4'b0010,4'b0100,4'b1000: res    = {{24{byte_val[7]}}, byte_val};    // LB
+                        default: res                            = 32'b0;
                     endcase
 
                 end
                 else begin
 
                     casez(r_bytes)
-                        4'b1111: res = r_data2;                                                 // LW
-                        4'b0011, 4'b1100: res = {16'b0, half_val};                              // LHU
-                        4'b0001,4'b0010,4'b0100,4'b1000: res = {24'b0, byte_val};               // LBU
-                        default: res = 0;
+                        4'b1111: res                            = r_data2;                          // LW
+                        4'b0011, 4'b1100: res                   = {16'b0, half_val};                // LHU
+                        4'b0001,4'b0010,4'b0100,4'b1000: res    = {24'b0, byte_val};                // LBU
+                        default: res                            = 32'b0;
                     endcase
                 end
             end

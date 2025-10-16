@@ -26,26 +26,26 @@ module pcounter
 
         if (!rst_n) begin
 
-            address <= IF_BASE_ADDR;
-            ovf <= 0;
+            address             <= IF_BASE_ADDR;
+            ovf                 <= 0;
 
         end 
         else if (clk_en) begin
 
             if (load) begin
 
-                address <= loaded;
+                address         <= loaded;
 
             end else if (enable) begin
 
                 if (address < (IF_MAX_ADDR - IF_INC)) begin
 
-                    address <= address + IF_INC;
-                    ovf <= 0;
+                    address     <= address + IF_INC;
+                    ovf         <= 0;
 
                 end else begin
 
-                    ovf <= 1;
+                    ovf         <= 1;
 
                 end
             end

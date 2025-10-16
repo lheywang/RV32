@@ -24,14 +24,14 @@ module counter(
 
         if (!rst_n) begin
 
-            cnt <= 0;
+            cnt         <= 0;
         
         end 
         else if (clk_en) begin
 
             if (enable) begin
 
-                cnt <= cnt + {32'b0, PERF_CNT_INC};
+                cnt     <= cnt + {32'b0, core_config_pkg::PERF_CNT_INC};
 
             end
 
@@ -41,12 +41,15 @@ module counter(
 
     generate
         // Assigning outputs depending on the core configuration
-        if (PERF_CNT_PORT == 1) begin : gen_dualport
-            assign outL[XLEN-1:0] = cnt[((PERF_CNT_LEN / 2) - 1) : 0];              // 32 LSB
-            assign outH[XLEN-1:0] = cnt[(PERF_CNT_LEN - 1) : (PERF_CNT_LEN / 2)];   // 32 MSB
+        if (core_config_pkg::PERF_CNT_PORT == 1) begin : gen_dualport
+            assign outL[core_config_pkg::XLEN-1:0] = 
+                cnt[((core_config_pkg::PERF_CNT_LEN / 2) - 1) : 0];                                 // 32 LSB
+            assign outH[core_config_pkg::XLEN-1:0] = 
+                cnt[(core_config_pkg::PERF_CNT_LEN - 1) : (core_config_pkg::PERF_CNT_LEN / 2)];     // 32 MSB
         end 
         else begin : gen_singleport
-            assign outL[(PERF_CNT_LEN - 1) : 0] = cnt[(PERF_CNT_LEN - 1) : 0];      // 64 LSB
+            assign outL[(core_config_pkg::PERF_CNT_LEN - 1) : 0] = 
+                cnt[(core_config_pkg::PERF_CNT_LEN - 1) : 0];                                       // 64 LSB
             assign outH = 0;                                                        // 0
         end
     endgenerate

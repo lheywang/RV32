@@ -32,13 +32,13 @@ module registers (
 
                     if (wa != 0) begin
 
-                        regs[wa] <= wd;
+                        regs[wa]    <= wd;
 
                     end
                 end
 				
-            rd1 <= regs[ra1];
-            rd2 <= regs[ra2];
+            rd1                     <= regs[ra1];
+            rd2                     <= regs[ra2];
 
     end
 
