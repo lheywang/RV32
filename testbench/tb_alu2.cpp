@@ -37,6 +37,39 @@ int main(int argc, char **argv)
     stick(tb, tfp);
     stick(tb, tfp);
 
+    // MUL
+    tb->cmd = 16;
+
+    // MULH
+    tb->cmd = 17;
+
+    // MULHSU
+    tb->cmd = 18;
+
+    // MULHU
+    tb->cmd = 19;
+
+    // DIV
+    tb->cmd = 20;
+
+    // DIVU
+    tb->cmd = 21;
+
+    // REM
+    tb->cmd = 22;
+
+    // REMU
+    tb->cmd = 23;
+
+    // SLL
+    tb->cmd = 13;
+
+    // SRL
+    tb->cmd = 14;
+
+    // SRA
+    tb->cmd = 15;
+
     int cycle = 0;
 
     final_print(module);

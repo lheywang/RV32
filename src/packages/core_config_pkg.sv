@@ -156,29 +156,29 @@ package core_config_pkg;
     } csr_t;
 
     typedef enum logic [6:0] {
-        // ALU 0 (basic arithemetic)
+        // ALU 0 (basic arithemetic) (0)
         c_ADD, c_SUB,
         c_AND, c_OR,  c_XOR,
 
-        // ALU 1 (branches and conditions)
+        // ALU 1 (branches and conditions) (5)
         c_SLT, c_SLTU,
         c_BEQ, c_BNE, c_BLT, c_BGE, c_BLTU, c_BGEU,
 
-        // ALU 2 & 3 (multiplications and divisions, multi cycles)
+        // ALU 2 & 3 (multiplications and divisions, multi cycles) (13)
         c_SLL, c_SRL, c_SRA,
         c_MUL, 
         c_MULH, c_MULHSU, c_MULHU,
         c_DIV, c_DIVU,
         c_REM, c_REMU,
 
-        // ALU 4 (CSR)
+        // ALU 4 (CSR) (24)
         c_CSRRW, c_CSRRS, c_CSRRC,
 
-        // ALU 5 (Memory)
+        // ALU 5 (Memory) (27)
         c_SB, c_SH, c_SW,
         c_LB, c_LH, c_LW, c_LBU, c_LHU,
 
-        // Common
+        // Common (35)
         c_NONE
     } alu_commands_t;
 
