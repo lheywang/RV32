@@ -3,7 +3,7 @@
 # =======================================================
 TOP        ?= pcounter
 SRC_DIR    = src
-BUILD_DIR  = /mnt/ramdisk/
+BUILD_DIR  = build/
 CXX_TB     = $(abspath testbench/tb_$(TOP).cpp)
 CCX_UTILS  = $(abspath testbench/utils/utils.cpp)
 
@@ -105,12 +105,6 @@ clean:
 
 tests:
 	@./utils/tests.sh
-
-mount:
-	@mkdir -p /mnt/ramdisk
-	@mkdir -p build/
-	@./utils/ramdisk.sh 
-	@ln -s /mnt/ramdisk/ build/
 
 doc: FORCE
 	doxygen DoxyFile && cd documentation/latex && make pdf
