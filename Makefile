@@ -127,19 +127,19 @@ FORCE: ;
 # Opcodes
 $(BUILD_DIR)/generated_opcodes.svh $(BUILD_DIR)/generated_opcodes.h : src/packages/def/opcodes.def
 	@echo "Generating opcodes enums ..."
-	./utils/def2header.py -s $(BUILD_DIR)/generated_opcodes.svh -c $(BUILD_DIR)/generated_opcodes.h $< 
+	./utils/def2header.py -s $(BUILD_DIR)generated_opcodes.svh -c $(BUILD_DIR)generated_opcodes.h $< 
 
 # Decoders
 $(BUILD_DIR)/generated_decoders.svh $(BUILD_DIR)/generated_decoders.h : src/packages/def/decoders.def
 	@echo "Generating decoders enums ..."
-	./utils/def2header.py -s $(BUILD_DIR)/generated_decoders.svh -c $(BUILD_DIR)/generated_decoders.h $<
+	./utils/def2header.py -s $(BUILD_DIR)generated_decoders.svh -c $(BUILD_DIR)generated_decoders.h $<
 
 # CSRs
 $(BUILD_DIR)/generated_csr.svh $(BUILD_DIR)/generated_csr.h : src/packages/def/csr.def
 	@echo "Generating CSR enums ..."
-	./utils/def2header.py -s $(BUILD_DIR)/generated_csr.svh -c $(BUILD_DIR)/generated_csr.h $<
+	./utils/def2header.py -s $(BUILD_DIR)generated_csr.svh -c $(BUILD_DIR)generated_csr.h $<
 
 # Commands
 $(BUILD_DIR)/generated_commands.svh $(BUILD_DIR)/generated_commands.h : src/packages/def/commands.def
 	@echo "Generating commands ..."
-	./utils/def2header.py -s $(BUILD_DIR)/generated_commands.svh -c $(BUILD_DIR)/generated_commands.h $<
+	./utils/def2header.py -s $(BUILD_DIR)generated_commands.svh -c $(BUILD_DIR)generated_commands.h $<
