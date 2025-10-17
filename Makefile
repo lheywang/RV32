@@ -65,7 +65,6 @@ VERILATOR_FLAGS = -Wall \
 				  -j 8 \
 				  --cc $(VERILOG_SRCS) \
 				  -O3 \
-				  --output-split 0 \
 				  --top-module $(TOP) \
 				  --exe $(CXX_TB) $(CCX_UTILS) \
 				  -Mdir $(BUILD_DIR) \
@@ -90,7 +89,7 @@ run: $(BUILD_DIR)/V$(TOP)
 	@$(BUILD_DIR)V$(TOP)
 
 # Compile generated C++ from Verilator
-$(BUILD_DIR)/V$(TOP): $(VERILOG_SRCS) $(CXX_TB) $(CXX_HEADERS) $(SYSTEMVERILOG_HEADERS)
+$(BUILD_DIR)/V$(TOP): $(BUILD_DIR) $(VERILOG_SRCS) $(CXX_TB) $(CXX_HEADERS) $(SYSTEMVERILOG_HEADERS) 
 	verilator $(VERILATOR_FLAGS)
 	make -C $(BUILD_DIR) -f V$(TOP).mk V$(TOP) -j8 CXX="ccache clang++"
 
@@ -137,3 +136,7 @@ $(BUILD_DIR)/generated_csr.svh $(BUILD_DIR)/generated_csr.h : src/packages/def/c
 $(BUILD_DIR)/generated_commands.svh $(BUILD_DIR)/generated_commands.h : src/packages/def/commands.def
 	@echo "Generating commands ..."
 	./utils/def2header.py -s $(BUILD_DIR)generated_commands.svh -c $(BUILD_DIR)generated_commands.h $<
+
+# Build dir
+$(BUILD_DIR) : 
+	@mkdir $(BUILD_DIR)
