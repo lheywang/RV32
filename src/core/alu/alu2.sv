@@ -326,45 +326,45 @@ module alu2 (
     end
 
     // Instantiate multiplier
-    booth multiplier0 (
-        .clk                    (clk),
-        .rst_n                  (rst_n),
-        .start                  (mul_start),
-        .multiplicand           (r_arg0),
-        .multiplier             (r_arg1),
-        .signed_multiplicand    (mul_signed_a),
-        .signed_multiplier      (mul_signed_b),
-        .product                (mul_product),
-        .product_low            (mul_low),
-        .product_high           (mul_high),
-        .done                   (mul_done)
-    );
+    // booth multiplier0 (
+    //     .clk                    (clk),
+    //     .rst_n                  (rst_n),
+    //     .start                  (mul_start),
+    //     .multiplicand           (r_arg0),
+    //     .multiplier             (r_arg1),
+    //     .signed_multiplicand    (mul_signed_a),
+    //     .signed_multiplier      (mul_signed_b),
+    //     .product                (mul_product),
+    //     .product_low            (mul_low),
+    //     .product_high           (mul_high),
+    //     .done                   (mul_done)
+    // );
     
-    // Instantiate divider
-    srt divider0 (
-        .clk                    (clk),
-        .rst_n                  (rst_n),
-        .start                  (div_start),
-        .dividend               (r_arg0),
-        .divisor                (r_arg1),
-        .is_signed              (div_signed),
-        .quotient               (div_quotient),
-        .remainder              (div_remainder),
-        .done                   (div_done),
-        .div_by_zero            (div_by_zero)
-    );
+    // // Instantiate divider
+    // srt divider0 (
+    //     .clk                    (clk),
+    //     .rst_n                  (rst_n),
+    //     .start                  (div_start),
+    //     .dividend               (r_arg0),
+    //     .divisor                (r_arg1),
+    //     .is_signed              (div_signed),
+    //     .quotient               (div_quotient),
+    //     .remainder              (div_remainder),
+    //     .done                   (div_done),
+    //     .div_by_zero            (div_by_zero)
+    // );
     
-    // Instantiate barrel shifter (shifts up to 8 bits per cycle)
-    shift shifter0 (
-        .clk                    (clk),
-        .rst_n                  (rst_n),
-        .start                  (shift_start),
-        .data_in                (r_arg0),
-        .shift_amount           (r_arg1[5:0]),  // RISC-V uses lower 5 bits for shift amount
-        .shift_left             (shift_left),
-        .arithmetic             (shift_arithmetic),
-        .data_out               (shift_result),
-        .done                   (shift_done)
-    );
+    // // Instantiate barrel shifter (shifts up to 8 bits per cycle)
+    // shift shifter0 (
+    //     .clk                    (clk),
+    //     .rst_n                  (rst_n),
+    //     .start                  (shift_start),
+    //     .data_in                (r_arg0),
+    //     .shift_amount           (r_arg1[5:0]),  // RISC-V uses lower 5 bits for shift amount
+    //     .shift_left             (shift_left),
+    //     .arithmetic             (shift_arithmetic),
+    //     .data_out               (shift_result),
+    //     .done                   (shift_done)
+    // );
 
 endmodule

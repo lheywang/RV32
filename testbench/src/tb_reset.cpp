@@ -5,8 +5,8 @@
 #include <iostream>
 #include <iomanip>
 
-#include "utils/colors.h"
-#include "utils/utils.h"
+#include "colors.h"
+#include "utils.h"
 
 char *module = (char *)"Reset";
 

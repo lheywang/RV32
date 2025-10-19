@@ -5,8 +5,9 @@
 #include <iostream>
 #include <iomanip>
 
-#include "utils/colors.h"
-#include "utils/utils.h"
+#include "colors.h"
+#include "utils.h"
+#include "generated_opcodes.h"
 
 char *module = (char *)"Decoder";
 
@@ -103,83 +104,83 @@ unsigned int instructions[]{
 
 decoded dinstructions[] = {
     // Loads (0)
-    {.rs1 = 0, .rs2 = 0, .rd = 15, .imm = 1957076992, .opcode = 1, .illegal = 0}, // LUI
-    {.rs1 = 0, .rs2 = 0, .rd = 15, .imm = 1957076992, .opcode = 2, .illegal = 0}, // AUIPC
+    {.rs1 = 0,  .rs2 = 0,   .rd = 15,   .imm = 1957076992,  .opcode = opcodes_t::i_LUI,     .illegal = 0},
+    {.rs1 = 0,  .rs2 = 0,   .rd = 15,   .imm = 1957076992,  .opcode = opcodes_t::i_AUIPC,   .illegal = 0},
 
     // Immediates (2)
-    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 3, .illegal = 0},  // ADDI
-    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 4, .illegal = 0},  // SLTI
-    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 5, .illegal = 0},  // SLTIU
-    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 6, .illegal = 0},  // XORI
-    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 11, .illegal = 0}, // ORI
-    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 7, .illegal = 0},  // ANDI
-    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0xFFFFFFFF, .opcode = 8, .illegal = 0},  // SLLI
-    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0x3F, .opcode = 9, .illegal = 0},        // SRLI
-    {.rs1 = 3, .rs2 = 0, .rd = 16, .imm = 0x43F, .opcode = 10, .illegal = 0},      // SRAI
+    {.rs1 = 3,  .rs2 = 0,   .rd = 16,   .imm = 0xFFFFFFFF,  .opcode = opcodes_t::i_ADDI,    .illegal = 0},
+    {.rs1 = 3,  .rs2 = 0,   .rd = 16,   .imm = 0xFFFFFFFF,  .opcode = opcodes_t::i_SLTI,    .illegal = 0},
+    {.rs1 = 3,  .rs2 = 0,   .rd = 16,   .imm = 0xFFFFFFFF,  .opcode = opcodes_t::i_SLTIU,   .illegal = 0},
+    {.rs1 = 3,  .rs2 = 0,   .rd = 16,   .imm = 0xFFFFFFFF,  .opcode = opcodes_t::i_XORI,    .illegal = 0},
+    {.rs1 = 3,  .rs2 = 0,   .rd = 16,   .imm = 0xFFFFFFFF,  .opcode = opcodes_t::i_ORI,     .illegal = 0},
+    {.rs1 = 3,  .rs2 = 0,   .rd = 16,   .imm = 0xFFFFFFFF,  .opcode = opcodes_t::i_ANDI,    .illegal = 0},
+    {.rs1 = 3,  .rs2 = 0,   .rd = 16,   .imm = 0xFFFFFFFF,  .opcode = opcodes_t::i_SLLI,    .illegal = 0},
+    {.rs1 = 3,  .rs2 = 0,   .rd = 16,   .imm = 0x3F,        .opcode = opcodes_t::i_SRLI,    .illegal = 0},
+    {.rs1 = 3,  .rs2 = 0,   .rd = 16,   .imm = 0x43F,       .opcode = opcodes_t::i_SRAI,    .illegal = 0}, 
 
     // Registers (b)
-    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 12, .illegal = 0}, // ADD
-    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 13, .illegal = 0}, // SUB
-    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 14, .illegal = 0}, // SLL
-    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 15, .illegal = 0}, // SLT
-    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 16, .illegal = 0}, // SLTU
-    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 17, .illegal = 0}, // XOR
-    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 18, .illegal = 0}, // SRL
-    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 19, .illegal = 0}, // SRA
-    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 20, .illegal = 0}, // OR
-    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 21, .illegal = 0}, // AND
+    {.rs1 = 17, .rs2 = 15,  .rd = 31,   .imm = 0,           .opcode = opcodes_t::i_ADD,     .illegal = 0},
+    {.rs1 = 17, .rs2 = 15,  .rd = 31,   .imm = 0,           .opcode = opcodes_t::i_SUB,     .illegal = 0},
+    {.rs1 = 17, .rs2 = 15,  .rd = 31,   .imm = 0,           .opcode = opcodes_t::i_SLL,     .illegal = 0},
+    {.rs1 = 17, .rs2 = 15,  .rd = 31,   .imm = 0,           .opcode = opcodes_t::i_SLT,     .illegal = 0},
+    {.rs1 = 17, .rs2 = 15,  .rd = 31,   .imm = 0,           .opcode = opcodes_t::i_SLTU,    .illegal = 0},
+    {.rs1 = 17, .rs2 = 15,  .rd = 31,   .imm = 0,           .opcode = opcodes_t::i_XOR,     .illegal = 0},
+    {.rs1 = 17, .rs2 = 15,  .rd = 31,   .imm = 0,           .opcode = opcodes_t::i_SRL,     .illegal = 0},
+    {.rs1 = 17, .rs2 = 15,  .rd = 31,   .imm = 0,           .opcode = opcodes_t::i_SRA,     .illegal = 0},
+    {.rs1 = 17, .rs2 = 15,  .rd = 31,   .imm = 0,           .opcode = opcodes_t::i_OR,      .illegal = 0},
+    {.rs1 = 17, .rs2 = 15,  .rd = 31,   .imm = 0,           .opcode = opcodes_t::i_AND,     .illegal = 0},
 
     // Misc (15)
-    {.rs1 = 0, .rs2 = 0, .rd = 0, .imm = 0, .opcode = 30, .illegal = 0}, // FENCE
+    {.rs1 = 0,  .rs2 = 0,   .rd = 0,    .imm = 0,           .opcode = opcodes_t::i_FENCE,   .illegal = 0},
 
     // Branches (16)
-    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0xFFE, .opcode = 31, .illegal = 0}, // BEQ
-    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0xFFE, .opcode = 32, .illegal = 0}, // BNE
-    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0xFFE, .opcode = 33, .illegal = 0}, // BLT
-    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0xFFE, .opcode = 34, .illegal = 0}, // BGE
-    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0xFFE, .opcode = 35, .illegal = 0}, // BLTU
-    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0xFFE, .opcode = 36, .illegal = 0}, // BGEU
+    {.rs1 = 6,  .rs2 = 7,   .rd = 0,    .imm = 0xFFE,       .opcode = opcodes_t::i_BEQ,     .illegal = 0},
+    {.rs1 = 6,  .rs2 = 7,   .rd = 0,    .imm = 0xFFE,       .opcode = opcodes_t::i_BNE,     .illegal = 0},
+    {.rs1 = 6,  .rs2 = 7,   .rd = 0,    .imm = 0xFFE,       .opcode = opcodes_t::i_BLT,     .illegal = 0},
+    {.rs1 = 6,  .rs2 = 7,   .rd = 0,    .imm = 0xFFE,       .opcode = opcodes_t::i_BGE,     .illegal = 0},
+    {.rs1 = 6,  .rs2 = 7,   .rd = 0,    .imm = 0xFFE,       .opcode = opcodes_t::i_BLTU,    .illegal = 0},
+    {.rs1 = 6,  .rs2 = 7,   .rd = 0,    .imm = 0xFFE,       .opcode = opcodes_t::i_BGEU,    .illegal = 0},
 
     // Memory (1c)
-    {.rs1 = 3, .rs2 = 0x1F, .rd = 0, .imm = 0xFFFFFFFF, .opcode = 42, .illegal = 0}, // SB
-    {.rs1 = 3, .rs2 = 0x1F, .rd = 0, .imm = 0xFFFFFFFF, .opcode = 43, .illegal = 0}, // SH
-    {.rs1 = 3, .rs2 = 0x1F, .rd = 0, .imm = 0xFFFFFFFF, .opcode = 44, .illegal = 0}, // SW
-    {.rs1 = 3, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 37, .illegal = 0},    // LB
-    {.rs1 = 3, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 38, .illegal = 0},    // LH
-    {.rs1 = 3, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 39, .illegal = 0},    // LW
-    {.rs1 = 3, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 40, .illegal = 0},    // LBU
-    {.rs1 = 3, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 41, .illegal = 0},    // LHU
+    {.rs1 = 3,  .rs2 = 31,  .rd = 0,    .imm = 0xFFFFFFFF,  .opcode = opcodes_t::i_SB,      .illegal = 0},
+    {.rs1 = 3,  .rs2 = 31,  .rd = 0,    .imm = 0xFFFFFFFF,  .opcode = opcodes_t::i_SH,      .illegal = 0},
+    {.rs1 = 3,  .rs2 = 31,  .rd = 0,    .imm = 0xFFFFFFFF,  .opcode = opcodes_t::i_SW,      .illegal = 0},
+    {.rs1 = 3,  .rs2 = 0,   .rd = 1,    .imm = 0xFFFFFFFF,  .opcode = opcodes_t::i_LB,      .illegal = 0},
+    {.rs1 = 3,  .rs2 = 0,   .rd = 1,    .imm = 0xFFFFFFFF,  .opcode = opcodes_t::i_LH,      .illegal = 0},
+    {.rs1 = 3,  .rs2 = 0,   .rd = 1,    .imm = 0xFFFFFFFF,  .opcode = opcodes_t::i_LW,      .illegal = 0},
+    {.rs1 = 3,  .rs2 = 0,   .rd = 1,    .imm = 0xFFFFFFFF,  .opcode = opcodes_t::i_LBU,     .illegal = 0},
+    {.rs1 = 3,  .rs2 = 0,   .rd = 1,    .imm = 0xFFFFFFFF,  .opcode = opcodes_t::i_LHU,     .illegal = 0},
 
     // Jumps (24)
-    {.rs1 = 0, .rs2 = 0, .rd = 3, .imm = 0xFFFFFFFE, .opcode = 45, .illegal = 0}, // JAL
-    {.rs1 = 1, .rs2 = 0, .rd = 3, .imm = 0xFFFFFFFF, .opcode = 46, .illegal = 0}, // JALR
+    {.rs1 = 0,  .rs2 = 0,   .rd = 3,    .imm = 0xFFFFFFFE,  .opcode = opcodes_t::i_JAL,     .illegal = 0},
+    {.rs1 = 1,  .rs2 = 0,   .rd = 3,    .imm = 0xFFFFFFFF,  .opcode = opcodes_t::i_JALR,    .illegal = 0},
 
     // Syscalls (26)
-    {.rs1 = 0, .rs2 = 0, .rd = 0, .imm = 0, .opcode = 47, .illegal = 0}, // ECALL
-    {.rs1 = 0, .rs2 = 0, .rd = 0, .imm = 0, .opcode = 48, .illegal = 0}, // EBREAK
-    {.rs1 = 0, .rs2 = 0, .rd = 0, .imm = 0, .opcode = 49, .illegal = 0}, // MRET
+    {.rs1 = 0,  .rs2 = 0,   .rd = 0,    .imm = 0,           .opcode = opcodes_t::i_ECALL,   .illegal = 0},
+    {.rs1 = 0,  .rs2 = 0,   .rd = 0,    .imm = 0,           .opcode = opcodes_t::i_EBREAK,  .illegal = 0},
+    {.rs1 = 0,  .rs2 = 0,   .rd = 0,    .imm = 0,           .opcode = opcodes_t::i_MRET,    .illegal = 0},
 
     // RV32M (29)
-    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 22, .illegal = 0}, // MUL
-    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 23, .illegal = 0}, // MULH
-    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 25, .illegal = 0}, // MULHSU
-    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 24, .illegal = 0}, // MULHU
-    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 26, .illegal = 0}, // DIV
-    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 27, .illegal = 0}, // DIVU
-    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 28, .illegal = 0}, // REM
-    {.rs1 = 17, .rs2 = 15, .rd = 31, .imm = 0, .opcode = 29, .illegal = 0}, // REMU
+    {.rs1 = 17, .rs2 = 15,  .rd = 31,   .imm = 0,           .opcode = opcodes_t::i_MUL,     .illegal = 0},
+    {.rs1 = 17, .rs2 = 15,  .rd = 31,   .imm = 0,           .opcode = opcodes_t::i_MULH,    .illegal = 0},
+    {.rs1 = 17, .rs2 = 15,  .rd = 31,   .imm = 0,           .opcode = opcodes_t::i_MULHSU,  .illegal = 0},
+    {.rs1 = 17, .rs2 = 15,  .rd = 31,   .imm = 0,           .opcode = opcodes_t::i_MULHU,   .illegal = 0},
+    {.rs1 = 17, .rs2 = 15,  .rd = 31,   .imm = 0,           .opcode = opcodes_t::i_DIV,     .illegal = 0},
+    {.rs1 = 17, .rs2 = 15,  .rd = 31,   .imm = 0,           .opcode = opcodes_t::i_DIVU,    .illegal = 0},
+    {.rs1 = 17, .rs2 = 15,  .rd = 31,   .imm = 0,           .opcode = opcodes_t::i_REM,     .illegal = 0},
+    {.rs1 = 17, .rs2 = 15,  .rd = 31,   .imm = 0,           .opcode = opcodes_t::i_REMU,    .illegal = 0},
 
     // ZICSR (31)
-    {.rs1 = 31, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 50, .illegal = 0}, // CSRRW
-    {.rs1 = 31, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 51, .illegal = 0}, // CSRRS
-    {.rs1 = 31, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 52, .illegal = 0}, // CSRRC
-    {.rs1 = 31, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 53, .illegal = 0}, // CSRRWI
-    {.rs1 = 31, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 54, .illegal = 0}, // CSRRSI
-    {.rs1 = 31, .rs2 = 0, .rd = 1, .imm = 0xFFFFFFFF, .opcode = 55, .illegal = 0}, // CSRRCI
+    {.rs1 = 31, .rs2 = 0,   .rd = 1,    .imm = 0xFFFFFFFF,  .opcode = opcodes_t::i_CSRRW,   .illegal = 0},
+    {.rs1 = 31, .rs2 = 0,   .rd = 1,    .imm = 0xFFFFFFFF,  .opcode = opcodes_t::i_CSRRS,   .illegal = 0},
+    {.rs1 = 31, .rs2 = 0,   .rd = 1,    .imm = 0xFFFFFFFF,  .opcode = opcodes_t::i_CSRRC,   .illegal = 0},
+    {.rs1 = 31, .rs2 = 0,   .rd = 1,    .imm = 0xFFFFFFFF,  .opcode = opcodes_t::i_CSRRWI,  .illegal = 0},
+    {.rs1 = 31, .rs2 = 0,   .rd = 1,    .imm = 0xFFFFFFFF,  .opcode = opcodes_t::i_CSRRSI,  .illegal = 0},
+    {.rs1 = 31, .rs2 = 0,   .rd = 1,    .imm = 0xFFFFFFFF,  .opcode = opcodes_t::i_CSRRCI,  .illegal = 0},
 
     // Illegals (37)
-    {.rs1 = 3, .rs2 = 1, .rd = 0, .imm = 0xFFFFFFFF, .opcode = 0, .illegal = 1}, // SH Based
-    {.rs1 = 6, .rs2 = 7, .rd = 0, .imm = 0xFFE, .opcode = 0, .illegal = 1}       // BGE Based
+    {.rs1 = 3,  .rs2 = 1,   .rd = 0,    .imm = 0xFFFFFFFF,  .opcode = 0,                    .illegal = 1}, // SH Based
+    {.rs1 = 6,  .rs2 = 7,   .rd = 0,    .imm = 0xFFE,       .opcode = 0,                    .illegal = 1}       // BGE Based
 };
 
 // Main
@@ -240,5 +241,5 @@ int main(int argc, char **argv)
     get_counts(&pass, &fail);
 
     delete tb;
-    return fail;
+    return (fail != 0) ? 1 : 0;
 }

@@ -5,8 +5,8 @@
 #include <iostream>
 #include <iomanip>
 
-#include "utils/colors.h"
-#include "utils/utils.h"
+#include "colors.h"
+#include "utils.h"
 
 unsigned int inputs1[5] = {10, 32, 48, 64, 1024};
 unsigned int inputs2[5] = {0x7FFFF000, 4096, 0xAAAAAAAA, 0x55555555, 0};
@@ -110,5 +110,5 @@ int main(int argc, char **argv)
     get_counts(&pass, &fail);
 
     delete tb;
-    return fail;
+    return (fail != 0) ? 1 : 0;
 }

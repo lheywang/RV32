@@ -139,5 +139,5 @@ int main(int argc, char **argv)
     uint64_t pass, fail;
     get_counts(&pass, &fail);
     delete tb;
-    return fail;
+    return (fail != 0) ? 1 : 0;
 }

@@ -5,8 +5,8 @@
 #include <iostream>
 #include <iomanip>
 
-#include "utils/colors.h"
-#include "utils/utils.h"
+#include "colors.h"
+#include "utils.h"
 
 /*
  *  Note for the future :
@@ -429,5 +429,5 @@ int main(int argc, char **argv)
     get_counts(&pass, &fail);
 
     delete tb;
-    return fail;
+    return (fail != 0) ? 1 : 0;
 }

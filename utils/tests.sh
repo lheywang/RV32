@@ -14,6 +14,7 @@ targets=(
     csr
     reset
     occupancy
+    booth
     alu0
     alu1
     alu5
