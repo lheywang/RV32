@@ -1,8 +1,8 @@
 #include <iostream>
-#include "colors.h"
 #include <iomanip>
 #include <stdint.h>
 
+#include "colors.h"
 #include "utils.h"
 
 uint64_t __pass = 0;

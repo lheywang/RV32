@@ -4,8 +4,10 @@
 TOP        ?= pcounter
 SRC_DIR    = src
 BUILD_DIR  = build/
-CXX_TB     = $(abspath testbench/tb_$(TOP).cpp)
-CCX_UTILS  = $(abspath testbench/utils/utils.cpp)
+TB_DIR 	   = testbench/
+TB_UTILS   = $(abspath $(TB_DIR)/include )
+CXX_TB 	   := $(shell find $(abspath $(TB_DIR)/src) -type f -iname "tb_$(TOP).cpp" | head -n 1)
+CCX_UTILS  = $(abspath $(TB_DIR)/src/utils/utils.cpp)
 
 # Including all SV packages files 
 VERILOG_SRCS = $(SRC_DIR)/packages/core_config_pkg.sv 
@@ -68,7 +70,8 @@ VERILATOR_FLAGS = -Wall \
 				  --top-module $(TOP) \
 				  --exe $(CXX_TB) $(CCX_UTILS) \
 				  -Mdir $(BUILD_DIR) \
-				  -I$(BUILD_DIR)
+				  -I$(BUILD_DIR) \
+				  -CFLAGS "-I$(TB_UTILS)"
 
 SYSTEMVERILOG_HEADERS = $(BUILD_DIR)/generated_opcodes.svh \
 						$(BUILD_DIR)/generated_decoders.svh \
