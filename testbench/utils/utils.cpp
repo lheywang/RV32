@@ -15,7 +15,8 @@ void final_print(char name[64])
               << "Simulation complete."
               << std::endl
               << std::dec
-              << KYEL << "--------------------------------------------------------\n"
+              << KYEL 
+              << "--------------------------------------------------------\n"
               << "Results : (" << name << ")"
               << "\n--------------------------------------------------------"
               << std::endl
@@ -113,5 +114,18 @@ void get_counts(uint64_t *passed, uint64_t *failed)
 {
     *passed = __pass;
     *failed = __fail;
+    return;
+}
+
+void print_case(char name[64], char cases[64])
+{
+    std::cout << std::dec
+              << KYEL 
+              << "--------------------------------------------------------\n"
+              << "Mid point : (" << name << ") : " << cases
+              << "\n--------------------------------------------------------"
+              << RST
+              << std::endl;
+
     return;
 }
