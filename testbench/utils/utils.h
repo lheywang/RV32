@@ -6,7 +6,7 @@
 void final_print(char name[64]);
 void initial_print(char name[64]);
 
-static vluint64_t sim_time = 0;
+extern vluint64_t sim_time;
 extern uint64_t __pass;
 extern uint64_t __fail;
 

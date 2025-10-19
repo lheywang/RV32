@@ -7,6 +7,7 @@
 
 uint64_t __pass = 0;
 uint64_t __fail = 0;
+vluint64_t sim_time = 0;
 
 void final_print(char name[64])
 {
@@ -56,7 +57,7 @@ void equality_print(char name[64], int cycle, int value, int reference, bool pri
             std::cout << KGRN
                       << "[ PASS ] Cycle "
                       << std::setw(8) << cycle
-                      << "    [ " << name << " ]"
+                      << "    [ " << name << " ] @ " << sim_time << " ps"
                       << RST
                       << std::dec
                       << std::endl;
@@ -67,8 +68,8 @@ void equality_print(char name[64], int cycle, int value, int reference, bool pri
         std::cout << KRED
                   << "[ FAIL ] Cycle "
                   << std::setw(8) << cycle
+                  << "    [ " << name << " ] @ " << sim_time << " ps | Got : 0x"
                   << std::hex
-                  << "    [ " << name << " ] Got : 0x"
                   << std::setw(8)
                   << value
                   << " waited : 0x"
@@ -93,7 +94,7 @@ void equality_print_arg(char name[64], int value, int reference)
     {
         std::cout << KRED
                   << std::hex
-                  << "    [ " << name << " ] Got : 0x"
+                  << "    [ " << name << " ] @ " << sim_time << " ps | Got : 0x"
                   << std::setw(8)
                   << value
                   << " waited : 0x"
