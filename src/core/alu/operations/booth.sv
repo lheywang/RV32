@@ -100,28 +100,8 @@ module booth(
                      *  - If the operand is   signed, we always sign extend to the MSB
                      */
 
-                    if (X_signed) begin
-
-                        next_Z = $signed({{34{$unsigned(X[31])}}, $unsigned(X)});  // Sign extend
-
-                    end
-                    else begin
-
-                        next_Z = {34'b0, X};        // Zero extend
-
-                    end
-
-
-                    if (Y_signed) begin
-
-                        next_Y_ext = $signed({$unsigned(Y[31]), $unsigned(Y)});         // Sign extend
-
-                    end
-                    else begin
-
-                        next_Y_ext = {1'd0, Y};          // Zero extend
-
-                    end
+                    next_Z = (X_signed) ? $signed({{34{X[31]}}, X}) : {34'b0, X};
+                    next_Y_ext = (Y_signed) ? $signed({Y[31], Y}) :{1'd0, Y};
 
                 end
                 else begin
