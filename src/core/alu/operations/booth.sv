@@ -68,7 +68,7 @@ module booth(
             temp            <= next_temp;
             count           <= next_count;
 
-            if (pres_state == START) begin
+            if (pres_state == IDLE) begin
 
                 Y_ext           <= next_Y_ext;
 

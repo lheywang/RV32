@@ -42,18 +42,88 @@ int main(int argc, char **argv)
 
     int ticks = 0;
 
-    tb->start = 1;
-    tb->X_signed = 0;
-    tb->Y_signed = 0;
-    tb->X = input1[0];
-    tb->Y = input2[0];
-
-    // Running for a defined number of cycles
-    for (int i = 0; i < 40; i++)
+    for (int op = 0; op < 4; op ++)
     {
-        tick(tb, tfp);
-        tb->start = 0;
-        ticks += 1;
+        switch (op)
+        {
+            case 0 :                // MULxU
+                tb->X_signed = 0;
+                tb->Y_signed = 0;
+                break;
+            case 1 :                // (unsupported by risc V)
+                tb->X_signed = 0;
+                tb->Y_signed = 1;
+                break;
+            case 2 :                // MULxSU
+                tb->X_signed = 1;
+                tb->Y_signed = 0;
+                break;
+            case 3 :                // MULx
+                tb->X_signed = 1;
+                tb->Y_signed = 1;
+                break;
+        }
+
+        // First set of inputs
+        for (int i = 0; i < 10; i++)
+        {
+            for (int ii = 0; ii < 10; ii ++)
+            {
+                // Set inputs
+                tb->X = input1[i];
+                tb->Y = input2[ii];
+
+                // Start the test
+                tb->start = 1;
+
+                // Let the testbench compute
+                for (int i = 0; i < 33; i++)
+                {
+                    tick(tb, tfp);
+                    tb->start = 0;
+                }
+                equality_print((char *)"Valid ",
+                                ticks,
+                                tb->valid,
+                                1);
+
+                switch(op)
+                {
+                    case 0 : 
+                        equality_print((char *)"Result (U * U)",
+                                        ticks,
+                                        tb->Z,
+                                        (unsigned)tb->X * (unsigned)tb->Y);
+                        break;
+                    case 1 :
+                        equality_print((char *)"Result (U * S)",
+                                        ticks,
+                                        tb->Z,
+                                        (unsigned)tb->X * (signed)tb->Y);
+                        break;
+                    case 2 :
+                        equality_print((char *)"Result (S * U)",
+                                        ticks,
+                                        tb->Z,
+                                        (signed)tb->X * (unsigned)tb->Y);
+                        break;
+                    case 3 : 
+                        equality_print((char *)"Result (S * S)",
+                                        ticks,
+                                        tb->Z,
+                                        (signed)tb->X * (signed)tb->Y);
+                        break;
+                }
+
+                tick(tb, tfp);
+                equality_print((char *)"Valid ",
+                                ticks,
+                                tb->valid,
+                                0);
+
+                ticks += 1;
+            }
+        }
     }
 
     final_print(module);
