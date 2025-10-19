@@ -1,0 +1,56 @@
+[*]
+[*] GTKWave Analyzer v3.4.0 (w)1999-2022 BSI
+[*] Sun Oct 19 13:00:15 2025
+[*]
+[dumpfile] "/home/lheywang/Dev/RV32/simout/booth.vcd"
+[dumpfile_mtime] "Sun Oct 19 12:57:58 2025"
+[dumpfile_size] 8268
+[savefile] "/home/lheywang/Dev/RV32/presentation/t8.gtkw"
+[timestart] 0
+[size] 1920 1033
+[pos] -461 -218
+*-3.707421 4 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] TOP.
+[sst_width] 276
+[signals_width] 284
+[sst_expanded] 1
+[sst_vpaned_height] 309
+@28
+TOP.booth.clk
+TOP.booth.rst_n
+@200
+-
+@22
+[color] 2
+TOP.booth.X[31:0]
+@28
+[color] 2
+TOP.booth.X_signed
+@22
+[color] 2
+TOP.booth.Y[31:0]
+@28
+[color] 2
+TOP.booth.Y_signed
+[color] 2
+TOP.booth.start
+@200
+-
+@24
+[color] 7
+TOP.booth.Z[63:0]
+@28
+[color] 7
+TOP.booth.valid
+@200
+-
+@29
+[color] 3
+TOP.booth.temp[1:0]
+@23
+[color] 3
+TOP.booth.Z_temp[64:0]
+[color] 3
+TOP.booth.Z_reg[64:0]
+[pattern_trace] 1
+[pattern_trace] 0

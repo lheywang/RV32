@@ -1,84 +1,163 @@
-// https://electrobinary.blogspot.com/2020/08/booth-multiplier-verilog-code.html
+/*
+ *  This section of code is mostly based on the algorithm here :
+ *  https://electrobinary.blogspot.com/2020/08/booth-multiplier-verilog-code.html
+ *  
+ *  With modifications : 
+ *  - Support of 32 bits operands
+ *  - Integration of some Verilog -> SystemVerilog improvements.
+ *  - Support of both signed and unsigned operands.
+ */ 
+ 
+`timescale 1ns / 1ps
+import core_config_pkg::XLEN;
 
-module booth2(clk,rst,start,X,Y,valid,Z);
+module booth(
+    
+    input   logic                                           clk,
+    input   logic                                           rst_n,
+    input   logic                                           start,
+    input   logic                                           X_signed,
+    input   logic                                           Y_signed,
+    input   logic   [(core_config_pkg::XLEN - 1) : 0]       X,
+    input   logic   [(core_config_pkg::XLEN - 1) : 0]       Y,
+    output  logic                                           valid,
+    output  logic   [((2 * core_config_pkg::XLEN) - 1) : 0] Z
+);
 
-input clk;
-input rst;
-input start;
-input signed [31:0]X,Y;
-output signed [63:0]Z;
-output valid;
+    /*
+     *  Custom types
+     */
+    typedef enum logic[0 : 0] {
+        IDLE    = 1'b0,
+        START   = 1'b1
+    } state_t;
 
-reg signed [63:0] Z,next_Z,Z_temp;
-reg next_state, pres_state;
-reg [1:0] temp,next_temp;
-reg [5:0] count,next_count;
-reg valid, next_valid;
+    /* 
+     *  Storage registers
+     */
+    logic   signed  [(2 * core_config_pkg::XLEN) : 0]       next_Z;
+    logic   signed  [(2 * core_config_pkg::XLEN) : 0]       Z_temp;
+    logic   signed  [(2 * core_config_pkg::XLEN) : 0]       Z_reg;
+    logic   signed  [(core_config_pkg::XLEN) : 0]           Y_ext;
+    logic   signed  [(core_config_pkg::XLEN) : 0]           next_Y_ext;
+    state_t                                                 next_state;
+    state_t                                                 pres_state;
+    logic           [1:0]                                   temp;
+    logic           [1:0]                                   next_temp;
+    logic           [($clog2(core_config_pkg::XLEN)-1) : 0] count;
+    logic           [($clog2(core_config_pkg::XLEN)-1) : 0] next_count;
+    logic                                                   next_valid;
 
-parameter IDLE = 1'b0;
-parameter START = 1'b1;
+    always_ff @ (posedge clk or negedge rst_n) begin
 
-always @ (posedge clk or negedge rst)
-begin
-if(!rst)
-begin
-  Z          <= 0;
-  valid      <= 0;
-  pres_state <= 0;
-  temp       <= 0;
-  count      <= 0;
-end
-else
-begin
-  Z          <= next_Z;
-  valid      <= next_valid;
-  pres_state <= next_state;
-  temp       <= next_temp;
-  count      <= next_count;
-end
-end
+        if(!rst_n) begin
 
-always @ (*)
-begin 
-case(pres_state)
-IDLE:
-begin
-next_count = 0;
-next_valid = 0;
-if(start)
-begin
-    next_state = START;
-    next_temp  = {X[0],1'b0};
-    next_Z     = {32'd0,X};
-end
-else
-begin
-    next_state = pres_state;
-    next_temp  = 0;
-    next_Z     = 0;
-end
-end
+            Z_reg           <= 65'b0;
+            valid           <= 1'b0;
+            pres_state      <= IDLE;
+            temp            <= 2'b0;
+            count           <= '0;
+            Y_ext           <= '0;
 
-START:
-begin
+        end
+        else begin
 
-	/*
-	 * 	Not using default will indcate to quartus to infer muxes rather than equal + selectors.
-	 * 	This lead to a gain of frequency of about 35 MHz.
-	 */
-    case(temp)
-	 2'b00: 	 Z_temp = {Z[63:32],Z[31:0]};	
-    2'b10:   Z_temp = {Z[63:32]-Y,Z[31:0]};
-    2'b01:   Z_temp = {Z[63:32]+Y,Z[31:0]};
-	 2'b11: 	 Z_temp = {Z[63:32],Z[31:0]};
-endcase
-	 
-next_temp  = {X[count+1],X[count]};
-next_count = count + 1;
-next_Z     = Z_temp >>> 1;
-next_valid = (&count) ? 1'b1 : 1'b0; 
-next_state = (&count) ? IDLE : pres_state;	
-end
-endcase
-end
+            Z_reg           <= next_Z;
+            valid           <= next_valid;  
+            pres_state      <= next_state;
+            temp            <= next_temp;
+            count           <= next_count;
+
+            if (pres_state == START) begin
+
+                Y_ext           <= next_Y_ext;
+
+            end
+
+        end
+    end
+
+    always_comb begin 
+
+        case(pres_state)
+
+            IDLE: begin
+
+                next_count      = 0;
+                next_valid      = 0;
+                Z_temp          = '0;
+
+                if(start) begin
+
+                    next_state  = START;
+                    next_temp   = {X[0],1'b0};
+                
+                    /*
+                     *  Perform sign handling conditions : 
+                     *  - If the operand is unsigned, we always padd '0' as the MSB
+                     *  - If the operand is   signed, we always sign extend to the MSB
+                     */
+
+                    if (X_signed) begin
+
+                        next_Z = {{33{X[31]}}, X};  // Sign extend
+
+                    end
+                    else begin
+
+                        next_Z = {33'd0, X};        // Zero extend
+
+                    end
+
+
+                    if (Y_signed) begin
+
+                        next_Y_ext = {Y[31], Y};         // Sign extend
+
+                    end
+                    else begin
+
+                        next_Y_ext = {1'd0, Y};          // Zero extend
+
+                    end
+
+                end
+                else begin
+
+                    next_state = pres_state;
+                    next_temp  = 0;
+                    next_Z     = 0;
+                    next_Y_ext = 0;
+
+                end
+            end
+
+            START: begin
+
+                /*
+                * 	Not using default will indcate to quartus to infer muxes rather than equal + selectors.
+                * 	This lead to a gain of frequency of about 35 MHz.
+                */
+                case(temp)
+                    2'b00:  Z_temp = Z_reg;                                 // + 0
+                    2'b10:  Z_temp = {Z_reg[64:32] - Y_ext,     Z[31:0]};   // - Y
+                    2'b01:  Z_temp = {Z_reg[64:32] + Y_ext,     Z[31:0]};   // + Y
+                    2'b11:  Z_temp = Z_reg;                                 // + 0
+                endcase
+                
+                next_temp       = {X[count+1],X[count]};
+                next_count      = count + 1;
+                next_Z          = $signed(Z_temp) >>> 1;
+
+                next_valid      = (&count) ? 1'b1 : 1'b0; 
+                next_state      = (&count) ? IDLE : pres_state;
+
+                next_Y_ext = 0;
+
+            end
+        endcase
+    end
+
+    assign Z = Z_reg[((2 * core_config_pkg::XLEN) - 1) : 0];
+
 endmodule
