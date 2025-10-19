@@ -130,9 +130,9 @@ module booth(
                 *   pass from 199.08 MHz to 200.72 MHz.
                 */
                 case(temp)
-                    2'b00:  Z_temp = Z_reg;                                                 // + 0
-                    2'b10:  Z_temp = {Z_reg[65], Z_reg[64:32] - Y_op,    Z_reg[31:0]};   // - Y
-                    2'b01:  Z_temp = {Z_reg[65], Z_reg[64:32] + Y_op,    Z_reg[31:0]};   // + Y
+                    2'b00:  Z_temp = Z_reg;                                             // + 0
+                    2'b10:  Z_temp = {Z_reg[65], Z_reg[64:32] - Y_op,    Z_reg[31:0]};  // - Y
+                    2'b01:  Z_temp = {Z_reg[65], Z_reg[64:32] + Y_op,    Z_reg[31:0]};  // + Y
                     2'b11:  Z_temp = Z_reg;                                             // + 0
                 endcase
                 
