@@ -82,7 +82,7 @@ int main(int argc, char **argv)
                     tick(tb, tfp);
                     tb->start = 0;
                 }
-                equality_print((char *)"Valid ",
+                equality_print((char *)"Valid         ",
                                 ticks,
                                 tb->valid,
                                 1);
@@ -116,7 +116,7 @@ int main(int argc, char **argv)
                 }
 
                 tick(tb, tfp);
-                equality_print((char *)"Valid ",
+                equality_print((char *)"Valid         ",
                                 ticks,
                                 tb->valid,
                                 0);
