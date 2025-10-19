@@ -74,7 +74,9 @@ int main(int argc, char **argv)
                 tb->Y = input2[ii];
 
                 // Start the test
+                stick(tb, tfp);
                 tb->start = 1;
+                stick(tb, tfp);
 
                 // Let the testbench compute
                 for (int i = 0; i < 33; i++)

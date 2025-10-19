@@ -35,9 +35,9 @@ module booth(
     /* 
      *  Storage registers
      */
-    logic   signed  [(2 * core_config_pkg::XLEN) : 0]       next_Z;
-    logic   signed  [(2 * core_config_pkg::XLEN) : 0]       Z_temp;
-    logic   signed  [(2 * core_config_pkg::XLEN) : 0]       Z_reg;
+    logic   signed  [((2 * core_config_pkg::XLEN) + 1) : 0] next_Z;
+    logic   signed  [((2 * core_config_pkg::XLEN) + 1) : 0] Z_temp;
+    logic   signed  [((2 * core_config_pkg::XLEN) + 1) : 0] Z_reg;
     logic   signed  [(core_config_pkg::XLEN) : 0]           Y_ext;
     logic   signed  [(core_config_pkg::XLEN) : 0]           next_Y_ext;
     state_t                                                 next_state;
@@ -52,7 +52,7 @@ module booth(
 
         if(!rst_n) begin
 
-            Z_reg           <= 65'b0;
+            Z_reg           <= 66'b0;
             valid           <= 1'b0;
             pres_state      <= IDLE;
             temp            <= 2'b0;
@@ -100,12 +100,12 @@ module booth(
 
                     if (X_signed) begin
 
-                        next_Z = {{33{X[31]}}, X};  // Sign extend
+                        next_Z = $signed({{34{$unsigned(X[31])}}, $unsigned(X)});  // Sign extend
 
                     end
                     else begin
 
-                        next_Z = {33'd0, X};        // Zero extend
+                        next_Z = {34'b0, X};        // Zero extend
 
                     end
 
@@ -139,10 +139,10 @@ module booth(
                 * 	This lead to a gain of frequency of about 35 MHz.
                 */
                 case(temp)
-                    2'b00:  Z_temp = Z_reg;                                 // + 0
-                    2'b10:  Z_temp = {Z_reg[64:32] - Y_ext,     Z[31:0]};   // - Y
-                    2'b01:  Z_temp = {Z_reg[64:32] + Y_ext,     Z[31:0]};   // + Y
-                    2'b11:  Z_temp = Z_reg;                                 // + 0
+                    2'b00:  Z_temp = Z_reg;                                             // + 0
+                    2'b10:  Z_temp = {Z_reg[65:32] - $signed(Y_ext),    Z_reg[31:0]};   // - Y
+                    2'b01:  Z_temp = {Z_reg[65:32] + $signed(Y_ext),    Z_reg[31:0]};   // + Y
+                    2'b11:  Z_temp = Z_reg;                                             // + 0
                 endcase
                 
                 next_temp       = {X[count+1],X[count]};
