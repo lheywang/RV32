@@ -16,7 +16,9 @@ module booth(
     input   logic                                           clk,
     input   logic                                           rst_n,
     input   logic                                           start,
+    /* verilator lint_off UNUSEDSIGNAL */
     input   logic                                           X_signed,
+    /* verilator lint_on UNUSEDSIGNAL */
     input   logic                                           Y_signed,
     input   logic   [(core_config_pkg::XLEN - 1) : 0]       X,
     input   logic   [(core_config_pkg::XLEN - 1) : 0]       Y,
@@ -87,6 +89,7 @@ module booth(
                 next_count      = 0;
                 next_valid      = 0;
                 Z_temp          = '0;
+                Y_op            = '0;
 
                 if(start) begin
 
@@ -99,9 +102,10 @@ module booth(
                      *  - If the operand is unsigned, we always padd '0' as the MSB
                      *  - If the operand is   signed, we always sign extend to the MSB
                      */
-
-                    next_Z = (X_signed) ? $signed({{34{X[31]}}, X}) : {34'b0, X};
                     next_Y_ext = (Y_signed) ? $signed({Y[31], Y}) :{1'd0, Y};
+
+                    // Z is always maintained as this form, regardless of it's sign.
+                    next_Z = {34'b0, X};
 
                 end
                 else begin
@@ -119,14 +123,17 @@ module booth(
                 Y_op = Y_signed ? $signed(Y_ext) : $unsigned(Y_ext);
 
                 /*
-                * 	Not using default will indcate to quartus to infer muxes rather than equal + selectors.
-                * 	This lead to a gain of frequency of about 35 MHz.
+                *   Not using default will indcate to quartus to infer muxes rather than equal + selectors.
+                *   This lead to a gain of frequency of about 35 MHz.
+                *   
+                *   Note 2 : By preserving the MSB, we can reduce a bit the ripple carry chain, and thus,
+                *   pass from 199.08 MHz to 200.72 MHz.
                 */
                 case(temp)
-                    2'b00:  Z_temp = Z_reg;                                   // + 0
-                    2'b10:  Z_temp = {Z_reg[65:32] - Y_op,    Z_reg[31:0]};   // - Y
-                    2'b01:  Z_temp = {Z_reg[65:32] + Y_op,    Z_reg[31:0]};   // + Y
-                    2'b11:  Z_temp = Z_reg;                                   // + 0
+                    2'b00:  Z_temp = Z_reg;                                                 // + 0
+                    2'b10:  Z_temp = {Z_reg[65], Z_reg[64:32] - Y_op,    Z_reg[31:0]};   // - Y
+                    2'b01:  Z_temp = {Z_reg[65], Z_reg[64:32] + Y_op,    Z_reg[31:0]};   // + Y
+                    2'b11:  Z_temp = Z_reg;                                             // + 0
                 endcase
                 
                 next_temp       = Z_reg[1:0];
