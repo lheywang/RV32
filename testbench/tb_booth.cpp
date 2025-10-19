@@ -49,25 +49,29 @@ int main(int argc, char **argv)
             case 0 :                // MULxU
                 tb->X_signed = 0;
                 tb->Y_signed = 0;
+                print_case(module, (char*)"Unsigned X Unsigned");
                 break;
             case 1 :                // (unsupported by risc V)
                 tb->X_signed = 0;
                 tb->Y_signed = 1;
+                print_case(module, (char*)"Unsigned X   Signed");
                 break;
             case 2 :                // MULxSU
                 tb->X_signed = 1;
                 tb->Y_signed = 0;
+                print_case(module, (char*)"  Signed X Unsigned");
                 break;
             case 3 :                // MULx
                 tb->X_signed = 1;
                 tb->Y_signed = 1;
+                print_case(module, (char*)"  Signed X   Signed");
                 break;
         }
 
         // First set of inputs
         for (int i = 0; i < 10; i++)
         {
-            for (int ii = 0; ii < 10; ii ++)
+            for (int ii = 0; ii < 10; ii++)
             {
                 // Set inputs
                 tb->X = input1[i];
@@ -79,7 +83,7 @@ int main(int argc, char **argv)
                 stick(tb, tfp);
 
                 // Let the testbench compute
-                for (int i = 0; i < 33; i++)
+                for (int k = 0; k < 33; k++)
                 {
                     tick(tb, tfp);
                     tb->start = 0;
