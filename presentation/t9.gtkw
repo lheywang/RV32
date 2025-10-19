@@ -1,0 +1,79 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Sun Oct 19 20:44:21 2025
+[*]
+[dumpfile] "/home/user/dev/RV32/simout/srt.vcd"
+[dumpfile_mtime] "Sun Oct 19 20:40:53 2025"
+[dumpfile_size] 3986932
+[savefile] "/home/user/dev/RV32/presentation/t9.gtkw"
+[timestart] 0
+[size] 2560 985
+[pos] -27 -24
+*0.000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] TOP.
+[sst_width] 297
+[signals_width] 190
+[sst_expanded] 1
+[sst_vpaned_height] 120
+@28
+TOP.srt.clk
+TOP.srt.rst_n
+@200
+-
+@22
+[color] 1
+TOP.srt.dividend[31:0]
+@28
+[color] 1
+TOP.srt.dividend_signed
+@22
+[color] 1
+TOP.srt.divisor[31:0]
+@29
+[color] 1
+TOP.srt.divisor_signed
+@200
+-
+@c00022
+[color] 3
+TOP.srt.count[5:0]
+@28
+(0)TOP.srt.count[5:0]
+(1)TOP.srt.count[5:0]
+(2)TOP.srt.count[5:0]
+(3)TOP.srt.count[5:0]
+(4)TOP.srt.count[5:0]
+(5)TOP.srt.count[5:0]
+@1401200
+-group_end
+@22
+[color] 3
+TOP.srt.next_count[5:0]
+@28
+[color] 3
+TOP.srt.pres_state[1:0]
+[color] 3
+TOP.srt.next_state[1:0]
+@200
+-
+@28
+[color] 6
+TOP.srt.dividend_neg
+[color] 6
+TOP.srt.divisor_neg
+@200
+-
+@28
+[color] 2
+TOP.srt.next_dividend_neg
+[color] 2
+TOP.srt.next_divisor_neg
+@22
+[color] 2
+TOP.srt.test_sub[31:0]
+[color] 2
+TOP.srt.next_quotient[31:0]
+[color] 2
+TOP.srt.next_remainder[32:0]
+[pattern_trace] 1
+[pattern_trace] 0
