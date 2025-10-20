@@ -7,11 +7,11 @@ module srt(
     input   logic                                       start,
     input   logic                                       dividend_signed,
     input   logic                                       divisor_signed,
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]  dividend,
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]  divisor,
+    input   logic   [(core_config_pkg::XLEN - 1) : 0]   dividend,
+    input   logic   [(core_config_pkg::XLEN - 1) : 0]   divisor,
     output  logic                                       valid,
-    output  logic   [(core_config_pkg::XLEN - 1) : 0]  quotient,
-    output  logic   [(core_config_pkg::XLEN - 1) : 0]  remainder,
+    output  logic   [(core_config_pkg::XLEN - 1) : 0]   quotient,
+    output  logic   [(core_config_pkg::XLEN - 1) : 0]   remainder,
     output  logic                                       div_by_zero
 );
 
@@ -121,6 +121,21 @@ module srt(
                         next_AQ = {dividend, 33'h1FFFFFFFF};
                         next_state = ERR;
 
+                    end
+
+                    /* 
+                     *  Note : Using two signess for the division lead to incorrect 
+                     *  and unpredictable results.
+                     *
+                     *  XORing the signs ensure us to get an error in theses cases, or the
+                     *  right result at the end !
+                     */
+                    else if (dividend_signed ^ divisor_signed) begin
+
+                        next_div_by_zero = 1'b0;
+                        next_AQ = {dividend, 33'h1FFFFFFFF};
+                        next_state = ERR;
+
                     end 
                     else begin
 
@@ -138,6 +153,9 @@ module srt(
                          */
                         abs_dividend = (dividend ^ sign_mask_dividend) + {31'b0, sign_mask_dividend[0]};
                         abs_divisor  = (divisor  ^ sign_mask_divisor)  + {31'b0, sign_mask_divisor[0]};
+
+                        next_dividend_neg = dividend_signed && dividend[31];
+                        next_divisor_neg  = divisor_signed  && divisor[31];
 
                         next_AQ       = {33'd0, abs_dividend};
                         next_divisor  = abs_divisor;

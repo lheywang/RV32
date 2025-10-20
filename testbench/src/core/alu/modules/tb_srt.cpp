@@ -11,8 +11,8 @@
 
 char *module = (char *)"SRT-Divider";
 
-unsigned int input1[10] = {10, 100, 1000, 0xFFFFFFFF, 0, 8, 2, 17, 29, 33};
-unsigned int input2[10] = {3, 5, 7, 9, 22, 0xFFFFFFFF, 21, 37, 49, 11345678};
+unsigned int input1[20] = {10, 100, 1000, 0xFFFFFFFF, 0, 8, 2, 17, 29, 33, 59, 87, 453610452, 452135, 125245454, 47, 123, 789, 456, 20};
+unsigned int input2[20] = {3, 5, 7, 9, 22, 0xFFFFFFFF, 21, 37, 49, 11345678, 0xAAAAAAAA, 0x55555555, 456, 123, 789, 741, 852, 963, 0, 123};
 
 // Main
 int main(int argc, char **argv)
@@ -42,7 +42,7 @@ int main(int argc, char **argv)
 
     int ticks = 0;
 
-    for (int op = 0; op < 4; op ++)
+    for (int op = 0; op < 2; op ++)
     {
         switch (op)
         {
@@ -52,16 +52,6 @@ int main(int argc, char **argv)
                 print_case(module, (char*)"Unsigned X Unsigned");
                 break;
             case 1 :
-                tb->dividend_signed = 0;
-                tb->divisor_signed = 1;
-                print_case(module, (char*)"Unsigned X   Signed");
-                break;
-            case 2 :
-                tb->dividend_signed = 1;
-                tb->divisor_signed = 0;
-                print_case(module, (char*)"  Signed X Unsigned");
-                break;
-            case 3 :
                 tb->dividend_signed = 1;
                 tb->divisor_signed = 1;
                 print_case(module, (char*)"  Signed X   Signed");
@@ -69,9 +59,9 @@ int main(int argc, char **argv)
         }
 
         // First set of inputs
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 20; i++)
         {
-            for (int ii = 0; ii < 10; ii++)
+            for (int ii = 0; ii < 20; ii++)
             {
                 // Set inputs
                 tb->dividend = input1[i];
@@ -88,39 +78,52 @@ int main(int argc, char **argv)
                     tick(tb, tfp);
                     tb->start = 0;
                 }
-                equality_print((char *)"Valid         ",
+
+                if (tb->divisor == 0)
+                {
+                    equality_print((char *)"Valid         ",
+                                ticks,
+                                tb->valid,
+                                0);
+
+                    equality_print((char *)"Result (Null )",
+                                            ticks,
+                                            tb->quotient,
+                                            0xFFFFFFFF);
+                }
+                else 
+                {
+                    equality_print((char *)"Valid         ",
                                 ticks,
                                 tb->valid,
                                 1);
 
-                switch(op)
-                {
-                    case 0 : 
-                        equality_print((char *)"Result (U / U)",
-                                        ticks,
-                                        tb->quotient,
-                                        (unsigned)tb->dividend / (unsigned)tb->divisor);
-                        break;
-                    case 1 :
-                        equality_print((char *)"Result (U / S)",
-                                        ticks,
-                                        tb->quotient,
-                                        (unsigned)tb->dividend / (signed)tb->divisor);
-                        break;
-                    case 2 :
-                        equality_print((char *)"Result (S / U)",
-                                        ticks,
-                                        tb->quotient,
-                                        (signed)tb->dividend / (unsigned)tb->divisor);
-                        break;
-                    case 3 : 
-                        equality_print((char *)"Result (S / S)",
-                                        ticks,
-                                        tb->quotient,
-                                        (signed)tb->dividend / (signed)tb->divisor);
-                        break;
+                    switch(op)
+                    {
+                        case 0 : 
+                            equality_print((char *)"Result (U / U)",
+                                            ticks,
+                                            tb->quotient,
+                                            (unsigned)tb->dividend / (unsigned)tb->divisor);
+                            equality_print((char *)"Result (U % U)",
+                                            ticks,
+                                            tb->remainder,
+                                            (unsigned)tb->dividend % (unsigned)tb->divisor);
+                            break;
+                            break;
+                        case 1 :
+                            equality_print((char *)"Result (S / S)",
+                                            ticks,
+                                            tb->quotient,
+                                            (signed)tb->dividend / (signed)tb->divisor);
+                            equality_print((char *)"Result (S % S)",
+                                            ticks,
+                                            tb->remainder,
+                                            (signed)tb->dividend % (signed)tb->divisor);
+                            break;
+                    }
                 }
-
+                
                 tick(tb, tfp);
                 equality_print((char *)"Valid         ",
                                 ticks,
