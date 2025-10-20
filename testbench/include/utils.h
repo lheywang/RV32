@@ -37,7 +37,9 @@ void tick(T *tb, VerilatedVcdC *tfp, bool trace = true)
 }
 
 void equality_print_arg(char name[64], int value, int reference);
+void equality_print_arg(char name[64], unsigned int value, unsigned int reference);
 void equality_print(char name[64], int cycle, int value, int reference, bool print = true);
+void equality_print(char name[64], int cycle, unsigned int value, unsigned int reference, bool print = true);
 void print_case(char name[64], char cases[64]);
 
 void get_counts(uint64_t *passed, uint64_t *failed);
