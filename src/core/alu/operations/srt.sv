@@ -124,22 +124,20 @@ module srt(
                     end 
                     else begin
 
-                        next_dividend_neg = dividend_signed && dividend[31];
-                        next_divisor_neg  = divisor_signed && divisor[31];
+                        logic [31:0] sign_mask_dividend;
+                        logic [31:0] sign_mask_divisor;
+                        logic [31:0] abs_dividend;
+                        logic [31:0] abs_divisor;
 
-                        // Initialize: A = 0, Q = |dividend|
-                        if (dividend_signed && dividend[31]) begin
-                            next_AQ = {33'd0, -$signed(dividend)};
-                        end else begin
-                            next_AQ = {33'd0, dividend};
-                        end
+                        sign_mask_dividend = {32{dividend_signed && dividend[31]}};
+                        sign_mask_divisor  = {32{divisor_signed  && divisor[31]}};
 
-                        // Store |divisor|
-                        if (divisor_signed && divisor[31]) begin
-                            next_divisor = -$signed(divisor);
-                        end else begin
-                            next_divisor = divisor;
-                        end
+                        // |x| = (x ^ mask) + mask[0];
+                        abs_dividend = (dividend ^ sign_mask_dividend) + {31'b0, sign_mask_dividend[0]};
+                        abs_divisor  = (divisor  ^ sign_mask_divisor)  + {31'b0, sign_mask_divisor[0]};
+
+                        next_AQ       = {33'd0, abs_dividend};
+                        next_divisor  = abs_divisor;
 
                         next_state = DIVIDE;
                     end
@@ -186,7 +184,6 @@ module srt(
                 
                 next_AQ = {AQ_reg[64], final_remainder, final_quotient};
 
-                
                 next_valid = 1'b1;
                 next_state = IDLE;
             end
