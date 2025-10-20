@@ -132,7 +132,10 @@ module srt(
                         sign_mask_dividend = {32{dividend_signed && dividend[31]}};
                         sign_mask_divisor  = {32{divisor_signed  && divisor[31]}};
 
-                        // |x| = (x ^ mask) + mask[0];
+                        /*
+                         *  Note : This combinational logic enable to negate a number without needing
+                         *  carry chains. The logic is A XOR MASK + 1, where XOR is used as a wanted inverter.
+                         */
                         abs_dividend = (dividend ^ sign_mask_dividend) + {31'b0, sign_mask_dividend[0]};
                         abs_divisor  = (divisor  ^ sign_mask_divisor)  + {31'b0, sign_mask_divisor[0]};
 
@@ -155,7 +158,6 @@ module srt(
                 A_part = shifted_AQ[64:32];
                 
                 temp_sub = A_part - {1'b0, divisor_reg};
-					 
                 case (temp_sub[32])
                     1'b1 :  next_AQ = {shifted_AQ[64:1], 1'b0};
                     1'b0 :  next_AQ = {temp_sub, shifted_AQ[31:1], 1'b1};
@@ -175,10 +177,14 @@ module srt(
 
                 logic [31:0] sign_mask_q;
                 logic [31:0] sign_mask_r;
-					 
+
                 sign_mask_q = {32{(dividend_neg_reg ^ divisor_neg_reg) && !quotient_null}};
                 sign_mask_r = {32{(dividend_neg_reg && !remainder_null)}};
-    
+
+                /*
+                 *  Note : This combinational logic enable to negate a number without needing
+                 *  carry chains. The logic is A XOR MASK + 1, where XOR is used as a wanted inverter.
+                 */	
                 final_quotient = (AQ_reg[31:0] ^ sign_mask_q) + {31'b0, sign_mask_q[0]};
                 final_remainder = (AQ_reg[63:32] ^ sign_mask_r) + {31'b0, sign_mask_r[0]};
                 
