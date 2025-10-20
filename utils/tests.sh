@@ -16,6 +16,7 @@ targets=(
     occupancy
     booth
     alu0
+    srt
     alu1
     alu5
 )
