@@ -14,9 +14,10 @@ targets=(
     csr
     reset
     occupancy
-    booth
+    booth       # modules for the ALU2
+    shift       # modules for the ALU2
+    srt         # modules for the ALU2
     alu0
-    srt
     alu1
     alu5
 )
