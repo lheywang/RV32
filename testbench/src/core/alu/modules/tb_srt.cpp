@@ -42,20 +42,20 @@ int main(int argc, char **argv)
 
     int ticks = 0;
 
-    for (int op = 0; op < 2; op ++)
+    for (int op = 0; op < 2; op++)
     {
         switch (op)
         {
-            case 0 :
-                tb->dividend_signed = 0;
-                tb->divisor_signed = 0;
-                print_case(module, (char*)"Unsigned X Unsigned");
-                break;
-            case 1 :
-                tb->dividend_signed = 1;
-                tb->divisor_signed = 1;
-                print_case(module, (char*)"  Signed X   Signed");
-                break;
+        case 0:
+            tb->dividend_signed = 0;
+            tb->divisor_signed = 0;
+            print_case(module, (char *)"Unsigned X Unsigned");
+            break;
+        case 1:
+            tb->dividend_signed = 1;
+            tb->divisor_signed = 1;
+            print_case(module, (char *)"  Signed X   Signed");
+            break;
         }
 
         // First set of inputs
@@ -72,63 +72,78 @@ int main(int argc, char **argv)
                 tb->start = 1;
                 stick(tb, tfp);
 
-                // Let the testbench compute
-                for (int k = 0; k < 34; k++)
-                {
-                    tick(tb, tfp);
-                    tb->start = 0;
-                }
-
                 if (tb->divisor == 0)
                 {
+
+                    // Let the testbench compute
+                    for (int k = 0; k < 2; k++)
+                    {
+                        tick(tb, tfp);
+                        tb->start = 0;
+                    }
                     equality_print((char *)"Valid         ",
-                                ticks,
-                                tb->valid,
-                                0);
+                                   ticks,
+                                   tb->valid,
+                                   1);
+                    equality_print((char *)"Div By Zero   ",
+                                   ticks,
+                                   tb->div_by_zero,
+                                   1);
 
                     equality_print((char *)"Result (Null )",
-                                            ticks,
-                                            tb->quotient,
-                                            0xFFFFFFFF);
+                                   ticks,
+                                   tb->quotient,
+                                   0xFFFFFFFF);
                 }
-                else 
+                else
                 {
-                    equality_print((char *)"Valid         ",
-                                ticks,
-                                tb->valid,
-                                1);
-
-                    switch(op)
+                    // Let the testbench compute
+                    for (int k = 0; k < 34; k++)
                     {
-                        case 0 : 
-                            equality_print((char *)"Result (U / U)",
-                                            ticks,
-                                            tb->quotient,
-                                            (unsigned)tb->dividend / (unsigned)tb->divisor);
-                            equality_print((char *)"Result (U % U)",
-                                            ticks,
-                                            tb->remainder,
-                                            (unsigned)tb->dividend % (unsigned)tb->divisor);
-                            break;
-                            break;
-                        case 1 :
-                            equality_print((char *)"Result (S / S)",
-                                            ticks,
-                                            tb->quotient,
-                                            (signed)tb->dividend / (signed)tb->divisor);
-                            equality_print((char *)"Result (S % S)",
-                                            ticks,
-                                            tb->remainder,
-                                            (signed)tb->dividend % (signed)tb->divisor);
-                            break;
+                        tick(tb, tfp);
+                        tb->start = 0;
+                    }
+
+                    equality_print((char *)"Valid         ",
+                                   ticks,
+                                   tb->valid,
+                                   1);
+                    equality_print((char *)"Div By Zero   ",
+                                   ticks,
+                                   tb->div_by_zero,
+                                   0);
+
+                    switch (op)
+                    {
+                    case 0:
+                        equality_print((char *)"Result (U / U)",
+                                       ticks,
+                                       tb->quotient,
+                                       (unsigned)tb->dividend / (unsigned)tb->divisor);
+                        equality_print((char *)"Result (U % U)",
+                                       ticks,
+                                       tb->remainder,
+                                       (unsigned)tb->dividend % (unsigned)tb->divisor);
+                        break;
+                        break;
+                    case 1:
+                        equality_print((char *)"Result (S / S)",
+                                       ticks,
+                                       tb->quotient,
+                                       (signed)tb->dividend / (signed)tb->divisor);
+                        equality_print((char *)"Result (S % S)",
+                                       ticks,
+                                       tb->remainder,
+                                       (signed)tb->dividend % (signed)tb->divisor);
+                        break;
                     }
                 }
-                
+
                 tick(tb, tfp);
                 equality_print((char *)"Valid         ",
-                                ticks,
-                                tb->valid,
-                                0);
+                               ticks,
+                               tb->valid,
+                               0);
 
                 ticks += 1;
             }
