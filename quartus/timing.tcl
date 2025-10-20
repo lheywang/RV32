@@ -1,4 +1,5 @@
 create_timing_netlist
 read_sdc
 update_timing_netlist
+report_clocks
 report_timing -npath 50
