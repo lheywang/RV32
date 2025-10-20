@@ -1,0 +1,43 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Mon Oct 20 16:24:19 2025
+[*]
+[dumpfile] "/home/user/dev/RV32/simout/shift.vcd"
+[dumpfile_mtime] "Mon Oct 20 16:22:40 2025"
+[dumpfile_size] 6192
+[savefile] "/home/user/dev/RV32/presentation/t10.gtkw"
+[timestart] 0
+[size] 2560 985
+[pos] -27 -24
+*-2.816973 15 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] TOP.
+[sst_width] 297
+[signals_width] 158
+[sst_expanded] 1
+[sst_vpaned_height] 291
+@28
+TOP.shift.clk
+TOP.shift.rst_n
+@200
+-
+@22
+TOP.shift.data_in[31:0]
+@28
+TOP.shift.shift_left
+TOP.shift.arithmetic
+@200
+-
+@28
+TOP.shift.pres_state[0]
+TOP.shift.next_state[0]
+@200
+-
+@28
+TOP.shift.r_arithmetic
+TOP.shift.r_shift_left
+@22
+TOP.shift.r_remaining[4:0]
+@23
+TOP.shift.r_shifted[31:0]
+[pattern_trace] 1
+[pattern_trace] 0
