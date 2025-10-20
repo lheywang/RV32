@@ -89,7 +89,11 @@ package core_config_pkg;
     // -------------------------------------------------------------------------
     // ALUs configuration
     // -------------------------------------------------------------------------
-    parameter logic [5:0] MAX_SHIFT_PER_CYCLE   = 8;              // Max bits shifts per cycles. Optimize for LUT / Speed
+    /*
+     *  Due to deep, in silicon considerations, a maximal shift of 6 is the value
+     *  that work the best (LUT / shift usage and maximal frequency).
+     */
+    parameter logic [4:0] MAX_SHIFT_PER_CYCLE   = 6;
 
     // -------------------------------------------------------------------------
     // Performance counter configuration
