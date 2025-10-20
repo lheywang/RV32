@@ -7,78 +7,84 @@ module srt(
     input   logic                                       start,
     input   logic                                       dividend_signed,
     input   logic                                       divisor_signed,
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]   dividend,
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]   divisor,
+    input   logic   [(core_config_pkg::XLEN - 1) : 0]  dividend,
+    input   logic   [(core_config_pkg::XLEN - 1) : 0]  divisor,
     output  logic                                       valid,
-    output  logic   [(core_config_pkg::XLEN - 1) : 0]   quotient,
-    output  logic   [(core_config_pkg::XLEN - 1) : 0]   remainder,
+    output  logic   [(core_config_pkg::XLEN - 1) : 0]  quotient,
+    output  logic   [(core_config_pkg::XLEN - 1) : 0]  remainder,
     output  logic                                       div_by_zero
 );
 
     /*
-     * State machine
+     * State machine (similar to Booth multiplier)
      */
     typedef enum logic[1:0] {
         IDLE        = 2'b00,
         DIVIDE      = 2'b01,
-        CORRECT     = 2'b10,
-        SIGN_FIX    = 2'b11
+        SIGN_FIX    = 2'b10,
+        ERR         = 2'b11
     } state_t;
 
-    state_t                                             pres_state;
-    state_t                                             next_state;
+    state_t pres_state, next_state;
 
     /*
      * Registers
+     * Structure: [Remainder (33 bits) | Quotient (32 bits)]
+     * Similar to Booth's [AC | QR] structure
      */
-    logic signed [(core_config_pkg::XLEN) : 0]          remainder_reg;      // 33 bits (sign + 32 data)
-    logic signed [(core_config_pkg::XLEN) : 0]          next_remainder;
-    logic        [(core_config_pkg::XLEN - 1) : 0]      quotient_reg;
-    logic        [(core_config_pkg::XLEN - 1) : 0]      next_quotient;
-    logic signed [(core_config_pkg::XLEN - 1) : 0]      divisor_reg;        // Store divisor
-    logic signed [(core_config_pkg::XLEN - 1) : 0]      next_divisor;
-    logic        [($clog2(core_config_pkg::XLEN)) : 0]  count;
-    logic        [($clog2(core_config_pkg::XLEN)) : 0]  next_count;
-    logic                                               next_valid;
-    logic                                               next_div_by_zero;
-    logic signed [(core_config_pkg::XLEN) : 0]          shifted_remainder;
-    logic signed [(core_config_pkg::XLEN - 1) : 0]      test_sub;
+    logic [64:0]            AQ_reg;         // Combined register [Remainder:Quotient]
+    logic [64:0]            next_AQ;
+    logic [31:0]            divisor_reg;
+    logic [31:0]            next_divisor;
+    logic [5:0]             count;
+    logic [5:0]             next_count;
+    logic                   next_valid;
+    logic                   next_div_by_zero;
     
-    // Sign tracking for final adjustment
-    logic                                           dividend_neg;
-    logic                                           divisor_neg;
-    logic                                           next_dividend_neg;
-    logic                                           next_divisor_neg;
+    // Sign tracking
+    logic                   dividend_neg_reg;
+    logic                   divisor_neg_reg;
+    logic                   next_dividend_neg;
+    logic                   next_divisor_neg;
+
+    logic                   next_quotient_null;
+    logic                   next_remainder_null;
+    logic                   quotient_null;
+    logic                   remainder_null; 
+    logic [31:0]            final_quotient;
+    logic [31:0]            final_remainder;
+    
 
     /*
      * Sequential logic
      */
     always_ff @(posedge clk or negedge rst_n) begin
-
         if (!rst_n) begin
 
-            pres_state      <= IDLE;
-            remainder_reg   <= '0;
-            quotient_reg    <= '0;
-            divisor_reg     <= '0;
-            count           <= '0;
-            valid           <= 1'b0;
-            div_by_zero     <= 1'b0;
-            dividend_neg    <= 1'b0;
-            divisor_neg     <= 1'b0;
+            pres_state       <= IDLE;
+            AQ_reg           <= '0;
+            divisor_reg      <= '0;
+            count            <= '0;
+            valid            <= 1'b0;
+            div_by_zero      <= 1'b0;
+            dividend_neg_reg <= 1'b0;
+            divisor_neg_reg  <= 1'b0;
+            quotient_null    <= 1'b0;
+            remainder_null   <= 1'b0;
 
         end 
         else begin
 
-            pres_state      <= next_state;
-            remainder_reg   <= next_remainder;
-            quotient_reg    <= next_quotient;
-            divisor_reg     <= next_divisor;
-            count           <= next_count;
-            valid           <= next_valid;
-            div_by_zero     <= next_div_by_zero;
-            dividend_neg    <= next_dividend_neg;
-            divisor_neg     <= next_divisor_neg;
+            pres_state       <= next_state;
+            AQ_reg           <= next_AQ;
+            divisor_reg      <= next_divisor;
+            count            <= next_count;
+            valid            <= next_valid;
+            div_by_zero      <= next_div_by_zero;
+            dividend_neg_reg <= next_dividend_neg;
+            divisor_neg_reg  <= next_divisor_neg;
+            quotient_null    <= next_quotient_null;
+            remainder_null   <= next_remainder_null;
 
         end
     end
@@ -89,118 +95,103 @@ module srt(
     always_comb begin
         // Defaults
         next_state          = pres_state;
-        next_remainder      = remainder_reg;
-        next_quotient       = quotient_reg;
+        next_AQ             = AQ_reg;
         next_divisor        = divisor_reg;
         next_count          = count;
         next_valid          = 1'b0;
         next_div_by_zero    = div_by_zero;
-        next_dividend_neg   = dividend_neg;
-        next_divisor_neg    = divisor_neg;
-        shifted_remainder   = 0;
-        test_sub            = 0;
+        next_dividend_neg   = dividend_neg_reg;
+        next_divisor_neg    = divisor_neg_reg;
+        next_quotient_null  = 1'b0;
+        next_remainder_null = 1'b0;
+        final_quotient      = '0;
+        final_remainder     = '0;
 
         case (pres_state)
             IDLE: begin
                 next_count = 6'd0;
                 next_div_by_zero = 1'b0;
+                next_valid = 1'b0;
 
                 if (start) begin
-                    // Check for division by zero
-                    if (divisor == 0) begin
-                        next_div_by_zero = 1'b1;
-                        next_state = SIGN_FIX;  // Go to output with error
-                    end else begin
-                        next_state = DIVIDE;
+                   
+                    if (divisor == 32'd0) begin
 
-                        // Track signs for final correction
+                        next_div_by_zero = 1'b1;
+                        next_AQ = {dividend, 33'h1FFFFFFFF};
+                        next_state = ERR;
+
+                    end 
+                    else begin
+
                         next_dividend_neg = dividend_signed && dividend[31];
                         next_divisor_neg  = divisor_signed && divisor[31];
 
-                        // Convert to absolute values for division
+                        // Initialize: A = 0, Q = |dividend|
                         if (dividend_signed && dividend[31]) begin
-                            // Negative dividend: convert to positive
-                            next_remainder = {1'b0, -$signed(dividend)};
+                            next_AQ = {33'd0, -$signed(dividend)};
                         end else begin
-                            next_remainder = {1'b0, dividend};
+                            next_AQ = {33'd0, dividend};
                         end
 
+                        // Store |divisor|
                         if (divisor_signed && divisor[31]) begin
-                            // Negative divisor: convert to positive
                             next_divisor = -$signed(divisor);
                         end else begin
                             next_divisor = divisor;
                         end
 
-                        next_quotient = 32'd0;
+                        next_state = DIVIDE;
                     end
                 end
             end
 
             DIVIDE: begin
-
+                /* verilator lint_off UNUSEDSIGNAL */
+                logic [64:0] shifted_AQ;
+                /* verilator lint_on UNUSEDSIGNAL */
+                logic [32:0] A_part;        // Remainder part (33 bits)
+                logic [32:0] temp_sub;
                 
-                // Shift remainder left by 1 (multiply by 2)
-                shifted_remainder = remainder_reg << 1;
+                shifted_AQ = AQ_reg << 1;
+                A_part = shifted_AQ[64:32];
                 
-                // Try subtracting divisor (32-bit subtraction for timing!)
-                test_sub = shifted_remainder[31:0] - divisor_reg;
-                
-                // Non-restoring division logic
-                if (shifted_remainder[32] == 1'b0) begin
-                    // Remainder is positive: subtract divisor
-                    if (test_sub[31] == 1'b0) begin
-                        // Result still positive: accept subtraction
-                        next_remainder = {1'b0, test_sub[31:0]};
-                        next_quotient = {quotient_reg[30:0], 1'b1};  // Q bit = 1
-                    end else begin
-                        // Result negative: keep original
-                        next_remainder = shifted_remainder;
-                        next_quotient = {quotient_reg[30:0], 1'b0};  // Q bit = 0
-                    end
-                end else begin
-                    // Remainder is negative: add divisor
-                    next_remainder = {1'b0, shifted_remainder[31:0] + divisor_reg};
-                    next_quotient = {quotient_reg[30:0], 1'b0};  // Q bit = 0
-                end
+                temp_sub = A_part - {1'b0, divisor_reg};
+					 
+                case (temp_sub[32])
+                    1'b1 :  next_AQ = {shifted_AQ[64:1], 1'b0};
+                    1'b0 :  next_AQ = {temp_sub, shifted_AQ[31:1], 1'b1};
+                endcase
 
                 next_count = count + 6'd1;
 
-                if (count == 6'd31) begin
-                    next_state = CORRECT;
-                end
-            end
+                next_quotient_null = (next_AQ[31:0] == 32'd0) ? 1'b1 : 1'b0; 
+                next_remainder_null = (next_AQ[63:32] == 32'd0) ? 1'b1 : 1'b0; 
 
-            CORRECT: begin
-                // Final correction if remainder is negative
-                if (remainder_reg[32]) begin
-                    next_remainder = remainder_reg + {1'b0, divisor_reg};
-                    next_quotient = quotient_reg - 1;
+                if (count == 6'd31) begin
+                    next_state = SIGN_FIX;
                 end
-                next_state = SIGN_FIX;
             end
 
             SIGN_FIX: begin
-                // Apply signs according to RISC-V rules:
-                // - Quotient sign: dividend_sign XOR divisor_sign
-                // - Remainder sign: dividend_sign
 
-                if (div_by_zero) begin
-                    // Division by zero: return -1 for quotient, dividend for remainder
-                    next_quotient = 32'hFFFFFFFF;
-                    next_remainder = {1'b0, dividend};
-                end else begin
-                    // Fix quotient sign
-                    if (dividend_neg ^ divisor_neg) begin
-                        next_quotient = -$signed(quotient_reg);
-                    end
+                logic [31:0] sign_mask_q;
+                logic [31:0] sign_mask_r;
+					 
+                sign_mask_q = {32{(dividend_neg_reg ^ divisor_neg_reg) && !quotient_null}};
+                sign_mask_r = {32{(dividend_neg_reg && !remainder_null)}};
+    
+                final_quotient = (AQ_reg[31:0] ^ sign_mask_q) + {31'b0, sign_mask_q[0]};
+                final_remainder = (AQ_reg[63:32] ^ sign_mask_r) + {31'b0, sign_mask_r[0]};
+                
+                next_AQ = {AQ_reg[64], final_remainder, final_quotient};
 
-                    // Fix remainder sign (takes dividend's sign)
-                    if (dividend_neg && remainder_reg != 0) begin
-                        next_remainder = -remainder_reg;
-                    end
-                end
+                
+                next_valid = 1'b1;
+                next_state = IDLE;
+            end
 
+            ERR: begin
                 next_valid = 1'b1;
                 next_state = IDLE;
             end
@@ -208,7 +199,7 @@ module srt(
     end
 
     // Output assignments
-    assign quotient = quotient_reg;
-    assign remainder = remainder_reg[31:0];
+    assign quotient = AQ_reg[31:0];
+    assign remainder = AQ_reg[63:32];
 
 endmodule

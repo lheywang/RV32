@@ -83,7 +83,7 @@ int main(int argc, char **argv)
                 stick(tb, tfp);
 
                 // Let the testbench compute
-                for (int k = 0; k < 33; k++)
+                for (int k = 0; k < 34; k++)
                 {
                     tick(tb, tfp);
                     tb->start = 0;
@@ -96,25 +96,25 @@ int main(int argc, char **argv)
                 switch(op)
                 {
                     case 0 : 
-                        equality_print((char *)"Result (U * U)",
+                        equality_print((char *)"Result (U / U)",
                                         ticks,
                                         tb->quotient,
                                         (unsigned)tb->dividend / (unsigned)tb->divisor);
                         break;
                     case 1 :
-                        equality_print((char *)"Result (U * S)",
+                        equality_print((char *)"Result (U / S)",
                                         ticks,
                                         tb->quotient,
                                         (unsigned)tb->dividend / (signed)tb->divisor);
                         break;
                     case 2 :
-                        equality_print((char *)"Result (S * U)",
+                        equality_print((char *)"Result (S / U)",
                                         ticks,
                                         tb->quotient,
                                         (signed)tb->dividend / (unsigned)tb->divisor);
                         break;
                     case 3 : 
-                        equality_print((char *)"Result (S * S)",
+                        equality_print((char *)"Result (S / S)",
                                         ticks,
                                         tb->quotient,
                                         (signed)tb->dividend / (signed)tb->divisor);
