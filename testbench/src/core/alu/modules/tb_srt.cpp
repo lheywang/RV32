@@ -76,11 +76,12 @@ int main(int argc, char **argv)
                 {
 
                     // Let the testbench compute
-                    for (int k = 0; k < 2; k++)
+                    do
                     {
                         tick(tb, tfp);
                         tb->start = 0;
-                    }
+                    } while (tb->valid != 1);
+
                     equality_print((char *)"Valid         ",
                                    ticks,
                                    tb->valid,
@@ -98,11 +99,11 @@ int main(int argc, char **argv)
                 else
                 {
                     // Let the testbench compute
-                    for (int k = 0; k < 34; k++)
+                    do
                     {
                         tick(tb, tfp);
                         tb->start = 0;
-                    }
+                    } while (tb->valid != 1);
 
                     equality_print((char *)"Valid         ",
                                    ticks,
