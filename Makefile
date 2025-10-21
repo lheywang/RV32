@@ -2,7 +2,7 @@
 # Variables
 # =======================================================
 TOP        ?= pcounter
-SRC_DIR    = src
+SRC_DIR    = rtl
 BUILD_DIR  = build/
 TB_DIR 	   = testbench/
 TB_UTILS   = $(abspath $(TB_DIR)/include )
