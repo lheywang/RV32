@@ -57,30 +57,30 @@ int main(int argc, char **argv)
                 stick(tb, tfp);
                 stick(tb, tfp);
 
-                equality_print((char *)"Busy", cycle, tb->busy, 1);
-                equality_print((char *)"Valid", cycle, tb->valid, 1);
-                equality_print((char *)"RD", cycle, tb->o_rd, 0x1F);
+                equality_print((char *)"Busy    ", cycle, tb->busy, 1);
+                equality_print((char *)"Valid   ", cycle, tb->valid, 1);
+                equality_print((char *)"RD      ", cycle, tb->o_rd, 0x1F);
 
                 switch (i)
                 {
                 case 0: // ADD
-                    equality_print((char *)"Add", cycle, tb->res, (inputs1[ii] + inputs2[iii]));
+                    equality_print((char *)"Add     ", cycle, tb->res, (inputs1[ii] + inputs2[iii]));
                     break;
 
                 case 1: // SUB
-                    equality_print((char *)"Sub", cycle, tb->res, (inputs1[ii] - inputs2[iii]));
+                    equality_print((char *)"Sub     ", cycle, tb->res, (inputs1[ii] - inputs2[iii]));
                     break;
 
                 case 2: // AND
-                    equality_print((char *)"And", cycle, tb->res, (inputs1[ii] & inputs2[iii]));
+                    equality_print((char *)"And     ", cycle, tb->res, (inputs1[ii] & inputs2[iii]));
                     break;
 
                 case 3: // OR
-                    equality_print((char *)"Or ", cycle, tb->res, (inputs1[ii] | inputs2[iii]));
+                    equality_print((char *)"Or      ", cycle, tb->res, (inputs1[ii] | inputs2[iii]));
                     break;
 
                 case 4: // XOR
-                    equality_print((char *)"Or ", cycle, tb->res, (inputs1[ii] ^ inputs2[iii]));
+                    equality_print((char *)"Xor     ", cycle, tb->res, (inputs1[ii] ^ inputs2[iii]));
                     break;
                 }
 

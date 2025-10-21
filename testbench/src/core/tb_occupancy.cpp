@@ -35,8 +35,6 @@ int main(int argc, char **argv)
 
     initial_print(module);
 
-    int pass = 0;
-    int fail = 0;
     int cycle = 0;
 
     // First, lock some registers
@@ -46,7 +44,6 @@ int main(int argc, char **argv)
         tb->source2 = 0;
         tb->target = i;
         tb->lock = 1;
-        tick(tb, tfp);
         tick(tb, tfp);
 
         equality_print((char *)"Execution status bit (1)", cycle, tb->exec_ok, 1);
@@ -61,7 +58,6 @@ int main(int argc, char **argv)
         tb->target = i;
         tb->lock = 1;
         tick(tb, tfp);
-        tick(tb, tfp);
 
         equality_print((char *)"Execution status bit (0)", cycle, tb->exec_ok, 0);
         cycle += 1;
@@ -73,7 +69,6 @@ int main(int argc, char **argv)
     {
         tb->address = i;
         tb->write = 1;
-        tick(tb, tfp);
         tick(tb, tfp);
         cycle += 1;
     }
@@ -87,7 +82,6 @@ int main(int argc, char **argv)
         tb->target = i;
         tb->lock = 1;
         tick(tb, tfp);
-        tick(tb, tfp);
 
         equality_print((char *)"Execution status bit (1)", cycle, tb->exec_ok, 1);
         cycle += 1;
@@ -96,6 +90,10 @@ int main(int argc, char **argv)
     final_print(module);
 
     tfp->close();
+
+    uint64_t fail, pass;
+    get_counts(&pass, &fail);
+
     delete tb;
     return (fail != 0) ? 1 : 0;
 }

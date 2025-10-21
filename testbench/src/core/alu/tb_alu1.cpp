@@ -56,14 +56,14 @@ int main(int argc, char **argv)
                 tick(tb, tfp);
                 tick(tb, tfp);
 
-                equality_print((char *)"Busy", cycle, tb->busy, 1);
-                equality_print((char *)"Valid", cycle, tb->valid, 1);
+                equality_print((char *)"Busy      ", cycle, tb->busy, 1);
+                equality_print((char *)"Valid     ", cycle, tb->valid, 1);
 
                 switch (i)
                 {
                 case 5: // SLT
-                    equality_print((char *)"SLT - res", cycle, tb->res, (static_cast<int32_t>(inputs1[ii]) < static_cast<int32_t>(inputs2[iii])) ? 1 : 0);
-                    equality_print((char *)"SLT - req", cycle, tb->req, 0);
+                    equality_print((char *)"SLT - res ", cycle, tb->res, (static_cast<int32_t>(inputs1[ii]) < static_cast<int32_t>(inputs2[iii])) ? 1 : 0);
+                    equality_print((char *)"SLT - req ", cycle, tb->req, 0);
                     break;
 
                 case 6: // SLTU
@@ -72,27 +72,27 @@ int main(int argc, char **argv)
                     break;
 
                 case 7: // BEQ
-                    equality_print((char *)"BEQ - res", cycle, tb->res, 16382);
-                    equality_print((char *)"BEQ - req", cycle, tb->req, ((static_cast<int32_t>(inputs1[ii]) == static_cast<int32_t>(inputs2[iii])) ? 1 : 0));
+                    equality_print((char *)"BEQ - res ", cycle, tb->res, 16382);
+                    equality_print((char *)"BEQ - req ", cycle, tb->req, ((static_cast<int32_t>(inputs1[ii]) == static_cast<int32_t>(inputs2[iii])) ? 1 : 0));
                     break;
 
                 case 8: // BNE
-                    equality_print((char *)"BNE - res", cycle, tb->res, 16382);
-                    equality_print((char *)"BNE - req", cycle, tb->req, ((static_cast<int32_t>(inputs1[ii]) == static_cast<int32_t>(inputs2[iii])) ? 0 : 1));
+                    equality_print((char *)"BNE - res ", cycle, tb->res, 16382);
+                    equality_print((char *)"BNE - req ", cycle, tb->req, ((static_cast<int32_t>(inputs1[ii]) == static_cast<int32_t>(inputs2[iii])) ? 0 : 1));
                     break;
 
                 case 9: // BLT
-                    equality_print((char *)"BLT - res", cycle, tb->res, 16382);
-                    equality_print((char *)"BLT - req", cycle, tb->req, ((static_cast<int32_t>(inputs1[ii]) < static_cast<int32_t>(inputs2[iii])) ? 1 : 0));
+                    equality_print((char *)"BLT - res ", cycle, tb->res, 16382);
+                    equality_print((char *)"BLT - req ", cycle, tb->req, ((static_cast<int32_t>(inputs1[ii]) < static_cast<int32_t>(inputs2[iii])) ? 1 : 0));
                     break;
                 case 10: // BGE
-                    equality_print((char *)"BGE - res", cycle, tb->res, 16382);
-                    equality_print((char *)"BGE - req", cycle, tb->req, ((static_cast<int32_t>(inputs1[ii]) >= static_cast<int32_t>(inputs2[iii])) ? 1 : 0));
+                    equality_print((char *)"BGE - res ", cycle, tb->res, 16382);
+                    equality_print((char *)"BGE - req ", cycle, tb->req, ((static_cast<int32_t>(inputs1[ii]) >= static_cast<int32_t>(inputs2[iii])) ? 1 : 0));
                     break;
                 case 11: // BLTU
                     equality_print((char *)"BLTU - res", cycle, tb->res, 16382);
                     equality_print((char *)"BLTU - req", cycle, tb->req, (static_cast<uint32_t>(inputs1[ii]) < static_cast<uint32_t>(inputs2[iii])) ? 1 : 0);
-                    break;                
+                    break;
                 case 12: // BGEU
                     equality_print((char *)"BGEU - res", cycle, tb->res, 16382);
                     equality_print((char *)"BGEU - req", cycle, tb->req, (static_cast<uint32_t>(inputs1[ii]) >= static_cast<uint32_t>(inputs2[iii])) ? 1 : 0);
