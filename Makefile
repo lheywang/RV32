@@ -59,7 +59,6 @@ VERILOG_SRCS += $(SRC_DIR)/rv32.sv
 # Parameters and public recipes
 # =======================================================
 NPROC = $(shell nproc)
-export CXX="ccache clang++"
 
 # --- Verilator options ---
 VERILATOR_FLAGS = -Wall \
@@ -94,7 +93,7 @@ run: $(BUILD_DIR)/V$(TOP)
 # Compile generated C++ from Verilator
 $(BUILD_DIR)/V$(TOP): $(BUILD_DIR) $(VERILOG_SRCS) $(CXX_TB) $(CXX_HEADERS) $(SYSTEMVERILOG_HEADERS) 
 	verilator $(VERILATOR_FLAGS)
-	make -C $(BUILD_DIR) -f V$(TOP).mk V$(TOP) -j8 CXX="ccache clang++"
+	make -C $(BUILD_DIR) -f V$(TOP).mk V$(TOP) -j8 CXX="ccache g++"
 
 # Clean
 clean:
