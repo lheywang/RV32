@@ -1,21 +1,6 @@
 `timescale 1ns / 1ps
 import core_config_pkg::XLEN;
 import core_config_pkg::MAX_SHIFT_PER_CYCLE;
-/*
- *  Note : This module use registered shift, which mean the shift may ne more than
- *  one cycle to complete. Using a dump shift would infer a LOT of LUTs, and fail the
- *  the timing tests. (A single shift won't, but the large muxes would).
- */
-
-/*
- *  Note2 : Using a value for MAX_SHIFT_PER_CYCLE equivalent of 6 give us
- *  the greatest results. Small LUT count (291, compare to 288 needed for a shift of 4),
- *  and an higher frequency of acceptable clock (218 MHz where any other couldn't get 
- *  the 200 MHz barrier.).
- *
- *  This is probably related to some IC level architecture choice, which enable
- *  Quartus to get a way smaller fanout, or LUT count.
- */
 
 module shift (
     input   logic                                           clk,
@@ -138,12 +123,16 @@ module shift (
 
             SHIFT : begin
                 
-                logic [4:0] step;
+                     logic [5:0] step;
 
                 next_shift_left     = r_shift_left;
                 next_arithmetic     = r_arithmetic;
                      
-                step = (r_remaining > core_config_pkg::MAX_SHIFT_PER_CYCLE) ? core_config_pkg::MAX_SHIFT_PER_CYCLE : r_remaining;
+                     step = (r_remaining > core_config_pkg::MAX_SHIFT_PER_CYCLE) ? core_config_pkg::MAX_SHIFT_PER_CYCLE : r_remaining;
+
+                                             next_remaining  = (r_remaining > core_config_pkg::MAX_SHIFT_PER_CYCLE) ? 
+                                                (r_remaining - core_config_pkg::MAX_SHIFT_PER_CYCLE) :
+                                                (0);
                 
                 unique case ({r_shift_left, r_arithmetic})
 
@@ -151,18 +140,18 @@ module shift (
                     2'b00 : begin
                         next_shifted    = r_shifted >> step;
 
-                        next_remaining  = (r_remaining > core_config_pkg::MAX_SHIFT_PER_CYCLE) ? 
-                                                (r_remaining - core_config_pkg::MAX_SHIFT_PER_CYCLE) :
-                                                (0);
+                        // next_remaining  = (r_remaining > core_config_pkg::MAX_SHIFT_PER_CYCLE) ? 
+                        //                         (r_remaining - core_config_pkg::MAX_SHIFT_PER_CYCLE) :
+                        //                         (0);
                     end
 
                     // Right, arithmetic shift
                     2'b01 : begin
-                        next_shifted    = $signed(r_shifted) >>> step;
+                        next_shifted    = r_shifted >>> step;
                                 
-                        next_remaining  = (r_remaining > core_config_pkg::MAX_SHIFT_PER_CYCLE) ? 
-                                                (r_remaining - core_config_pkg::MAX_SHIFT_PER_CYCLE) :
-                                                (0);
+                        // next_remaining  = (r_remaining > core_config_pkg::MAX_SHIFT_PER_CYCLE) ? 
+                        //                         (r_remaining - core_config_pkg::MAX_SHIFT_PER_CYCLE) :
+                        //                         (0);
                     end
 
                     // Left shift (we silently discard the arithmetic bit in that case)
@@ -170,18 +159,18 @@ module shift (
                     2'b11 : begin
                         next_shifted    = r_shifted << step;
                                 
-                        next_remaining  = (r_remaining > core_config_pkg::MAX_SHIFT_PER_CYCLE) ? 
-                                                (r_remaining - core_config_pkg::MAX_SHIFT_PER_CYCLE) :
-                                                (0);
+                        // next_remaining  = (r_remaining > core_config_pkg::MAX_SHIFT_PER_CYCLE) ? 
+                        //                         (r_remaining - core_config_pkg::MAX_SHIFT_PER_CYCLE) :
+                        //                         (0);
                     end
 
                 endcase
 
-                if (next_remaining == 0) begin
+                if (r_remaining == 0) begin
 
                     next_state          = IDLE;
                     next_done           = 1'b1;
-                    next_out            = next_shifted;
+                    next_out            = r_shifted;
 
                 end
                 else begin
