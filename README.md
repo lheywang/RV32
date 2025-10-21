@@ -44,67 +44,35 @@ Trying to compile without will end up in errors.
 
 ## File structure :
 
-.
-├── build Build folder, store temp artifacts<br>
-│ ├── \*<br>
-├── presentation GTKWave presentations files, usefull to store the state of any previous test bench<br>
-│ ├── \*.gtkw<br>
-├── src Main sources.<br>
-│ ├── clocks Main clocks. Actually an Intel FPGA IP.<br>
-│ │ └── pll<br>
-│ │ ├── \*<br>
-│ ├── core RV32I core implementation. Does not include any memory nor peripherals.<br>
-│ │ ├── alu<br>
-│ │ ├── clock<br>
-│ │ ├── core_controller<br>
-│ │ ├── decoder<br>
-│ │ ├── pcounter<br>
-│ │ ├── endianness<br>
-│ │ ├── csr<br>
-│ │ ├── register_file<br>
-│ │ ├── core_tb.vhd<br>
-│ │ └── core.vhd<br>
-│ ├── memory Memory section, include both ROM and RAM for the core. Not required in simulation only.<br>
-│ │ ├── behavioral Comportement simulation.<br>
-│ │ │ ├── altera_mf_components.vhd<br>
-│ │ │ ├── altera_mf.vhd<br>
-│ │ │ └── sim.md<br>
-│ │ ├── ram RAM. Actually an Intel FPGA IP.<br>
-│ │ │ ├── \*<br>
-│ │ └── rom ROM. Actually an Intel FPGA IP.<br>
-│ │ ├── \*<br>
-│ ├── packages Common packages.<br>
-│ │ └── common.vhd<br>
-│ ├── peripherals Peripherals folders. Any of them is optionnal.<br>
-│ │ ├── argb<br>
-│ │ ├── gpio<br>
-│ │ ├── keys<br>
-│ │ ├── pwm<br>
-│ │ ├── serial<br>
-│ │ ├── timer<br>
-│ │ └── ulpi<br>
-│ └── rv32.vhd<br>
-├── tests Tests folders. Contain small assembly programs to test the operation principle of the core.<br>
-│ ├── test1<br>
-│ │ ├── test.md<br>
-│ │ └── test.S<br>
-│ ├── tester.py Tester script, charged to automatically choose and build the correct memory file.<br>
-│ ├── autotester.py Autotester, used memory dumps to check if design is working, or not.<br>
-│ └── tests.md<br>
+.<br>
+├── build --------------- Temporay folder, for the build artifacts.<br>
+├── doc ----------------- Documentation folder, for hand-written one.<br>
+├── documentation ------- Doxygen doc (relevant in SV ?).<br>
+├── logs ---------------- Output folder for the test shell script. Contain all of the console outputs.<br>
+├── presentation -------- GTKWave presentations files.<br>
+├── quartus ------------- Some Quartus II scripts to ensure compilation will be one correctly.<br>
+├── rtl ----------------- RTL source for the softcore.<br>
+├── simout -------------- Verilator output folder for the dumped VCD files.<br>
+├── src ----------------- C sources files for both the BSP and basic examples.<br>
+├── testbench ----------- Verilator C++ testbenchs.<br>
+├── tests --------------- Assembly and C tests scripts to be simulated on the softcore.<br>
+├── utils --------------- Utility folder for scripts and python tools.<br>
 ├── .gitignore<br>
-├── ghdl.py Main simulation script.<br>
 ├── LICENSE<br>
+├── Makefile<br>
 └── README.md<br>
 
 ## Versions history
 
 ### v1 (VHDL)
+
 A first version, wroten in VHDL is available trough a stale branch. This version, even if working was NOT complete, and
 thus shall not be used as an official core.
 
-It's major drawback was pure combinational ALU and reg to reg operations. This created extremely long paths, which cause
+It's major drawback was pure combinational ALU and reg to reg operations. This created extremely long paths, which caused
 the frequency to reduce drastically. In the last version, it was not able to handle more than 50 MHz, where the latest version
 is designed to operate at 200+ MHz !
 
 ### v2 (SystemVerilog)
+
 To be done !
