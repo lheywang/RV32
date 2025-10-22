@@ -9,32 +9,16 @@
 #include "utils.h"
 #include "generated_commands.h"
 
-char *module = (char *)"ALU5";
+#include "testbench.h"
+
+char *module = (char *)"ALU2";
 
 // Main
 int main(int argc, char **argv)
 {
     Verilated::commandArgs(argc, argv);
-
-    // Instantiate model
-    Valu2 *tb = new Valu2;
-
-    // Setup waveform tracing
-    Verilated::traceEverOn(true);
-    VerilatedVcdC *tfp = new VerilatedVcdC;
-    tb->trace(tfp, 99);
-    tfp->open("simout/alu2.vcd");
-
-    initial_print(module);
-
-    // Reset sequence
-    tb->rst_n = 0;
-    stick(tb, tfp);
-    tb->rst_n = 1;
-    stick(tb, tfp);
-    stick(tb, tfp);
-    stick(tb, tfp);
-
+    Testbench<Valu2> tb("ALU2");
+    tb.reset();
     /*
      *  Note : Since the major work of proving that the operation are working is done
      *  into the dedicated testbenches, we oly assert here that the signals from, and to
@@ -76,117 +60,85 @@ int main(int argc, char **argv)
         switch (opcodes[op])
         {
         case alu_commands_t::c_MUL:
-            print_case(module, (char *)"MUL   ");
+            tb.set_case("MUL   ");
+            // print_case(module, (char *)"MUL   ");
             break;
         case alu_commands_t::c_MULH:
-            print_case(module, (char *)"MULH  ");
+            tb.set_case("MULH  ");
+            // print_case(module, (char *)"MULH  ");
             break;
         case alu_commands_t::c_MULHSU:
-            print_case(module, (char *)"MULHSU");
+            tb.set_case("MULHSU");
+            // print_case(module, (char *)"MULHSU");
             break;
         case alu_commands_t::c_MULHU:
-            print_case(module, (char *)"MULHU ");
+            tb.set_case("MULHU ");
+            // print_case(module, (char *)"MULHU ");
             break;
         case alu_commands_t::c_DIV:
-            print_case(module, (char *)"DIV   ");
+            tb.set_case("DIV   ");
+            // print_case(module, (char *)"DIV   ");
             break;
         case alu_commands_t::c_DIVU:
-            print_case(module, (char *)"DIVU  ");
+            tb.set_case("DIVU  ");
+            // print_case(module, (char *)"DIVU  ");
             break;
         case alu_commands_t::c_REM:
-            print_case(module, (char *)"REM   ");
+            tb.set_case("REM   ");
+            // print_case(module, (char *)"REM   ");
             break;
         case alu_commands_t::c_REMU:
-            print_case(module, (char *)"REMU  ");
+            tb.set_case("REMU  ");
+            // print_case(module, (char *)"REMU  ");
             break;
         case alu_commands_t::c_SLL:
-            print_case(module, (char *)"SLL   ");
+            tb.set_case("SLL   ");
+            // print_case(module, (char *)"SLL   ");
             break;
         case alu_commands_t::c_SRL:
-            print_case(module, (char *)"SRL   ");
+            tb.set_case("SRL   ");
+            // print_case(module, (char *)"SRL   ");
             break;
         case alu_commands_t::c_SRA:
-            print_case(module, (char *)"SRA   ");
+            tb.set_case("SRA   ");
+            // print_case(module, (char *)"SRA   ");
             break;
         }
 
-        // Computing the value
-        tb->cmd = opcodes[op];
-        tb->arg0 = val1;
-        tb->arg1 = val2;
-        tb->i_rd = 17;
+        // The usage of both tb.set and direct assignement work.
+        tb.dut->cmd = opcodes[op];
+        tb.dut->arg0 = val1;
+        tb.dut->arg1 = val2;
+        tb.dut->i_rd = 17;
 
-        // Wait for finish
-        int cycle_count = 0;
-        do
-        {
-            tick(tb, tfp);
-            tb->cmd = 0;
-            tb->arg0 = 0;
-            tb->arg1 = 0;
-            tb->i_rd = 0;
-            cycle_count += 1;
+        tb.dut->cmd = opcodes[op];
+        tb.dut->arg0 = val1;
+        tb.dut->arg1 = val2;
+        tb.dut->i_rd = 17;
 
-            if (cycle_count == 1)
-            {
-                equality_print((char *)"Busy          ",
-                               ticks,
-                               tb->busy,
-                               1);
-            }
-        } while (tb->valid != 1);
-
+        // Wait to finish
+        int count = tb.run_until(&tb.dut->valid, 1);
         char str[64];
-        sprintf(str, "This operation needed %d cycles to execute !", cycle_count);
-        print_info(module, str);
+        sprintf(str, "This operation needed %d cycles to execute !", count);
+        tb.set_info(std::string(str));
 
-        equality_print((char *)"Valid         ",
-                       ticks,
-                       tb->valid,
-                       1);
-
-        equality_print((char *)"Result        ",
-                       ticks,
-                       tb->res,
-                       results[op]);
-
-        equality_print((char *)"O_rd          ",
-                       ticks,
-                       tb->o_rd,
-                       17);
-        equality_print((char *)"i_error       ",
-                       ticks,
-                       tb->i_error,
-                       0);
-        equality_print((char *)"0_error       ",
-                       ticks,
-                       tb->o_error,
-                       0);
-        equality_print((char *)"req           ",
-                       ticks,
-                       tb->req,
-                       0);
+        tb.check_equality(&tb.dut->valid, 1, "valid");
+        tb.check_equality(&tb.dut->res, results[op], "res");
+        tb.check_equality(&tb.dut->o_rd, 17, "o_rd");
+        tb.check_equality(&tb.dut->i_error, 0, "i_error");
+        tb.check_equality(&tb.dut->o_error, 0, "o_error");
+        tb.check_equality(&tb.dut->req, 0, "req");
 
         // Finally, clearing the output
-        tb->clear = 1;
-        tick(tb, tfp);
-        tb->clear = 0;
 
-        equality_print((char *)"Busy          ",
-                       ticks,
-                       tb->busy,
-                       0);
+        tb.set(&tb.dut->clear, 1);
+        tb.tick();
+        tb.set(&tb.dut->clear, 0);
 
-        ticks += 1;
+        tb.check_equality(&tb.dut->busy, 0, "busy");
+
+        tb.increment_cycles();
     }
 
-    final_print(module);
-
-    tfp->close();
-
-    uint64_t fail, pass;
-    get_counts(&pass, &fail);
-
-    delete tb;
-    return (fail != 0) ? 1 : 0;
+    return tb.get_return();
 }
