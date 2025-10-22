@@ -91,9 +91,13 @@ package core_config_pkg;
     // -------------------------------------------------------------------------
     /*
      *  Due to deep, in silicon considerations, a maximal shift of 6 is the value
-     *  that work the best (LUT / shift usage and maximal frequency).
+     *  that work the best (LUT / shift usage and maximal frequency), but with
+     *  some corners that won't pass the Fmax requirements (198 MHz vs 200 MHz).
+     *  A value of 3 will ensure an Fmax beyond our requirements (208 MHz for the
+     *  worst corner).
+     *  Feel free to tune this parameter to meet your needs !
      */
-    parameter logic [4:0] MAX_SHIFT_PER_CYCLE   = 6;
+    parameter logic [4:0] MAX_SHIFT_PER_CYCLE   = 3;
 
     // -------------------------------------------------------------------------
     // Performance counter configuration
