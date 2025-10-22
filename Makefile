@@ -9,6 +9,7 @@ SIMOUT     = simout/
 TB_UTILS   = $(abspath $(TB_DIR)/include )
 CXX_TB 	   := $(shell find $(abspath $(TB_DIR)/src) -type f -iname "tb_$(TOP).cpp" | head -n 1)
 CCX_UTILS  = $(abspath $(TB_DIR)/src/utils/utils.cpp)
+CCX_UTILS += $(abspath $(TB_DIR)/src/utils/testbench.cpp)
 
 # Including all SV packages files 
 VERILOG_SRCS = $(SRC_DIR)/packages/core_config_pkg.sv 

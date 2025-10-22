@@ -3,6 +3,8 @@
 #include "verilated.h"
 #include "verilated_vcd_c.h"
 
+#include <iostream>
+
 void final_print(char name[64]);
 void initial_print(char name[64]);
 
