@@ -9,9 +9,6 @@
 #include "utils.h"
 #include "generated_commands.h"
 
-int input1[10] = {1, 10, 100, 1000, -1, -10, -100, -1000, -2000000000, 0};
-int input2[10] = {2, 5, 8, 17, 22, -32, -39, 1024, 18, 0};
-
 char *module = (char *)"ALU5";
 
 // Main
@@ -39,62 +36,149 @@ int main(int argc, char **argv)
     stick(tb, tfp);
 
     /*
-     *  Since theses operations won't be taking the same time, using a single
-     *  loop as before isn't "easy". Thus, we split them into different smaller
-     *  loops, longer code but easier to understand.
+     *  Note : Since the major work of proving that the operation are working is done
+     *  into the dedicated testbenches, we oly assert here that the signals from, and to
+     *  this ALU are correct, more than performing a real computation test.
      */
 
-    // MUL
-    tb->cmd = alu_commands_t::c_MUL;
+    int opcodes[] = {alu_commands_t::c_MUL,
+                     alu_commands_t::c_MULH,
+                     alu_commands_t::c_MULHSU,
+                     alu_commands_t::c_MULHU,
+                     alu_commands_t::c_DIV,
+                     alu_commands_t::c_DIVU,
+                     alu_commands_t::c_REM,
+                     alu_commands_t::c_REMU,
+                     alu_commands_t::c_SLL,
+                     alu_commands_t::c_SRL,
+                     alu_commands_t::c_SRA};
 
-    for (int i = 0; i < 10; i++)
+    int val1 = 0xAAAAAAAA;
+    int val2 = 2;
+
+    unsigned int results[] = {0x55555554,
+                              0x00000003,
+                              0x00000003,
+                              0x00000003,
+                              0xD5555555,
+                              0x55555555,
+                              0x00000000,
+                              0x00000000,
+                              0xAAAAAAA8,
+                              0x2AAAAAAA,
+                              0xEAAAAAAA};
+
+    int ticks = 0;
+
+    for (int op = 0; op < 11; op++)
     {
-        for (int ii = 0; ii < 10; ii++)
+        // Initial print for the case
+        switch (opcodes[op])
         {
-            tb->arg0 = input1[i];
-            tb->arg1 = input2[ii];
-
-            // Compute the results
-            for (int k = 0; k < 32; k++)
-            {
-                tick(tb, tfp);
-            }
-
-            // Asserts for results
+        case alu_commands_t::c_MUL:
+            print_case(module, (char *)"MUL   ");
+            break;
+        case alu_commands_t::c_MULH:
+            print_case(module, (char *)"MULH  ");
+            break;
+        case alu_commands_t::c_MULHSU:
+            print_case(module, (char *)"MULHSU");
+            break;
+        case alu_commands_t::c_MULHU:
+            print_case(module, (char *)"MULHU ");
+            break;
+        case alu_commands_t::c_DIV:
+            print_case(module, (char *)"DIV   ");
+            break;
+        case alu_commands_t::c_DIVU:
+            print_case(module, (char *)"DIVU  ");
+            break;
+        case alu_commands_t::c_REM:
+            print_case(module, (char *)"REM   ");
+            break;
+        case alu_commands_t::c_REMU:
+            print_case(module, (char *)"REMU  ");
+            break;
+        case alu_commands_t::c_SLL:
+            print_case(module, (char *)"SLL   ");
+            break;
+        case alu_commands_t::c_SRL:
+            print_case(module, (char *)"SRL   ");
+            break;
+        case alu_commands_t::c_SRA:
+            print_case(module, (char *)"SRA   ");
+            break;
         }
+
+        // Computing the value
+        tb->cmd = opcodes[op];
+        tb->arg0 = val1;
+        tb->arg1 = val2;
+        tb->i_rd = 17;
+
+        // Wait for finish
+        int cycle_count = 0;
+        do
+        {
+            tick(tb, tfp);
+            tb->cmd = 0;
+            tb->arg0 = 0;
+            tb->arg1 = 0;
+            tb->i_rd = 0;
+            cycle_count += 1;
+
+            if (cycle_count == 1)
+            {
+                equality_print((char *)"Busy          ",
+                               ticks,
+                               tb->busy,
+                               1);
+            }
+        } while (tb->valid != 1);
+
+        char str[64];
+        sprintf(str, "This operation needed %d cycles to execute !", cycle_count);
+        print_info(module, str);
+
+        equality_print((char *)"Valid         ",
+                       ticks,
+                       tb->valid,
+                       1);
+
+        equality_print((char *)"Result        ",
+                       ticks,
+                       tb->res,
+                       results[op]);
+
+        equality_print((char *)"O_rd          ",
+                       ticks,
+                       tb->o_rd,
+                       17);
+        equality_print((char *)"i_error       ",
+                       ticks,
+                       tb->i_error,
+                       0);
+        equality_print((char *)"0_error       ",
+                       ticks,
+                       tb->o_error,
+                       0);
+        equality_print((char *)"req           ",
+                       ticks,
+                       tb->req,
+                       0);
+
+        // Finally, clearing the output
+        tb->clear = 1;
+        tick(tb, tfp);
+        tb->clear = 0;
+
+        equality_print((char *)"Busy          ",
+                       ticks,
+                       tb->busy,
+                       0);
+
+        ticks += 1;
     }
-
-    // MULH
-    tb->cmd = alu_commands_t::c_MULH;
-
-    // MULHSU
-    tb->cmd = alu_commands_t::c_MULHSU;
-
-    // MULHU
-    tb->cmd = alu_commands_t::c_MULHU;
-
-    // DIV
-    tb->cmd = alu_commands_t::c_DIV;
-
-    // DIVU
-    tb->cmd = alu_commands_t::c_DIVU;
-
-    // REM
-    tb->cmd = alu_commands_t::c_REM;
-
-    // REMU
-    tb->cmd = alu_commands_t::c_REMU;
-
-    // SLL
-    tb->cmd = alu_commands_t::c_SLL;
-
-    // SRL
-    tb->cmd = alu_commands_t::c_SRL;
-
-    // SRA
-    tb->cmd = alu_commands_t::c_SRA;
-
-    int cycle = 0;
 
     final_print(module);
 

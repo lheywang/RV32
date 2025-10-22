@@ -60,6 +60,7 @@ module alu2 (
     logic                                                   unknown_instr;
     logic                                                   next_o_error;
     logic   [(core_config_pkg::XLEN - 1) : 0]               next_res;
+    logic   [(core_config_pkg::XLEN - 1) : 0]               res_int;
 
     // Multiplier signals
     logic                                                   mul_start;
@@ -225,12 +226,13 @@ module alu2 (
             shift_left                  <= 1'b0;
             shift_arithmetic            <= 1'b0; 
 
-            res                         <= 32'b0;
+            res_int                     <= 32'b0;
 
         end 
         else begin
 
             state                       <= next_state;
+            res_int                     <= next_res;
 
             if (state == IDLE) begin
 
@@ -252,17 +254,6 @@ module alu2 (
 
                 shift_left                  <= next_shift_left;
                 shift_arithmetic            <= next_shift_arithmetic;  
-
-                res                         <= 32'b0;
-
-            end
-
-            /*
-             *  To economize one clock cycle, if the next operation is out, then, latch the output
-             */
-            else if (state == OUT) begin
-
-                res                         <= next_res; // This line cause issues, to be reworked.
 
             end
         end
@@ -327,6 +318,7 @@ module alu2 (
                 out_shift_left          = 1'b0;
 
                 next_res                = 32'b0;
+                res                     = 32'b0;
 
                 busy                    = 1'b0;
                 o_rd                    = 5'b0;
@@ -346,6 +338,7 @@ module alu2 (
                 out_shift_left          = shift_left;
 
                 next_res                = 32'b0;
+                res                     = 32'b0;
 
                 busy                    = 1'b1;
                 o_rd                    = 5'b0;
@@ -365,11 +358,11 @@ module alu2 (
                 out_shift_arithmetic    = shift_arithmetic;
                 out_shift_left          = shift_left;
 
-                next_res                = 32'b0;
-
                 busy                    = 1'b1;
                 o_rd                    = 5'b0;
                 valid                   = 1'b0;
+
+                res                     = 32'b0;
 
                 unique case (r_cmd)
 
@@ -408,7 +401,8 @@ module alu2 (
                 o_rd                    = r_i_rd;
                 valid                   = 1'b1;
 
-                next_res                = res;
+                next_res                = res_int;
+                res                     = res_int;
 
             end 
         endcase
@@ -418,7 +412,7 @@ module alu2 (
      *  Static assignements
      */
 
-    assign i_error = unknown_instr;
+    assign i_error = unknown_instr & ~busy;
     assign o_error = div_by_zero;   // This is the only source of error in the ALU.
     assign req = 1'b0;              // Unused signal here
 

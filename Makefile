@@ -5,6 +5,7 @@ TOP        ?= pcounter
 SRC_DIR    = rtl
 BUILD_DIR  = build/
 TB_DIR 	   = testbench/
+SIMOUT     = simout/
 TB_UTILS   = $(abspath $(TB_DIR)/include )
 CXX_TB 	   := $(shell find $(abspath $(TB_DIR)/src) -type f -iname "tb_$(TOP).cpp" | head -n 1)
 CCX_UTILS  = $(abspath $(TB_DIR)/src/utils/utils.cpp)
@@ -98,7 +99,7 @@ $(BUILD_DIR)/V$(TOP): $(BUILD_DIR) $(VERILOG_SRCS) $(CXX_TB) $(CXX_HEADERS) $(SY
 # Clean
 clean:
 	rm -rf $(BUILD_DIR)*
-	rm -rf simout/*.vcd
+	rm -rf $(SIMOUT)*.vcd
 	rm -rf logs/*.ans
 	rm -rf logs/*.log
 	rm -rf documentation/html
@@ -111,6 +112,9 @@ doc: FORCE
 	doxygen DoxyFile && cd documentation/latex && make pdf
 
 FORCE: ;
+
+wave: run
+	gtkwave $(SIMOUT)$(TOP).vcd
 
 .PHONY: all run clean tests doc
 

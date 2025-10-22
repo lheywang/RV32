@@ -43,3 +43,4 @@ void equality_print(char name[64], int cycle, int value, int reference, bool pri
 void print_case(char name[64], char cases[64]);
 
 void get_counts(uint64_t *passed, uint64_t *failed);
+void print_info(char name[64], char cases[64]);
