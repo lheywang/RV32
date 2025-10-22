@@ -122,47 +122,41 @@ module shift (
             end
 
             SHIFT : begin
+
+                /*
+                 *  Improvements ideas : 
+                 *
+                 *  Actually, the limiting factor of the ALU2 is right here, the shifts logics.
+                 *  To ensure a maximal operating frequency, the shift is limited to 3 bits (
+                 *  see core_config_pkg.sv).
+                 *  
+                 *  That's fine in most case, but for some, it may be cool to fasten up the 
+                 *  process. Thus, a bypass shift with a fixed 8 bits could be imagined, and
+                 *  called when r_remaining is greater than this value.
+                 *
+                 *  Will be *perhaps* be done in a future revision, when the testing profiled
+                 *  the right values.
+                 */
                 
-                     logic [5:0] step;
+                logic [SHIFT_SIZE : 0] step;
 
                 next_shift_left     = r_shift_left;
                 next_arithmetic     = r_arithmetic;
                      
-                     step = (r_remaining > core_config_pkg::MAX_SHIFT_PER_CYCLE) ? core_config_pkg::MAX_SHIFT_PER_CYCLE : r_remaining;
+                step = (r_remaining > core_config_pkg::MAX_SHIFT_PER_CYCLE) ? 
+                        core_config_pkg::MAX_SHIFT_PER_CYCLE : 
+                        r_remaining;
 
-                                             next_remaining  = (r_remaining > core_config_pkg::MAX_SHIFT_PER_CYCLE) ? 
-                                                (r_remaining - core_config_pkg::MAX_SHIFT_PER_CYCLE) :
-                                                (0);
+                next_remaining  = (r_remaining > core_config_pkg::MAX_SHIFT_PER_CYCLE) ? 
+                        (r_remaining - core_config_pkg::MAX_SHIFT_PER_CYCLE) :
+                        (0);
                 
                 unique case ({r_shift_left, r_arithmetic})
 
-                    // Right, non arithmetic shift
-                    2'b00 : begin
-                        next_shifted    = r_shifted >> step;
-
-                        // next_remaining  = (r_remaining > core_config_pkg::MAX_SHIFT_PER_CYCLE) ? 
-                        //                         (r_remaining - core_config_pkg::MAX_SHIFT_PER_CYCLE) :
-                        //                         (0);
-                    end
-
-                    // Right, arithmetic shift
-                    2'b01 : begin
-                        next_shifted    = r_shifted >>> step;
-                                
-                        // next_remaining  = (r_remaining > core_config_pkg::MAX_SHIFT_PER_CYCLE) ? 
-                        //                         (r_remaining - core_config_pkg::MAX_SHIFT_PER_CYCLE) :
-                        //                         (0);
-                    end
-
-                    // Left shift (we silently discard the arithmetic bit in that case)
+                    2'b00 : next_shifted    = r_shifted >> step;
+                    2'b01 : next_shifted    = $signed(r_shifted) >>> step;
                     2'b10,
-                    2'b11 : begin
-                        next_shifted    = r_shifted << step;
-                                
-                        // next_remaining  = (r_remaining > core_config_pkg::MAX_SHIFT_PER_CYCLE) ? 
-                        //                         (r_remaining - core_config_pkg::MAX_SHIFT_PER_CYCLE) :
-                        //                         (0);
-                    end
+                    2'b11 : next_shifted    = r_shifted << step;
 
                 endcase
 

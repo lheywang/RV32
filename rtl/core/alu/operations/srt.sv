@@ -63,22 +63,19 @@ module srt(
 
     /* verilator lint_off UNUSEDSIGNAL */
     logic [64:0]            shifted_AQ;
-    /* verilator lint_on UNUSEDSIGNAL */
-    logic [32:0]            A_part;        // Remainder part (33 bits)
-    logic [32:0]            temp_sub;
-    /* verilator lint_off UNUSEDSIGNAL */
     logic [64:0]            next_shifted_AQ;
-    /* verilator lint_on UNUSEDSIGNAL */
-    logic [32:0]            next_A_part;        // Remainder part (33 bits)
+    /* verilator lint_on UNUSEDSIGNAL */      
+    logic [32:0]            temp_sub;  
+    logic [32:0]            A_part;   
     logic [32:0]            next_temp_sub;
     logic [31:0]            sign_mask_q;
     logic [31:0]            sign_mask_r;
     logic [31:0]            next_sign_mask_q;
     logic [31:0]            next_sign_mask_r;
-    logic [31:0]                sign_mask_dividend;
-    logic [31:0]                sign_mask_divisor;
-        logic [31:0]                next_sign_mask_dividend;
-    logic [31:0]                next_sign_mask_divisor;
+    logic [31:0]            sign_mask_dividend;
+    logic [31:0]            sign_mask_divisor;
+    logic [31:0]            next_sign_mask_dividend;
+    logic [31:0]            next_sign_mask_divisor;
 
      /*
       * Note : Theses registers, AQ_regx are high fanout ones, so we use multiple
@@ -87,8 +84,10 @@ module srt(
       */
     logic [64:0]            next_AQ;
     logic [64:0]            AQ_reg;
-    logic [63:0]            AQ_reg2;
-    logic [63:0]            AQ_reg3; 
+    /* verilator lint_off UNUSEDSIGNAL */
+    logic [64:0]            AQ_reg2;
+    logic [64:0]            AQ_reg3; 
+    /* verilator lint_on UNUSEDSIGNAL */
 
 
     /*
@@ -114,20 +113,19 @@ module srt(
             abs_dividend        <= 32'b0;
             abs_divisor         <= 32'b0;
             shifted_AQ          <= 65'b0;
-            A_part              <= 33'b0;
             temp_sub            <= 33'b0;
             sign_mask_q         <= 32'b0;
             sign_mask_r         <= 32'b0;
-                sign_mask_dividend  <= 32'b0;
-                sign_mask_divisor   <= 32'b0;
+            sign_mask_dividend  <= 32'b0;
+            sign_mask_divisor   <= 32'b0;
 
         end 
         else begin
 
             pres_state          <= next_state;
             AQ_reg              <= next_AQ;
-            AQ_reg2             <= next_AQ[63:0];
-            AQ_reg3             <= next_AQ[63:0];
+            AQ_reg2             <= next_AQ;
+            AQ_reg3             <= next_AQ;
             divisor_reg         <= next_divisor;
             count               <= next_count;
             valid               <= next_valid;
@@ -141,12 +139,11 @@ module srt(
             abs_dividend        <= next_abs_dividend;
             abs_divisor         <= next_abs_divisor;
             shifted_AQ          <= next_shifted_AQ;
-            A_part              <= next_A_part;
             temp_sub            <= next_temp_sub;
             sign_mask_q         <= next_sign_mask_q;
             sign_mask_r         <= next_sign_mask_r;
-                sign_mask_dividend  <= next_sign_mask_dividend;
-                sign_mask_divisor   <= next_sign_mask_divisor;
+            sign_mask_dividend  <= next_sign_mask_dividend;
+            sign_mask_divisor   <= next_sign_mask_divisor;
 
         end
     end
@@ -156,29 +153,34 @@ module srt(
      */
     always_comb begin
         // Defaults
-        next_state          = pres_state;
-        next_AQ             = AQ_reg;
-        next_divisor        = divisor_reg;
-        next_count          = count;
-        next_valid          = 1'b0;
-        next_div_by_zero    = div_by_zero;
-        next_dividend_neg   = dividend_neg_reg;
-        next_divisor_neg    = divisor_neg_reg;
-        next_quotient_null  = 1'b0;
-        next_remainder_null = 1'b0;
-        final_quotient      = '0;
-        final_remainder     = '0;
-        next_abs_dividend   = 32'b0;
-        next_abs_divisor    = 32'b0;
-        next_shifted_AQ     = 65'b0;
-        next_A_part         = 33'b0;
-        next_temp_sub       = 33'b0;
-          next_sign_mask_q    = 32'b0;
-          next_sign_mask_r    = 32'b0;
-          next_sign_mask_dividend = 32'b0;
-          next_sign_mask_divisor = 32'b0;
+        next_state              = pres_state;
+        next_AQ                 = AQ_reg;
+        next_divisor            = divisor_reg;
+        next_count              = count;
+        next_valid              = 1'b0;
+        next_div_by_zero        = div_by_zero;
+        next_dividend_neg       = dividend_neg_reg;
+        next_divisor_neg        = divisor_neg_reg;
+        next_quotient_null      = 1'b0;
+        next_remainder_null     = 1'b0;
+        final_quotient          = '0;
+        final_remainder         = '0;
+        next_abs_dividend       = 32'b0;
+        next_abs_divisor        = 32'b0;
+        next_shifted_AQ         = AQ_reg;
+        next_temp_sub           = 33'b0;
+        next_sign_mask_q        = 32'b0;
+        next_sign_mask_r        = 32'b0;
+        next_sign_mask_dividend = 32'b0;
+        next_sign_mask_divisor  = 32'b0;
+        A_part                  = 33'b0;
 
         case (pres_state)
+
+            /*
+             *  Initialization cases
+             */
+
             IDLE: begin
                 next_count = 6'd0;
                 next_div_by_zero = 1'b0;
@@ -214,15 +216,15 @@ module srt(
                         next_sign_mask_dividend = {32{dividend_signed && dividend[31]}};
                         next_sign_mask_divisor  = {32{divisor_signed  && divisor[31]}};
                                 
-                                next_state = IDLE2;
+                        next_state = IDLE2;
                         
                         end
                     end
                 end
                 
-                IDLE2 : begin
+            IDLE2 : begin
 
-                            /*
+                /*
                  *  Note : This combinational logic enable to negate a number without needing
                  *  carry chains. The logic is A XOR MASK + 1, where XOR is used as a wanted inverter.
                  */
@@ -245,10 +247,13 @@ module srt(
                     
             end
 
+            /*
+             *  Computing cases
+             */
             DIVIDE: begin
                 
                 next_shifted_AQ = AQ_reg << 1;
-                next_A_part = shifted_AQ[64:32];
+                A_part          = next_shifted_AQ[64:32];
                 
                 next_temp_sub = A_part - {1'b0, divisor_reg};
                 next_state = DIVIDE2;
@@ -256,31 +261,28 @@ module srt(
             end
 
             DIVIDE2: begin
-                case (temp_sub[32])
-                    1'b1 :  next_AQ = {shifted_AQ[64:1], 1'b0};
-                    1'b0 :  next_AQ = {temp_sub, shifted_AQ[31:1], 1'b1};
-                endcase
+
+                next_AQ = (temp_sub[32]) ? 
+                            {shifted_AQ[64:1], 1'b0} : 
+                            {temp_sub, shifted_AQ[31:1], 1'b1};
 
                 next_count = count + 6'd1;
+                next_state = (count == 6'd31) ? 
+                            SIGN_COMP : 
+                            DIVIDE;
 
-                if (count == 6'd31) begin
-                    next_state = SIGN_COMP;
-                end
-                else begin
-                    next_state = DIVIDE;
-                end
             end
                 
-                /*
-                 *  Adding this intermediate step vastly increase the Fmax of the design.
-                 */
-                SIGN_COMP : begin
+            /*
+             *  Output cases
+             */
+            SIGN_COMP : begin
 
-                    next_quotient_null  = ~(|AQ_reg2[31:0]);
-                    next_remainder_null = ~(|AQ_reg2[63:32]);
-                    next_state = SIGN_FIX1;
-                
-                end
+                next_quotient_null  = ~(|AQ_reg2[31:0]);
+                next_remainder_null = ~(|AQ_reg2[63:32]);
+                next_state = SIGN_FIX1;
+            
+            end
 
             SIGN_FIX1: begin
 
@@ -297,12 +299,16 @@ module srt(
                  *  Note : This combinational logic enable to negate a number without needing
                  *  carry chains. The logic is A XOR MASK + 1, where XOR is used as a wanted inverter.
                  */ 
-                final_quotient = (AQ_reg3[31:0] ^ sign_mask_q) + {31'b0, sign_mask_q[0]};
+                final_quotient  = (AQ_reg3[31:0] ^ sign_mask_q) + {31'b0, sign_mask_q[0]};
                 final_remainder = (AQ_reg3[63:32] ^ sign_mask_r) + {31'b0, sign_mask_r[0]};
                 
                 next_valid = 1'b1;
                 next_state = IDLE;
             end
+
+            /* 
+             *  Default handler
+             */ 
             default: next_state = IDLE;
         endcase
     end
