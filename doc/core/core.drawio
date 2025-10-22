@@ -86,7 +86,7 @@
                     <mxGeometry x="560" y="760" width="280" height="80" as="geometry"/>
                 </mxCell>
                 <mxCell id="84" value="CSR Register file" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
-                    <mxGeometry x="570" y="880" width="280" height="200" as="geometry"/>
+                    <mxGeometry x="560" y="880" width="280" height="200" as="geometry"/>
                 </mxCell>
                 <mxCell id="86" value="ALU 5 (Memory)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
                     <mxGeometry x="560" y="1120" width="280" height="80" as="geometry"/>
@@ -1800,6 +1800,17 @@
                 <mxCell id="510" value="enable" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=8;" vertex="1" connectable="0" parent="509">
                     <mxGeometry x="0.9091" y="-2" relative="1" as="geometry">
                         <mxPoint x="-28" y="2" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="512" value="" style="endArrow=classic;html=1;" edge="1" parent="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint y="830" as="sourcePoint"/>
+                        <mxPoint x="120" y="830" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="513" value="Address" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=8;" vertex="1" connectable="0" parent="512">
+                    <mxGeometry x="-0.0692" y="1" relative="1" as="geometry">
+                        <mxPoint x="4" as="offset"/>
                     </mxGeometry>
                 </mxCell>
             </root>
