@@ -181,6 +181,8 @@ int main(int argc, char **argv)
     Verilated::commandArgs(argc, argv);
     Testbench<Vdecoder> tb("Decoder");
     tb.reset();
+    tb.dut->clk_en = 1;
+    tb.tick();
 
     // --- Test 1: Count until overflow ---
     for (int i = 0; i < (sizeof(instructions) / sizeof(unsigned)); i++)
@@ -190,14 +192,13 @@ int main(int argc, char **argv)
 
         tb.tick();
         tb.tick();
-        tb.tick();
 
-        tb.check_equality(&tb.dut->rs1, dinstructions[i].rs1, "RS1");
-        tb.check_equality_arg(&tb.dut->rs2, dinstructions[i].rs2, "RS2");
-        tb.check_equality_arg(&tb.dut->rd, dinstructions[i].rd, "RD");
-        tb.check_equality_arg(&tb.dut->imm, dinstructions[i].imm, "IMM");
-        tb.check_equality_arg(&tb.dut->opcode, dinstructions[i].opcode, "OPCODE");
-        tb.check_equality_arg(&tb.dut->illegal, dinstructions[i].illegal, "ILLEGAL");
+        tb.check_equality((unsigned int)tb.dut->rs1, (unsigned int)dinstructions[i].rs1, "RS1");
+        tb.check_equality((unsigned int)tb.dut->rs2, (unsigned int)dinstructions[i].rs2, "RS2");
+        tb.check_equality((unsigned int)tb.dut->rd, (unsigned int)dinstructions[i].rd, "RD");
+        tb.check_equality((unsigned int)tb.dut->imm, (unsigned int)dinstructions[i].imm, "IMM");
+        tb.check_equality((unsigned int)tb.dut->opcode, (unsigned int)dinstructions[i].opcode, "OPCODE");
+        tb.check_equality((unsigned int)tb.dut->illegal, (unsigned int)dinstructions[i].illegal, "ILLEGAL");
     }
 
     return tb.get_return();

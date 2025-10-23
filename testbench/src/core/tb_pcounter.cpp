@@ -20,7 +20,7 @@ int main(int argc, char **argv)
         tb.tick();
 
         tb.dut->loaded += 4;
-        tb.check_equality(&tb.dut->address, tb.dut->loaded, "normal");
+        tb.check_equality((unsigned int)tb.dut->address, (unsigned int)tb.dut->loaded, "normal");
         tb.increment_cycles();
     }
 
@@ -40,7 +40,7 @@ int main(int argc, char **argv)
         if (i != 3)
             tb.dut->loaded += 4;
 
-        tb.check_equality(&tb.dut->address, tb.dut->loaded, "loading");
+        tb.check_equality((unsigned int)tb.dut->address, (unsigned int)tb.dut->loaded, "loading");
         tb.increment_cycles();
     }
 

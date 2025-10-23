@@ -16,7 +16,7 @@ int main(int argc, char **argv)
     // Count test
     for (uint64_t k = 1; k < 10001; k++)
     {
-        tb.check_equality(&tb.dut->outL, k, "Count");
+        tb.check_equality((unsigned int)tb.dut->outL, (unsigned int)k, "Count");
         tb.tick();
         tb.increment_cycles();
     }
@@ -28,7 +28,7 @@ int main(int argc, char **argv)
 
     for (uint64_t k = 1; k < 10001; k++)
     {
-        tb.check_equality(&tb.dut->outL, 0, "Count");
+        tb.check_equality((unsigned int)tb.dut->outL, (unsigned int)0, "Count");
         tb.tick();
         tb.increment_cycles();
     }

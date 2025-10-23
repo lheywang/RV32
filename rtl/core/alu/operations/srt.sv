@@ -182,9 +182,6 @@ module srt(
              */
 
             IDLE: begin
-                next_count = 6'd0;
-                next_div_by_zero = 1'b0;
-                next_valid = 1'b0;
 
                 if (start) begin
                    
@@ -206,8 +203,7 @@ module srt(
                     else if (dividend_signed ^ divisor_signed) begin
 
                         next_div_by_zero = 1'b0;
-                        final_quotient = 32'b1;
-                        final_remainder = 32'b1;
+                        next_AQ = {dividend, 33'h1FFFFFFFF};
                         next_state = SIGN_FIX2;
 
                     end 
@@ -223,6 +219,8 @@ module srt(
                 end
                 
             IDLE2 : begin
+
+                next_div_by_zero = 1'b0;
 
                 /*
                  *  Note : This combinational logic enable to negate a number without needing

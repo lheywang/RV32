@@ -62,10 +62,10 @@ int main(int argc, char **argv)
                 tb.tick();
                 tb.tick();
 
-                tb.check_equality(&tb.dut->mem_addr, target_addr, "Write-memaddr");
-                tb.check_equality(&tb.dut->mem_we, 1, "Write-we");
-                tb.check_equality(&tb.dut->mem_req, 1, "Write-req");
-                tb.check_equality(&tb.dut->busy, 1, "Write-busy");
+                tb.check_equality((unsigned int)tb.dut->mem_addr, (unsigned int)target_addr, "Write-memaddr");
+                tb.check_equality((unsigned int)tb.dut->mem_we, (unsigned int)1, "Write-we");
+                tb.check_equality((unsigned int)tb.dut->mem_req, (unsigned int)1, "Write-req");
+                tb.check_equality((unsigned int)tb.dut->busy, (unsigned int)1, "Write-busy");
 
                 switch (i)
                 {
@@ -73,19 +73,19 @@ int main(int argc, char **argv)
                     switch (iii)
                     {
                     case 0:
-                        tb.check_equality(&tb.dut->mem_wdata, (writedata[ii] & 0x000000FF), "Write-wdata");
+                        tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)(writedata[ii] & 0x000000FF), "Write-wdata");
                         break;
 
                     case 1:
-                        tb.check_equality(&tb.dut->mem_wdata, (writedata[ii] & 0x000000FF) << 8, "Write-wdata");
+                        tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)(writedata[ii] & 0x000000FF) << 8, "Write-wdata");
                         break;
 
                     case 2:
-                        tb.check_equality(&tb.dut->mem_wdata, (writedata[ii] & 0x000000FF) << 16, "Write-wdata");
+                        tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)(writedata[ii] & 0x000000FF) << 16, "Write-wdata");
                         break;
 
                     case 3:
-                        tb.check_equality(&tb.dut->mem_wdata, (writedata[ii] & 0x000000FF) << 24, "Write-wdata");
+                        tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)(writedata[ii] & 0x000000FF) << 24, "Write-wdata");
                         ;
                         break;
                     }
@@ -96,26 +96,26 @@ int main(int argc, char **argv)
                     {
                     case 0:
                     case 1:
-                        tb.check_equality(&tb.dut->mem_wdata, writedata[ii] & 0x0000FFFF, "Write-wdata");
+                        tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)writedata[ii] & 0x0000FFFF, "Write-wdata");
                         break;
 
                     case 2:
                     case 3:
-                        tb.check_equality(&tb.dut->mem_wdata, (writedata[ii] & 0x0000FFFF) << 16, "Write-wdata");
+                        tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)(writedata[ii] & 0x0000FFFF) << 16, "Write-wdata");
                         break;
                     }
                     break;
 
                 case 29: // SW
-                    tb.check_equality(&tb.dut->mem_wdata, writedata[ii], "Write-wdata");
+                    tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)writedata[ii], "Write-wdata");
                     break;
                 }
 
                 tb.tick();
 
-                tb.check_equality(&tb.dut->valid, 1, "Write-valid");
-                tb.check_equality(&tb.dut->res, 0, "Write-res");
-                tb.check_equality(&tb.dut->req, 0, "Write-req");
+                tb.check_equality((unsigned int)tb.dut->valid, (unsigned int)1, "Write-valid");
+                tb.check_equality((unsigned int)tb.dut->res, (unsigned int)0, "Write-res");
+                tb.check_equality((unsigned int)tb.dut->req, (unsigned int)0, "Write-req");
 
                 tb.dut->clear = 1;
                 tb.tick();
@@ -153,10 +153,10 @@ int main(int argc, char **argv)
                 tb.tick();
                 tb.tick();
 
-                tb.check_equality(&tb.dut->mem_addr, target_addr, "Read-memaddr");
-                tb.check_equality(&tb.dut->mem_we, 0, "Read-we");
-                tb.check_equality(&tb.dut->mem_req, 1, "Read-req");
-                tb.check_equality(&tb.dut->busy, 1, "Read-busy");
+                tb.check_equality((unsigned int)tb.dut->mem_addr, (unsigned int)target_addr, "Read-memaddr");
+                tb.check_equality((unsigned int)tb.dut->mem_we, (unsigned int)0, "Read-we");
+                tb.check_equality((unsigned int)tb.dut->mem_req, (unsigned int)1, "Read-req");
+                tb.check_equality((unsigned int)tb.dut->busy, (unsigned int)1, "Read-busy");
 
                 tb.tick();
                 tb.dut->clear = 1;
@@ -167,19 +167,19 @@ int main(int argc, char **argv)
                     switch (iii)
                     {
                     case 0:
-                        tb.check_equality(&tb.dut->res, sext8((writedata[ii] >> 0) & 0x000000FF), "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)sext8((writedata[ii] >> 0) & 0x000000FF), "Read-res");
                         break;
 
                     case 1:
-                        tb.check_equality(&tb.dut->res, sext8((writedata[ii] >> 8) & 0x000000FF), "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)sext8((writedata[ii] >> 8) & 0x000000FF), "Read-res");
                         break;
 
                     case 2:
-                        tb.check_equality(&tb.dut->res, sext8((writedata[ii] >> 16) & 0x000000FF), "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)sext8((writedata[ii] >> 16) & 0x000000FF), "Read-res");
                         break;
 
                     case 3:
-                        tb.check_equality(&tb.dut->res, sext8((writedata[ii] >> 24) & 0x000000FF), "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)sext8((writedata[ii] >> 24) & 0x000000FF), "Read-res");
                         break;
                     }
                     break;
@@ -189,37 +189,37 @@ int main(int argc, char **argv)
                     {
                     case 0:
                     case 1:
-                        tb.check_equality(&tb.dut->res, sext16((writedata[ii] >> 0) & 0x0000FFFF), "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)sext16((writedata[ii] >> 0) & 0x0000FFFF), "Read-res");
                         break;
 
                     case 2:
                     case 3:
-                        tb.check_equality(&tb.dut->res, sext16((writedata[ii] >> 16) & 0x0000FFFF), "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)sext16((writedata[ii] >> 16) & 0x0000FFFF), "Read-res");
                         break;
                     }
                     break;
 
                 case 32: // LW
-                    tb.check_equality(&tb.dut->res, writedata[ii], "Read-res");
+                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)writedata[ii], "Read-res");
                     break;
 
                 case 33: // LBU
                     switch (iii)
                     {
                     case 0:
-                        tb.check_equality(&tb.dut->res, (writedata[ii] >> 0) & 0x000000FF, "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(writedata[ii] >> 0) & 0x000000FF, "Read-res");
                         break;
 
                     case 1:
-                        tb.check_equality(&tb.dut->res, (writedata[ii] >> 8) & 0x000000FF, "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(writedata[ii] >> 8) & 0x000000FF, "Read-res");
                         break;
 
                     case 2:
-                        tb.check_equality(&tb.dut->res, (writedata[ii] >> 16) & 0x000000FF, "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(writedata[ii] >> 16) & 0x000000FF, "Read-res");
                         break;
 
                     case 3:
-                        tb.check_equality(&tb.dut->res, (writedata[ii] >> 24) & 0x000000FF, "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(writedata[ii] >> 24) & 0x000000FF, "Read-res");
                         break;
                     }
                     break;
@@ -229,18 +229,18 @@ int main(int argc, char **argv)
                     {
                     case 0:
                     case 1:
-                        tb.check_equality(&tb.dut->res, writedata[ii] & 0x0000FFFF, "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)writedata[ii] & 0x0000FFFF, "Read-res");
                         break;
 
                     case 2:
                     case 3:
-                        tb.check_equality(&tb.dut->res, (writedata[ii] >> 16) & 0x0000FFFF, "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(writedata[ii] >> 16) & 0x0000FFFF, "Read-res");
                         break;
                     }
                     break;
                 }
 
-                tb.check_equality(&tb.dut->valid, 1, "Read-valid");
+                tb.check_equality((unsigned int)tb.dut->valid, (unsigned int)1, "Read-valid");
                 tb.tick();
 
                 cycle += 1;
@@ -269,7 +269,7 @@ int main(int argc, char **argv)
         tb.tick();
         tb.tick();
 
-        tb.check_equality(&tb.dut->o_error, 1, "Read-o_error");
+        tb.check_equality((unsigned int)tb.dut->o_error, (unsigned int)1, "Read-o_error");
 
         tb.tick();
         tb.dut->clear = 1;
@@ -295,7 +295,7 @@ int main(int argc, char **argv)
         tb.tick();
         tb.tick();
 
-        tb.check_equality(&tb.dut->i_error, 1, "Read-i_error");
+        tb.check_equality((unsigned int)tb.dut->i_error, (unsigned int)1, "Read-i_error");
 
         tb.tick();
         tb.dut->clear = 1;

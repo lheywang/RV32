@@ -30,30 +30,30 @@ int main(int argc, char **argv)
                 tb.tick();
                 tb.tick();
 
-                tb.check_equality(&tb.dut->busy, 1, "Busy");
-                tb.check_equality(&tb.dut->valid, 1, "Busy");
-                tb.check_equality(&tb.dut->o_rd, 0x1F, "Busy");
+                tb.check_equality((unsigned int)tb.dut->busy, (unsigned int)1, "Busy");
+                tb.check_equality((unsigned int)tb.dut->valid, (unsigned int)1, "Busy");
+                tb.check_equality((unsigned int)tb.dut->o_rd, (unsigned int)0x1F, "Busy");
 
                 switch (i)
                 {
                 case 0: // ADD
-                    tb.check_equality(&tb.dut->res, (inputs1[ii] + inputs2[iii]), "Add");
+                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(inputs1[ii] + inputs2[iii]), "Add");
                     break;
 
                 case 1: // SUB
-                    tb.check_equality(&tb.dut->res, (inputs1[ii] - inputs2[iii]), "Sub");
+                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(inputs1[ii] - inputs2[iii]), "Sub");
                     break;
 
                 case 2: // AND
-                    tb.check_equality(&tb.dut->res, (inputs1[ii] & inputs2[iii]), "And");
+                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(inputs1[ii] & inputs2[iii]), "And");
                     break;
 
                 case 3: // OR
-                    tb.check_equality(&tb.dut->res, (inputs1[ii] | inputs2[iii]), "Or");
+                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(inputs1[ii] | inputs2[iii]), "Or");
                     break;
 
                 case 4: // XOR
-                    tb.check_equality(&tb.dut->res, (inputs1[ii] ^ inputs2[iii]), "Xor");
+                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(inputs1[ii] ^ inputs2[iii]), "Xor");
                     break;
                 }
 
@@ -72,7 +72,7 @@ int main(int argc, char **argv)
     tb.tick();
     tb.tick();
 
-    tb.check_equality(&tb.dut->o_error, 1, "Overflow");
+    tb.check_equality((unsigned int)tb.dut->o_error, (unsigned int)1, "Overflow");
 
     return tb.get_return();
 }

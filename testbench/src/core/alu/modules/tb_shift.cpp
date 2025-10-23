@@ -50,13 +50,13 @@ int main(int argc, char **argv)
                 switch (op)
                 {
                 case 0:
-                    tb.check_equality(&tb.dut->data_out, (unsigned)tb.dut->data_in >> tb.dut->shift_amount, "Shifted");
+                    tb.check_equality((unsigned int)tb.dut->data_out, (unsigned int)tb.dut->data_in >> tb.dut->shift_amount, "Shifted");
                     break;
                 case 1:
-                    tb.check_equality(&tb.dut->data_out, (signed)tb.dut->data_in >> tb.dut->shift_amount, "Shifted");
+                    tb.check_equality((signed int)tb.dut->data_out, (signed int)tb.dut->data_in >> tb.dut->shift_amount, "Shifted");
                     break;
                 case 2:
-                    tb.check_equality(&tb.dut->data_out, (unsigned)tb.dut->data_in << tb.dut->shift_amount, "Shifted");
+                    tb.check_equality((unsigned int)tb.dut->data_out, (unsigned int)tb.dut->data_in << tb.dut->shift_amount, "Shifted");
                     break;
                 }
 

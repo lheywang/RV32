@@ -13,6 +13,8 @@ int main(int argc, char **argv)
     Testbench<Vbooth> tb("Booth-Multiplier");
     tb.reset();
 
+    tb.tick();
+
     for (int op = 0; op < 4; op++)
     {
         switch (op)
@@ -53,33 +55,28 @@ int main(int argc, char **argv)
                 tb.dut->start = 1;
                 tb.stick();
 
-                // Let the testbench compute
-                for (int k = 0; k < 33; k++)
-                {
-                    tb.stick();
-                    tb.dut->start = 0;
-                }
+                tb.run_until(&tb.dut->valid, 1);
 
-                tb.check_equality(&tb.dut->valid, 1, "Valid");
+                tb.check_equality((unsigned int)tb.dut->valid, (unsigned int)1, "Valid");
 
                 switch (op)
                 {
                 case 0:
-                    tb.check_equality(&tb.dut->Z, (unsigned)tb.dut->X * (unsigned)tb.dut->Y, "Result (U * U)");
+                    tb.check_equality((unsigned)tb.dut->Z, (unsigned)tb.dut->X * (unsigned)tb.dut->Y, "Result (U * U)");
                     break;
                 case 1:
-                    tb.check_equality(&tb.dut->Z, (unsigned)tb.dut->X * (signed)tb.dut->Y, "Result (U * S)");
+                    tb.check_equality((signed)tb.dut->Z, (unsigned)tb.dut->X * (signed)tb.dut->Y, "Result (U * S)");
                     break;
                 case 2:
-                    tb.check_equality(&tb.dut->Z, (signed)tb.dut->X * (unsigned)tb.dut->Y, "Result (S * U)");
+                    tb.check_equality((signed)tb.dut->Z, (signed)tb.dut->X * (unsigned)tb.dut->Y, "Result (S * U)");
                     break;
                 case 3:
-                    tb.check_equality(&tb.dut->Z, (signed)tb.dut->X * (signed)tb.dut->Y, "Result (S * S)");
+                    tb.check_equality((signed)tb.dut->Z, (signed)tb.dut->X * (signed)tb.dut->Y, "Result (S * S)");
                     break;
                 }
 
                 tb.tick();
-                tb.check_equality(&tb.dut->valid, 0, "Valid");
+                tb.check_equality((unsigned int)tb.dut->valid, 0, "Valid");
                 tb.increment_cycles();
             }
         }

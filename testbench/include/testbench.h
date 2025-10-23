@@ -175,6 +175,7 @@ public:
     void stick(bool trace = true)
     {
         // Toggling the clock and evalutating changes
+        this->dut->eval();
         this->dut->clk = !this->dut->clk;
         this->dut->eval();
 
@@ -263,6 +264,9 @@ public:
             this->tick();
             cycles += 1;
         } while ((cycles < max_cycles) && *signal != (TYPE1)value);
+
+        // Ensure we register the changes
+        this->dut->eval();
 
         char str[64];
         sprintf(str, "This operation needed %d cycles to execute !", cycles);
@@ -405,14 +409,14 @@ public:
      *  @tparam value   The value to be compared against
      *  @param  print   Shall we print to the console ?
      */
-    template <typename TYPE1, typename TYPE2>
-    int check_equality(TYPE1 *signal, TYPE2 reference, std::string testname, bool print = true)
+    template <typename TYPE1>
+    int check_equality(TYPE1 signal, TYPE1 reference, std::string testname, bool print = true)
     {
         std::string tname = this->center_text(testname, NAME_WIDTH, NAME_FILL);
         std::string ttime = this->center_text(this->get_time(this->sim_time), TIME_WIDTH, TIME_FILL);
         std::string tcycle = this->center_text(std::to_string(this->cycle_count), NAME_WIDTH, NAME_FILL);
 
-        if (*signal == reference)
+        if ((uint64_t)signal == (uint64_t)reference)
         {
             if (print)
                 std::cout << KGRN
@@ -426,14 +430,18 @@ public:
         }
         else
         {
+
+            std::stringstream sigs, refs;
+            sigs << std::hex << signal;
+            refs << std::hex << reference;
+
             std::cout << KRED
                       << "[" << this->center_text("FAIL", NAME_WIDTH, NAME_FILL) << "] Cycle "
                       << tcycle
                       << "    [ " << tname << " ] @ " << ttime << " | Got : 0x"
-                      << std::hex
-                      << this->center_text(std::to_string(*signal), SIGNAL_WIDTH, SIGNAL_FILL)
+                      << this->center_text(sigs.str(), SIGNAL_WIDTH, SIGNAL_FILL)
                       << " waited : 0x"
-                      << this->center_text(std::to_string(reference), SIGNAL_WIDTH, SIGNAL_FILL)
+                      << this->center_text(refs.str(), SIGNAL_WIDTH, SIGNAL_FILL)
                       << " |"
                       << RST
                       << std::dec
@@ -452,10 +460,10 @@ public:
      *  @tparam value   The value to be compared against
      *  @param  print   Shall we print to the console ?
      */
-    template <typename TYPE1, typename TYPE2>
-    int check_equality_arg(TYPE1 *signal, TYPE2 reference, std::string testname, bool print = true)
+    template <typename TYPE1>
+    int check_equality_arg(TYPE1 signal, TYPE1 reference, std::string testname, bool print = true)
     {
-        if (*signal == reference)
+        if ((uint64_t)signal == (uint64_t)reference)
         {
             this->pass += 1;
         }
@@ -465,14 +473,17 @@ public:
             std::string ttime = this->center_text(this->get_time(this->sim_time), TIME_WIDTH, TIME_FILL);
             std::string tcycle = this->center_text(std::to_string(this->cycle_count), NAME_WIDTH, NAME_FILL);
 
+            std::stringstream sigs, refs;
+            sigs << std::hex << signal;
+            refs << std::hex << reference;
+
             std::cout << KRED
                       << "[" << this->center_text("    ", NAME_WIDTH, NAME_FILL) << "] Cycle "
                       << tcycle
                       << "    [ " << tname << " ] @ " << ttime << " | Got : 0x"
-                      << std::hex
-                      << this->center_text(std::to_string(*signal), SIGNAL_WIDTH, SIGNAL_FILL)
+                      << this->center_text(sigs.str(), SIGNAL_WIDTH, SIGNAL_FILL)
                       << " waited : 0x"
-                      << this->center_text(std::to_string(reference), SIGNAL_WIDTH, SIGNAL_FILL)
+                      << this->center_text(refs.str(), SIGNAL_WIDTH, SIGNAL_FILL)
                       << " |"
                       << RST
                       << std::dec

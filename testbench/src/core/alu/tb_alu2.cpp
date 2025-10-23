@@ -113,20 +113,20 @@ int main(int argc, char **argv)
         // Wait to finish
         tb.run_until(&tb.dut->valid, 1);
 
-        tb.check_equality(&tb.dut->valid, 1, "valid");
-        tb.check_equality(&tb.dut->res, results[op], "res");
-        tb.check_equality(&tb.dut->o_rd, 17, "o_rd");
-        tb.check_equality(&tb.dut->i_error, 0, "i_error");
-        tb.check_equality(&tb.dut->o_error, 0, "o_error");
-        tb.check_equality(&tb.dut->req, 0, "req");
+        tb.check_equality((unsigned int)tb.dut->valid, (unsigned int)1, "valid");
+        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)results[op], "res");
+        tb.check_equality((unsigned int)tb.dut->o_rd, (unsigned int)17, "o_rd");
+        tb.check_equality((unsigned int)tb.dut->i_error, (unsigned int)0, "i_error");
+        tb.check_equality((unsigned int)tb.dut->o_error, (unsigned int)0, "o_error");
+        tb.check_equality((unsigned int)tb.dut->req, (unsigned int)0, "req");
 
         // Finally, clearing the output
 
-        tb.set(&tb.dut->clear, 1);
+        tb.dut->clear = 1;
         tb.tick();
-        tb.set(&tb.dut->clear, 0);
+        tb.dut->clear = 0;
 
-        tb.check_equality(&tb.dut->busy, 0, "busy");
+        tb.check_equality((unsigned int)tb.dut->busy, (unsigned int)0, "busy");
 
         tb.increment_cycles();
     }

@@ -19,7 +19,7 @@ int main(int argc, char **argv)
         int rem = (i % 2);
 
         if (i > 1)
-            tb.check_equality(&tb.dut->clk_en, rem, "clock");
+            tb.check_equality((unsigned int)tb.dut->clk_en, (unsigned int)rem, "clock");
     }
 
     return tb.get_return();

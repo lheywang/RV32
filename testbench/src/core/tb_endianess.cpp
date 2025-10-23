@@ -33,7 +33,7 @@ int main(int argc, char **argv)
     {
         tb.dut->in = to_rev[k];
         tb.dut->eval();
-        tb.check_equality(&tb.dut->out, reversed[k], "Endianness");
+        tb.check_equality((unsigned int)tb.dut->out, (unsigned int)reversed[k], "Endianness");
     }
 
     return tb.get_return();

@@ -21,7 +21,7 @@ int main(int argc, char **argv)
         tb.dut->target = i;
         tb.tick();
 
-        tb.check_equality(&tb.dut->exec_ok, 1, "status bit (1)");
+        tb.check_equality((unsigned int)tb.dut->exec_ok, (unsigned int)1, "status bit (1)");
         tb.increment_cycles();
     }
 
@@ -33,7 +33,7 @@ int main(int argc, char **argv)
         tb.dut->target = i;
         tb.tick();
 
-        tb.check_equality(&tb.dut->exec_ok, 0, "status bit (0)");
+        tb.check_equality((unsigned int)tb.dut->exec_ok, (unsigned int)0, "status bit (0)");
         tb.increment_cycles();
     }
 
@@ -59,7 +59,7 @@ int main(int argc, char **argv)
         tb.dut->target = i;
         tb.tick();
 
-        tb.check_equality(&tb.dut->exec_ok, 1, "status bit (1)");
+        tb.check_equality((unsigned int)tb.dut->exec_ok, (unsigned int)1, "status bit (1)");
         tb.increment_cycles();
     }
 

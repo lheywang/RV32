@@ -31,6 +31,9 @@ int main(int argc, char **argv)
     Verilated::commandArgs(argc, argv);
     Testbench<Vcsr> tb("CSR");
 
+    tb.tick();
+    tb.tick();
+
     // Count test
     for (uint64_t k = 0; k < 23; k++)
     {
@@ -46,7 +49,7 @@ int main(int argc, char **argv)
         tb.tick();
 
         // Read some data (without calling tick but only eval to register them without clock)
-        tb.check_equality(&tb.dut->rd, readback[k], "CSR");
+        tb.check_equality((unsigned int)tb.dut->rd, (unsigned int)readback[k], "CSR");
         tb.increment_cycles();
     }
 

@@ -45,13 +45,13 @@ int main(int argc, char **argv)
 
         if ((k % 32) == 0)
         {
-            tb.check_equality(&tb.dut->rd1, 0, "Reg 0 (RD1)");
-            tb.check_equality_arg(&tb.dut->rd2, 0, "Reg 0 (RD2)");
+            tb.check_equality((unsigned int)tb.dut->rd1, (unsigned int)0, "Reg 0 (RD1)");
+            tb.check_equality_arg((unsigned int)tb.dut->rd2, (unsigned int)0, "Reg 0 (RD2)");
         }
         else
         {
-            tb.check_equality(&tb.dut->rd1, data[k], "Reg N (RD1)");
-            tb.check_equality_arg(&tb.dut->rd2, data[k], "Reg N (RD2)");
+            tb.check_equality((unsigned int)tb.dut->rd1, (unsigned int)data[k], "Reg N (RD1)");
+            tb.check_equality_arg((unsigned int)tb.dut->rd2, (unsigned int)data[k], "Reg N (RD2)");
         }
     }
 

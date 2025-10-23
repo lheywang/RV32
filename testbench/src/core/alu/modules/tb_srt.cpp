@@ -42,38 +42,34 @@ int main(int argc, char **argv)
                 tb.stick();
                 tb.dut->start = 1;
                 tb.stick();
+                tb.dut->start = 0;
+
+                tb.run_until(&tb.dut->valid, 1);
 
                 if (tb.dut->divisor == 0)
                 {
-                    tb.run_until(&tb.dut->valid, 1);
-
-                    tb.check_equality(&tb.dut->valid, 1, "valid");
-                    tb.check_equality(&tb.dut->div_by_zero, 1, "Div By Zero");
-                    tb.check_equality(&tb.dut->quotient, 0xFFFFFFFF, "Result (NULL)");
+                    tb.check_equality((unsigned int)tb.dut->div_by_zero, (unsigned int)1, "Div By Zero");
+                    tb.check_equality((unsigned int)tb.dut->quotient, (unsigned int)0xFFFFFFFF, "Result (NULL)");
                 }
                 else
                 {
-                    // Let the testbench compute
-                    tb.run_until(&tb.dut->valid, 1);
-
-                    tb.check_equality(&tb.dut->valid, 1, "valid");
-                    tb.check_equality(&tb.dut->div_by_zero, 0, "Div By Zero");
+                    tb.check_equality((unsigned int)tb.dut->div_by_zero, (unsigned int)0, "Div By Zero");
 
                     switch (op)
                     {
                     case 0:
-                        tb.check_equality(&tb.dut->quotient, ((unsigned)tb.dut->dividend / (unsigned)tb.dut->divisor), "Result (U / U)");
-                        tb.check_equality(&tb.dut->remainder, ((unsigned)tb.dut->dividend % (unsigned)tb.dut->divisor), "Result (U % U)");
+                        tb.check_equality((unsigned int)tb.dut->quotient, (unsigned int)((unsigned)tb.dut->dividend / (unsigned)tb.dut->divisor), "Result (U / U)");
+                        tb.check_equality((unsigned int)tb.dut->remainder, (unsigned int)((unsigned)tb.dut->dividend % (unsigned)tb.dut->divisor), "Result (U % U)");
                         break;
                     case 1:
-                        tb.check_equality(&tb.dut->quotient, ((signed)tb.dut->dividend / (signed)tb.dut->divisor), "Result (S / S)");
-                        tb.check_equality(&tb.dut->remainder, ((signed)tb.dut->dividend % (signed)tb.dut->divisor), "Result (S % S)");
+                        tb.check_equality((unsigned int)tb.dut->quotient, (unsigned int)((signed)tb.dut->dividend / (signed)tb.dut->divisor), "Result (S / S)");
+                        tb.check_equality((unsigned int)tb.dut->remainder, (unsigned int)((signed)tb.dut->dividend % (signed)tb.dut->divisor), "Result (S % S)");
                         break;
                     }
                 }
 
                 tb.tick();
-                tb.check_equality(&tb.dut->valid, 0, "Valid");
+                tb.check_equality((unsigned int)tb.dut->valid, (unsigned int)0, "Valid");
                 tb.increment_cycles();
             }
         }
