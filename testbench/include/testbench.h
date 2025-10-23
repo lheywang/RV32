@@ -16,6 +16,7 @@
 #pragma once
 
 #include <iostream>
+#include <string>
 #include <iomanip>
 #include <stdint.h>
 
@@ -29,6 +30,26 @@
 #include "generated_csr.h"
 #include "generated_decoders.h"
 #include "generated_opcodes.h"
+
+/*
+ * ===========================================================================================
+ * PARAMETERS
+ * ===========================================================================================
+ */
+
+constexpr int STATUS_WIDTH = 10;
+constexpr int CYCLE_WIDTH = 6;
+constexpr int NAME_WIDTH = 14;
+constexpr int TIME_WIDTH = 10;
+constexpr int SIGNAL_WIDTH = 8;
+
+constexpr char STATUS_FILL = ' ';
+constexpr char CYCLE_FILL = ' ';
+constexpr char NAME_FILL = ' ';
+constexpr char TIME_FILL = ' ';
+constexpr char SIGNAL_FILL = ' ';
+
+static const std::string HEADER = std::string("==================================================================");
 
 /*
  * ===========================================================================================
@@ -199,6 +220,8 @@ public:
      */
     void reset()
     {
+        this->tick();
+
         // Set the reset low (active)
         this->dut->rst_n = 0;
         this->stick();
@@ -233,13 +256,18 @@ public:
     template <typename TYPE1, typename TYPE2>
     int run_until(TYPE1 *signal, TYPE2 value, int max_cycles = 1000)
     {
-        this->tick();
-        int cycles = 0;
+        this->tick(); // This tick is needed to ensure the DUT will register any input previously applied.
+        int cycles = 1;
         do
         {
             this->tick();
             cycles += 1;
         } while ((cycles < max_cycles) && *signal != (TYPE1)value);
+
+        char str[64];
+        sprintf(str, "This operation needed %d cycles to execute !", cycles);
+        this->set_info(std::string(str));
+
         return cycles;
     }
 
@@ -319,14 +347,14 @@ public:
                   << std::endl
                   << std::dec
                   << KYEL
-                  << "========================================================\n"
-                  << "Results : (" << this->name << ")"
-                  << "\n========================================================"
+                  << HEADER << std::endl
+                  << "Results : " << this->center_text(this->name, NAME_WIDTH, NAME_FILL) << std::endl
+                  << HEADER
                   << std::endl
                   << KGRN << "\tPass : "
-                  << std::setw(4) << this->pass
+                  << this->center_text(std::to_string(this->pass), 6, ' ')
                   << KRED << "\n\tFail : "
-                  << std::setw(4) << this->fail
+                  << this->center_text(std::to_string(this->fail), 6, ' ')
                   << RST
                   << std::endl;
 
@@ -356,9 +384,9 @@ public:
     void initial_print()
     {
         std::cout << KMAG
-                  << "--------------------------------------------------------" << std::endl
-                  << "Starting " << this->name << " simulation..." << std::endl
-                  << "--------------------------------------------------------" << std::endl
+                  << HEADER << std::endl
+                  << "Starting " << this->center_text(this->name, NAME_WIDTH, NAME_FILL) << " simulation..." << std::endl
+                  << HEADER << std::endl
                   << RST;
         return;
     }
@@ -380,13 +408,17 @@ public:
     template <typename TYPE1, typename TYPE2>
     int check_equality(TYPE1 *signal, TYPE2 reference, std::string testname, bool print = true)
     {
+        std::string tname = this->center_text(testname, NAME_WIDTH, NAME_FILL);
+        std::string ttime = this->center_text(this->get_time(this->sim_time), TIME_WIDTH, TIME_FILL);
+        std::string tcycle = this->center_text(std::to_string(this->cycle_count), NAME_WIDTH, NAME_FILL);
+
         if (*signal == reference)
         {
             if (print)
                 std::cout << KGRN
-                          << "[  PASS   ] Cycle "
-                          << std::setw(8) << this->cycle_count
-                          << "    [ " << testname << " ] @ " << this->sim_time << " ps"
+                          << "[" << this->center_text("PASS", NAME_WIDTH, NAME_FILL) << "] Cycle "
+                          << tcycle
+                          << "    [ " << tname << " ] @ " << ttime
                           << RST
                           << std::dec
                           << std::endl;
@@ -395,15 +427,13 @@ public:
         else
         {
             std::cout << KRED
-                      << "[  FAIL   ] Cycle "
-                      << std::setw(8) << this->cycle_count
-                      << "    [ " << testname << " ] @ " << this->sim_time << " ps | Got : 0x"
+                      << "[" << this->center_text("FAIL", NAME_WIDTH, NAME_FILL) << "] Cycle "
+                      << tcycle
+                      << "    [ " << tname << " ] @ " << ttime << " | Got : 0x"
                       << std::hex
-                      << std::setw(8)
-                      << *signal
+                      << this->center_text(std::to_string(*signal), SIGNAL_WIDTH, SIGNAL_FILL)
                       << " waited : 0x"
-                      << std::setw(8)
-                      << reference
+                      << this->center_text(std::to_string(reference), SIGNAL_WIDTH, SIGNAL_FILL)
                       << " |"
                       << RST
                       << std::dec
@@ -431,14 +461,18 @@ public:
         }
         else
         {
+            std::string tname = this->center_text(testname, NAME_WIDTH, NAME_FILL);
+            std::string ttime = this->center_text(this->get_time(this->sim_time), TIME_WIDTH, TIME_FILL);
+            std::string tcycle = this->center_text(std::to_string(this->cycle_count), NAME_WIDTH, NAME_FILL);
+
             std::cout << KRED
+                      << "[" << this->center_text("    ", NAME_WIDTH, NAME_FILL) << "] Cycle "
+                      << tcycle
+                      << "    [ " << tname << " ] @ " << ttime << " | Got : 0x"
                       << std::hex
-                      << "    [ " << this->name << " ] @ " << this->sim_time << " ps | Got : 0x"
-                      << std::setw(8)
-                      << *signal
+                      << this->center_text(std::to_string(*signal), SIGNAL_WIDTH, SIGNAL_FILL)
                       << " waited : 0x"
-                      << std::setw(8)
-                      << reference
+                      << this->center_text(std::to_string(reference), SIGNAL_WIDTH, SIGNAL_FILL)
                       << " |"
                       << RST
                       << std::dec
@@ -464,9 +498,10 @@ public:
     {
         std::cout << std::dec
                   << KCYN
-                  << "--------------------------------------------------------\n"
-                  << "Case : (" << this->name << ") : " << cases
-                  << "\n--------------------------------------------------------"
+                  << HEADER
+                  << std::endl
+                  << "Case : (" << this->center_text(this->name, NAME_WIDTH, NAME_FILL) << ") : " << cases << std::endl
+                  << HEADER
                   << RST
                   << std::endl;
 
@@ -481,9 +516,13 @@ public:
      */
     int set_info(std::string message)
     {
+        std::stringstream ss;
+        ss << "[" << this->center_text("INFO", NAME_WIDTH, NAME_FILL) << "] (";
+        std::string tstatus = ss.str();
+
         std::cout << std::dec
                   << KBLU
-                  << "[  INFO   ] : (" << this->name << ") : " << message
+                  << tstatus << this->name << ") " << message
                   << RST
                   << std::endl;
 
@@ -497,9 +536,13 @@ public:
      */
     int set_warn(std::string message)
     {
+        std::stringstream ss;
+        ss << "[" << this->center_text("WARN", NAME_WIDTH, NAME_FILL) << "] (";
+        std::string tstatus = ss.str();
+
         std::cout << std::dec
                   << KYEL
-                  << "[ WARNING ] : (" << this->name << ") : " << message
+                  << tstatus << this->name << ") " << message
                   << RST
                   << std::endl;
 
@@ -513,9 +556,13 @@ public:
      */
     int set_error(std::string message)
     {
+        std::stringstream ss;
+        ss << "[" << this->center_text("ERROR", NAME_WIDTH, NAME_FILL) << "] (";
+        std::string tstatus = ss.str();
+
         std::cout << std::dec
                   << KRED
-                  << "[  ERROR  ] : (" << this->name << ") : " << message
+                  << tstatus << this->center_text(this->name, NAME_WIDTH, NAME_FILL) << ") " << message
                   << RST
                   << std::endl;
 
@@ -631,8 +678,11 @@ private:
     /*
      *  Functions
      */
-    void
-    verilator_init()
+
+    /**
+     *  @brief  [PRIVATE] Handle the common stuff related to the verilator config.
+     */
+    void verilator_init()
     {
         // Initializing variables
         this->sim_time = 0;
@@ -666,5 +716,43 @@ private:
         // Logging to console the first elements
         this->initial_print();
         return;
+    }
+
+    /**
+     *  @brief  [PRIVATE] Helper function to center some text into a define width
+     */
+    std::string center_text(const std::string &text, int width, char fill = ' ')
+    {
+        if ((int)text.size() >= width)
+            return text.substr(0, width); // truncate if too long
+
+        int total_padding = width - text.size();
+        int left = total_padding / 2;
+        int right = total_padding - left;
+
+        return std::string(left, fill) + text + std::string(right, fill);
+    }
+
+    /**
+     *  @brief  [PRIVATE] Helper function to convert the sim_time into a human friendly time.
+     */
+    std::string get_time(vluint64_t time)
+    {
+        const char *units[] = {"sec", "ms", "µs", "ns", "ps"};
+        const double scales[] = {1, 1e-3, 1e-6, 1e-9, 1e-12};
+        double time_s = time * 1e-12;
+
+        for (int i = 0; i < 5; ++i)
+        {
+            double converted = time_s / scales[i];
+            if (converted >= 1.0 || i == 4)
+            {
+                std::ostringstream oss;
+                oss << std::fixed << std::setprecision(3) << converted << " " << units[i];
+                return oss.str();
+            }
+        }
+
+        return "0 s"; // fallback
     }
 };
