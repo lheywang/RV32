@@ -101,6 +101,7 @@ clean:
 	rm -rf $(BUILD_DIR)*
 	rm -rf $(SIMOUT)*.vcd
 	rm -rf logs/*.ans
+	rm -rf logs/reports/*.md
 	rm -rf logs/*.log
 	rm -rf documentation/html
 	rm -rf documentation/latex

@@ -8,6 +8,7 @@ to make easier the debuging !
 import argparse
 import sys
 from dataclasses import dataclass
+import datetime
 
 
 @dataclass
@@ -45,7 +46,7 @@ def write_report(parsed, file):
         fout.write("# Summary\n\n")
 
         for index, test in enumerate(parsed):
-            if len(test.data.keys()) > 1:
+            if len(list(test.data.keys())) > 0:
 
                 # Initiliaze the markdown array
                 fout.write(f"## {test.name}\n\n")
@@ -57,11 +58,14 @@ def write_report(parsed, file):
                     percent = ((total - test.data[key][1]) / total) * 100
 
                     fout.write(
-                        f"| {test.name:14} | {test.data[key][0]:6} | {test.data[key][1]:6} | {percent:.3f} |\n"
+                        f"| {key:16} | {test.data[key][0]:6} | {test.data[key][1]:6} | {percent:.3f}  |\n"
                     )
 
-                if index != (len(parsed) - 1):
-                    fout.write("\n\n")
+                fout.write("\n\n")
+
+        fout.write(
+            f"*This report was generated automatically from a log file on the {datetime.datetime.now()}.*"
+        )
 
 
 def sanitize(line):
@@ -165,7 +169,7 @@ if __name__ == "__main__":
     if args.mode == "FILE":
         print(f"Reading data from file ... ")
         with open(args.file, "r") as f:
-            lines = f.readlines
+            lines = f.readlines()
 
     else:
         print(f"Reading data from stdin ... ")
