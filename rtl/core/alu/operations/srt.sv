@@ -153,7 +153,7 @@ module srt(
      */
     always_comb begin
         // Defaults
-        next_state              = pres_state;
+        next_state              = IDLE;
         next_AQ                 = AQ_reg;
         next_divisor            = divisor_reg;
         next_count              = count;
@@ -189,7 +189,8 @@ module srt(
 
                         next_div_by_zero = 1'b1;
                         next_AQ = {dividend, 33'h1FFFFFFFF};
-                        next_state = SIGN_FIX2;
+                        next_state = SIGN_FIX1;
+                        next_count = 6'b0;
 
                     end
 
@@ -204,7 +205,8 @@ module srt(
 
                         next_div_by_zero = 1'b0;
                         next_AQ = {dividend, 33'h1FFFFFFFF};
-                        next_state = SIGN_FIX2;
+                        next_state = SIGN_FIX1;
+                        next_count = 6'b0;
 
                     end 
                     else begin
@@ -213,6 +215,7 @@ module srt(
                         next_sign_mask_divisor  = {32{divisor_signed  && divisor[31]}};
                                 
                         next_state = IDLE2;
+                        next_count = 6'b0;
                         
                         end
                     end
