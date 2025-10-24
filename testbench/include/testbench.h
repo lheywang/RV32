@@ -416,7 +416,7 @@ public:
         std::string ttime = this->center_text(this->get_time(this->sim_time), TIME_WIDTH, TIME_FILL);
         std::string tcycle = this->center_text(std::to_string(this->cycle_count), NAME_WIDTH, NAME_FILL);
 
-        if ((uint64_t)signal == (uint64_t)reference)
+        if (signal == reference)
         {
             if (print)
                 std::cout << KGRN
@@ -463,7 +463,7 @@ public:
     template <typename TYPE1>
     int check_equality_arg(TYPE1 signal, TYPE1 reference, std::string testname, bool print = true)
     {
-        if ((uint64_t)signal == (uint64_t)reference)
+        if (signal == reference)
         {
             this->pass += 1;
         }
@@ -749,7 +749,7 @@ private:
      */
     std::string get_time(vluint64_t time)
     {
-        const char *units[] = {"sec", "ms", "µs", "ns", "ps"};
+        const char *units[] = {"sec", "ms", "us", "ns", "ps"};
         const double scales[] = {1, 1e-3, 1e-6, 1e-9, 1e-12};
         double time_s = time * 1e-12;
 

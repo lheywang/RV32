@@ -12,19 +12,18 @@ int main(int argc, char **argv)
     // Reset sequence
     tb.dut->rst_in = 1;
     tb.tick(); // First tick not valid, but taht's fine
-    tb.tick();
 
     // Idle state
     for (uint64_t k = 0; k < 10; k++)
     {
-        tb.check_equality(&tb.dut->rst_out, 0, "Active");
+        tb.check_equality((int)tb.dut->rst_out, 0, "Active");
         tb.tick();
         tb.increment_cycles();
     }
 
     for (uint64_t k = 0; k < 10; k++)
     {
-        tb.check_equality(&tb.dut->rst_out, 1, "Idle");
+        tb.check_equality((int)tb.dut->rst_out, 1, "Idle");
         tb.tick();
         tb.increment_cycles();
     }
@@ -37,7 +36,7 @@ int main(int argc, char **argv)
     // Active state
     for (uint64_t k = 0; k < 10; k++)
     {
-        tb.check_equality(&tb.dut->rst_out, 0, "Reset");
+        tb.check_equality((int)tb.dut->rst_out, 0, "Reset");
         tb.tick();
         tb.increment_cycles();
     }
@@ -45,7 +44,7 @@ int main(int argc, char **argv)
     // Idle state
     for (uint64_t k = 0; k < 10; k++)
     {
-        tb.check_equality(&tb.dut->rst_out, 1, "Idle");
+        tb.check_equality((int)tb.dut->rst_out, 1, "Idle");
         tb.tick();
         tb.increment_cycles();
     }

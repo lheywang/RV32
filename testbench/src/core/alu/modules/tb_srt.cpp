@@ -39,17 +39,31 @@ int main(int argc, char **argv)
                 tb.dut->divisor = input2[ii];
 
                 // Start the test
-                tb.stick();
+                tb.tick();
                 tb.dut->start = 1;
-                tb.stick();
+                tb.tick();
                 tb.dut->start = 0;
 
                 tb.run_until(&tb.dut->valid, 1);
+
+                std::cout << std::hex
+                          << (unsigned int)input1[i]
+                          << " / "
+                          << (unsigned int)input2[ii]
+                          << " = "
+                          << (unsigned int)tb.dut->quotient
+                          << " * "
+                          << (unsigned int)input2[ii]
+                          << " + "
+                          << (unsigned int)tb.dut->remainder
+                          << std::dec
+                          << std::endl;
 
                 if (tb.dut->divisor == 0)
                 {
                     tb.check_equality((unsigned int)tb.dut->div_by_zero, (unsigned int)1, "Div By Zero");
                     tb.check_equality((unsigned int)tb.dut->quotient, (unsigned int)0xFFFFFFFF, "Result (NULL)");
+                    tb.check_equality((unsigned int)tb.dut->remainder, (unsigned int)0, "Result (U % U)");
                 }
                 else
                 {
@@ -58,12 +72,12 @@ int main(int argc, char **argv)
                     switch (op)
                     {
                     case 0:
-                        tb.check_equality((unsigned int)tb.dut->quotient, (unsigned int)((unsigned)tb.dut->dividend / (unsigned)tb.dut->divisor), "Result (U / U)");
-                        tb.check_equality((unsigned int)tb.dut->remainder, (unsigned int)((unsigned)tb.dut->dividend % (unsigned)tb.dut->divisor), "Result (U % U)");
+                        tb.check_equality((unsigned int)tb.dut->quotient, (unsigned int)input1[i] / (unsigned int)input2[ii], "Result (U / U)");
+                        tb.check_equality((unsigned int)tb.dut->remainder, (unsigned int)input1[i] % (unsigned int)input2[ii], "Result (U % U)");
                         break;
                     case 1:
-                        tb.check_equality((unsigned int)tb.dut->quotient, (unsigned int)((signed)tb.dut->dividend / (signed)tb.dut->divisor), "Result (S / S)");
-                        tb.check_equality((unsigned int)tb.dut->remainder, (unsigned int)((signed)tb.dut->dividend % (signed)tb.dut->divisor), "Result (S % S)");
+                        tb.check_equality((signed int)tb.dut->quotient, (signed int)input1[i] / (signed int)input2[ii], "Result (S / S)");
+                        tb.check_equality((signed int)tb.dut->remainder, (signed int)input1[i] % (signed int)input2[ii], "Result (S % S)");
                         break;
                     }
                 }

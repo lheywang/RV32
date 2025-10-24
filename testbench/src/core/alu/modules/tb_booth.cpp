@@ -51,32 +51,49 @@ int main(int argc, char **argv)
                 tb.dut->Y = input2[ii];
 
                 // Start the test
-                tb.stick();
+                tb.tick();
                 tb.dut->start = 1;
-                tb.stick();
+                tb.tick();
+                tb.dut->start = 0;
 
-                tb.run_until(&tb.dut->valid, 1);
+                int count = tb.run_until(&tb.dut->valid, 1);
 
-                tb.check_equality((unsigned int)tb.dut->valid, (unsigned int)1, "Valid");
+                tb.check_equality((int)tb.dut->valid, (int)1, "Valid");
 
+                uint64_t result = 0;
                 switch (op)
                 {
                 case 0:
-                    tb.check_equality((unsigned)tb.dut->Z, (unsigned)tb.dut->X * (unsigned)tb.dut->Y, "Result (U * U)");
+                    result = ((uint64_t)input1[i] * (uint64_t)input2[ii]);
+                    tb.check_equality((uint32_t)((tb.dut->Z)),
+                                      (uint32_t)(result),
+                                      "Result (U * U)");
                     break;
                 case 1:
-                    tb.check_equality((signed)tb.dut->Z, (unsigned)tb.dut->X * (signed)tb.dut->Y, "Result (U * S)");
+                    result = ((uint64_t)input1[i] * (int64_t)input2[ii]);
+                    std::cout << std::hex << "0x" << result << " = 0x" << tb.dut->Z << " | " << (uint64_t)input1[i] << " * " << (int64_t)input2[ii] << std::dec << std::endl;
+                    tb.check_equality((uint32_t)((tb.dut->Z)),
+                                      (uint32_t)(result),
+                                      "Result (U * S)");
                     break;
                 case 2:
-                    tb.check_equality((signed)tb.dut->Z, (signed)tb.dut->X * (unsigned)tb.dut->Y, "Result (S * U)");
+                    result = ((int64_t)input1[i] * (uint64_t)input2[ii]);
+                    std::cout << std::hex << "0x" << result << " = 0x" << tb.dut->Z << " | " << (int64_t)input1[i] << " * " << (uint64_t)input2[ii] << std::dec << std::endl;
+                    tb.check_equality((uint32_t)((tb.dut->Z)),
+                                      (uint32_t)(result),
+                                      "Result (S * U)");
                     break;
                 case 3:
-                    tb.check_equality((signed)tb.dut->Z, (signed)tb.dut->X * (signed)tb.dut->Y, "Result (S * S)");
+                    result = ((int64_t)input1[i] * (int64_t)input2[ii]);
+                    std::cout << std::hex << "0x" << result << " = 0x" << tb.dut->Z << " | " << (int64_t)input1[i] << " * " << (int64_t)input2[ii] << std::dec << std::endl;
+                    tb.check_equality((uint32_t)((tb.dut->Z)),
+                                      (uint32_t)(result),
+                                      "Result (S * S)");
                     break;
                 }
 
                 tb.tick();
-                tb.check_equality((unsigned int)tb.dut->valid, 0, "Valid");
+                tb.check_equality((int)tb.dut->valid, 0, "Valid");
                 tb.increment_cycles();
             }
         }
