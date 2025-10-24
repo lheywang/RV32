@@ -19,6 +19,7 @@ targets=(
     srt         # modules for the ALU2
     alu0
     alu1
+    alu2
     alu5
 )
 
