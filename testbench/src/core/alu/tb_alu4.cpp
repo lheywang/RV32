@@ -3,8 +3,27 @@
 
 #include "testbench.h"
 
-unsigned int inputs1[5] = {10, 32, 48, 64, 1024};
-unsigned int inputs2[5] = {0x7FFFF000, 4096, 0xAAAAAAAA, 0x55555555, 0};
+unsigned short int addresses[] = {
+    0x300, 0x304, 0x305,
+    0x340, 0x341, 0x342,
+    0x343, 0x344, 0xB00,
+    0xB02, 0xB03, 0xB04,
+    0xB05, 0xB80, 0xB82,
+    0xB83, 0xB84, 0xB85,
+    0xF10, 0xF11, 0xF12,
+    0xF13, 0xF14 // Written addresses of CSR registers.
+};
+
+unsigned int readback[] = {
+    0x00007188, 0xFFFF0888, 0xFFFFFF01,
+    0xFFFFFFFF, 0xFFFFFFFE, 0x8000001F,
+    0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000 // Values that shall be read
+};
 
 // Main
 int main(int argc, char **argv)
@@ -13,67 +32,67 @@ int main(int argc, char **argv)
     Testbench<Valu4> tb("ALU4");
     tb.reset();
 
-    // Formal calculation test
-    for (int i = 0; i < 5; i++)
-    {
-        tb.dut->cmd = i;
-        tb.dut->i_rd = 0x1F;
-
-        for (int ii = 0; ii < 5; ii++)
-        {
-            for (int iii = 0; iii < 5; iii++)
-            {
-                tb.dut->arg0 = inputs1[ii];
-                tb.dut->arg1 = inputs2[iii];
-
-                tb.tick();
-                tb.tick();
-
-                tb.check_equality(&tb.dut->busy, 1, "busy");
-                tb.check_equality(&tb.dut->valid, 1, "valid");
-                tb.check_equality(&tb.dut->o_rd, 0x1F, "RD");
-
-                switch (i)
-                {
-                case 0: // ADD
-                    tb.check_equality(&tb.dut->res, (inputs1[ii] + inputs2[iii]), "Add");
-                    break;
-
-                case 1: // SUB
-                    tb.check_equality(&tb.dut->res, (inputs1[ii] - inputs2[iii]), "Sub");
-                    break;
-
-                case 2: // AND
-                    tb.check_equality(&tb.dut->res, (inputs1[ii] & inputs2[iii]), "And");
-                    break;
-
-                case 3: // OR
-                    tb.check_equality(&tb.dut->res, (inputs1[ii] | inputs2[iii]), "Or");
-                    break;
-
-                case 4: // XOR
-                    tb.check_equality(&tb.dut->res, 0x1F, "Xor");
-                    break;
-                }
-
-                tb.dut->clear = 1;
-
-                tb.increment_cycles();
-            }
-        }
-    }
-
-    // Overflow test
-    tb.dut->cmd = 0;
-    tb.dut->i_rd = 0x1F;
+    // Constant writes
     tb.dut->arg0 = 0xFFFFFFFF;
-    tb.dut->arg1 = 0xFFFFFFFF;
-    tb.increment_cycles();
+    tb.dut->i_rd = 17;
+    tb.dut->clear = 0;
+    tb.dut->csr_err = 0;
 
-    tb.tick();
-    tb.tick();
+    for (int op = 0; op < 3; op += 1)
+    {
+        // Setting up the command
+        switch (op)
+        {
+        case 0 : 
+            tb.dut->cmd = alu_commands_t::c_CSRRW;
+            tb.set_case("CSRRW");
+            break;
 
-    tb.check_equality(&tb.dut->o_error, 1, "Overflow");
+        case 1:
+            tb.dut->cmd = alu_commands_t::c_CSRRS;
+            tb.set_case("CSRRS");
+            break; 
+
+        case 2: 
+            tb.dut->cmd = alu_commands_t::c_CSRRC;
+            tb.set_case("CSRRC");
+            break;
+        }
+
+        // Setting up the address
+        for (int addr = 0; addr < 23; addr += 1)
+        {
+            tb.dut->imm = addresses[addr];
+            tb.dut->csr_rd = readback[addr];
+
+            tb.tick();
+
+            tb.check_equality((unsigned int)tb.dut->csr_ra, (unsigned int)addresses[addr], "CSR_RA");
+            tb.check_equality((unsigned int)tb.dut->csr_wa, (unsigned int)0, "CSR_WA");
+
+            tb.tick();
+
+            tb.check_equality((unsigned int)tb.dut->csr_ra, (unsigned int)0, "CSR_RA");
+            tb.check_equality((unsigned int)tb.dut->csr_wa, (unsigned int)addresses[addr], "CSR_WA");
+
+            tb.check_equality((unsigned int)tb.dut->res, (unsigned int)readback[addr], "CSR_RD");
+            tb.check_equality((unsigned int)tb.dut->o_error, (unsigned int)0, "CSR_ERR");
+            tb.check_equality((int)tb.dut->o_rd, 17, "RD");
+
+            switch (op)
+            {
+            case 0 : 
+            case 1:
+                tb.check_equality((unsigned int)tb.dut->csr_wd, (unsigned int)0xFFFFFFFF, "CSR_WD");
+                break; 
+
+            case 2: 
+                tb.check_equality((unsigned int)tb.dut->csr_wd, (unsigned int)0x00000000, "CSR_WD");
+                break;
+            }
+            
+        } 
+    }
 
     return tb.get_return();
 }
