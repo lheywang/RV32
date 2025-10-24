@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-import subprocess
-import concurrent.futures
 import os
+import subprocess
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
-# Config
+# === CONFIG ===
 targets = [
     "clock",
     "counter",
@@ -30,84 +30,76 @@ summary_file = os.path.join(report_dir, "_summary.md")
 os.makedirs(report_dir, exist_ok=True)
 
 
-def run_build(target):
-    """Run make for one target and generate its report."""
+def run_target(target: str):
+    """Build target, generate report, and parse .stat file."""
     log_file = os.path.join(log_dir, f"{target}.ans")
     report_file = os.path.join(report_dir, f"{target}.md")
+    stat_file = os.path.join(report_dir, f"{target}.stat")
 
-    # Run make, capturing stdout and stderr
+    # Run Verilator build
     with open(log_file, "w") as f:
-        proc = subprocess.run(
-            ["make", f"TOP={target}"],
-            stdout=f,
-            stderr=subprocess.STDOUT,
-        )
+        subprocess.run(["make", f"TOP={target}"], stdout=f, stderr=subprocess.STDOUT)
 
-    # Determine result based on log content
-    status = "PASS"
-    with open(log_file, "r") as f:
-        content = f.read()
-        if "FAIL" in content:
-            status = "FAIL"
+    # Generate the Markdown report
+    subprocess.run(
+        ["./utils/generate_report.py", "-m", "FILE", "-f", log_file, "-o", report_file],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
 
-    # Generate report (even on failure)
-    try:
-        subprocess.run(
-            [
-                "./utils/generate_report.py",
-                "-m",
-                "FILE",
-                "-f",
-                log_file,
-                "-o",
-                report_file,
-            ],
-            check=False,
-        )
-    except Exception as e:
-        print(f"⚠️  Failed to generate report for {target}: {e}")
+    # Parse .stat file (if available)
+    stats = {"pass": 0, "fail": 0, "percent": 0.0}
+    if os.path.exists(stat_file):
+        with open(stat_file) as f:
+            for line in f:
+                k, v = line.strip().split("=")
+                stats[k] = float(v)
+        os.remove(stat_file)
 
-    return target, status
+    # Compute status
+    status = "PASS" if stats["fail"] == 0 else "FAIL"
+    return (
+        target,
+        status,
+        int(stats["pass"]),
+        int(stats["fail"]),
+        float(stats["percent"]),
+    )
 
 
 def main():
-    print(f"🔧 Starting parallel builds ({os.cpu_count()} workers)...")
-    print(f"Logs:     {log_dir}")
-    print(f"Reports:  {report_dir}\n")
+    print(f"🔧 Running Verilator builds in parallel ({os.cpu_count()} threads)...\n")
 
-    results = {}
-
-    # Run builds in parallel
-    with concurrent.futures.ThreadPoolExecutor(max_workers=os.cpu_count()) as ex:
-        futures = {ex.submit(run_build, t): t for t in targets}
-        for fut in concurrent.futures.as_completed(futures):
-            target, status = fut.result()
+    results = []
+    with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
+        for res in executor.map(run_target, targets):
+            target, status, passed, failed, percent = res
             emoji = "✅" if status == "PASS" else "❌"
-            print(f"{emoji} {target} → {status}")
-            results[target] = status
+            print(f"{emoji} {target:10s} → {status:4s} ({percent:.2f}%)")
+            results.append(res)
 
-    # Build global summary
-    print("\n🧾 Generating global summary...")
+    # === Generate global summary ===
+    total_pass = sum(r[2] for r in results)
+    total_fail = sum(r[3] for r in results)
+    avg_percent = sum(r[4] for r in results) / len(results)
+
     with open(summary_file, "w") as f:
         f.write("# 🧾 Global Test Summary\n\n")
-        f.write("| Module | Status | Report |\n")
-        f.write("| ------- | ------- | ------- |\n")
-        for target in targets:
-            status = results.get(target, "N/A")
+        f.write("| Module | Status | Passed | Failed | Success (%) |\n")
+        f.write("| ------- | ------- | ------- | ------- | ------------ |\n")
+        for target, status, passed, failed, percent in results:
             emoji = "✅" if status == "PASS" else "❌"
-            report_link = f"./{target}.md"
-            f.write(f"| {target} | {emoji} {status} | [{target}.md]({report_link}) |\n")
-        f.write(f"\n*Generated automatically on {datetime.now()}*\n")
+            f.write(
+                f"| {target} | {emoji} {status} | {passed} | {failed} | {percent:.2f} |\n"
+            )
 
-    # Summary result
-    fail_count = sum(1 for s in results.values() if s == "FAIL")
-    if fail_count == 0:
-        print("\n🎉 All builds passed successfully!")
-    else:
-        print(f"\n⚠️  {fail_count} / {len(targets)} builds failed.")
-        print(f"See details in {summary_file}")
+        f.write(f"\n**Total passed:** {total_pass}  \n")
+        f.write(f"**Total failed:** {total_fail}  \n")
+        f.write(f"**Average success:** {avg_percent:.2f}%  \n")
+        f.write(f"\n*Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*\n")
 
-    print(f"\n✅ Reports available in: {report_dir}")
+    print(f"\n📄 Summary written to: {summary_file}")
+    print(f"📁 Reports directory: {report_dir}")
 
 
 if __name__ == "__main__":

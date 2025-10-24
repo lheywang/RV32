@@ -7,6 +7,7 @@ to make easier the debuging !
 
 import argparse
 import sys
+import os
 from dataclasses import dataclass
 import datetime
 
@@ -103,6 +104,8 @@ def parse(lines):
     test_cases = []
     case_id = 0
 
+    totals = [0, 0]
+
     test_cases.append(test_case())
     test_cases[case_id].name = "Init"
     test_cases[case_id].data = dict()
@@ -123,6 +126,7 @@ def parse(lines):
             if not name in test_cases[case_id].data.keys():
                 test_cases[case_id].data[name] = [0, 0]
             test_cases[case_id].data[name][0] += 1
+            totals[0] += 1
 
         elif "FAIL" in line:
 
@@ -130,8 +134,9 @@ def parse(lines):
             if not name in test_cases[case_id].data.keys():
                 test_cases[case_id].data[name] = [0, 0]
             test_cases[case_id].data[name][1] += 1
+            totals[1] += 1
 
-    return test_cases
+    return test_cases, totals
 
 
 if __name__ == "__main__":
@@ -174,10 +179,17 @@ if __name__ == "__main__":
         lines = sys.stdin.readlines()
 
     # Call the tool
-    parsed = parse(lines)
+    parsed, totals = parse(lines)
 
     if args.output == "CONSOLE":
         print_report(parsed)
 
     else:
         write_report(parsed, args.output)
+
+    stat_file = os.path.splitext(args.output)[0] + ".stat"
+    percent = ((sum(totals) - totals[1]) / sum(totals)) * 100
+    with open(stat_file, "w") as f:
+        f.write(f"pass={totals[0]}\n")
+        f.write(f"fail={totals[1]}\n")
+        f.write(f"percent={percent:.3f}\n")
