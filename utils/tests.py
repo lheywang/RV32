@@ -90,7 +90,7 @@ def main():
         for target, status, passed, failed, percent in results:
             emoji = "✅" if status == "PASS" else "❌"
             f.write(
-                f"| {target} | {emoji} {status} | {passed} | {failed} | {percent:.2f} |\n"
+                f"| [{target}](./{target}.md) | {emoji} {status} | {passed} | {failed} | {percent:.2f} |\n"
             )
 
         f.write(f"\n**Total passed:** {total_pass}  \n")
