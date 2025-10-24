@@ -24,6 +24,7 @@ module booth(
     input   logic   [(core_config_pkg::XLEN - 1) : 0]       Y,
     output  logic                                           valid,
     output  logic   [((2 * core_config_pkg::XLEN) - 1) : 0] Z
+    
 );
 
     /*
