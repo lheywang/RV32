@@ -167,21 +167,17 @@ if __name__ == "__main__":
     # Source the data from STDIN or FILE
     lines = None
     if args.mode == "FILE":
-        print(f"Reading data from file ... ")
         with open(args.file, "r") as f:
             lines = f.readlines()
 
     else:
-        print(f"Reading data from stdin ... ")
         lines = sys.stdin.readlines()
 
     # Call the tool
     parsed = parse(lines)
 
     if args.output == "CONSOLE":
-        print(f"Reporting data to stdout ... ")
         print_report(parsed)
 
     else:
-        print(f"Reporting data to file ... ")
         write_report(parsed, args.output)

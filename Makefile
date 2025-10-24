@@ -107,7 +107,7 @@ clean:
 	rm -rf documentation/latex
 
 tests:
-	@./utils/tests.sh
+	python utils/tests.py
 
 doc: FORCE
 	doxygen DoxyFile && cd documentation/latex && make pdf
