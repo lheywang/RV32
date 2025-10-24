@@ -42,6 +42,8 @@ module srt(
     logic [5:0]             next_count;
     logic                   next_valid;
     logic                   next_div_by_zero;
+    logic                   sign_error;
+    logic                   next_sign_error;
     
     // Sign tracking
     logic                   dividend_neg_reg;
@@ -104,6 +106,7 @@ module srt(
             count               <= '0;
             valid               <= 1'b0;
             div_by_zero         <= 1'b0;
+            sign_error          <= 1'b0;
             dividend_neg_reg    <= 1'b0;
             divisor_neg_reg     <= 1'b0;
             quotient_null       <= 1'b0;
@@ -130,6 +133,7 @@ module srt(
             count               <= next_count;
             valid               <= next_valid;
             div_by_zero         <= next_div_by_zero;
+            sign_error          <= next_sign_error;
             dividend_neg_reg    <= next_dividend_neg;
             divisor_neg_reg     <= next_divisor_neg;
             quotient_null       <= next_quotient_null;
@@ -159,12 +163,13 @@ module srt(
         next_count              = count;
         next_valid              = 1'b0;
         next_div_by_zero        = div_by_zero;
+        next_sign_error         = sign_error;
         next_dividend_neg       = dividend_neg_reg;
         next_divisor_neg        = divisor_neg_reg;
         next_quotient_null      = 1'b0;
         next_remainder_null     = 1'b0;
-        final_quotient          = '0;
-        final_remainder         = '0;
+        final_quotient          = quotient;
+        final_remainder         = remainder;
         next_abs_dividend       = 32'b0;
         next_abs_divisor        = 32'b0;
         next_shifted_AQ         = AQ_reg;
@@ -188,7 +193,7 @@ module srt(
                     if (divisor == 32'd0) begin
 
                         next_div_by_zero = 1'b1;
-                        next_AQ = {dividend, 33'h1FFFFFFFF};
+                        next_sign_error = 1'b0;
                         next_state = SIGN_FIX1;
                         next_count = 6'b0;
 
@@ -204,7 +209,7 @@ module srt(
                     else if (dividend_signed ^ divisor_signed) begin
 
                         next_div_by_zero = 1'b0;
-                        next_AQ = {dividend, 33'h1FFFFFFFF};
+                        next_sign_error = 1'b1;
                         next_state = SIGN_FIX1;
                         next_count = 6'b0;
 
@@ -213,7 +218,9 @@ module srt(
 
                         next_sign_mask_dividend = {32{dividend_signed && dividend[31]}};
                         next_sign_mask_divisor  = {32{divisor_signed  && divisor[31]}};
-                                
+
+                        next_div_by_zero = 1'b0;
+                        next_sign_error = 1'b0;
                         next_state = IDLE2;
                         next_count = 6'b0;
                         
@@ -297,12 +304,21 @@ module srt(
             SIGN_FIX2 : begin
 
                 /*
-                 *  Note : This combinational logic enable to negate a number without needing
-                 *  carry chains. The logic is A XOR MASK + 1, where XOR is used as a wanted inverter.
-                 */ 
-                final_quotient  = (AQ_reg3[31:0] ^ sign_mask_q) + {31'b0, sign_mask_q[0]};
-                final_remainder = (AQ_reg3[63:32] ^ sign_mask_r) + {31'b0, sign_mask_r[0]};
-                
+                 *  Handling the RISC-V spec by forcing some specific values on the output buses, if needed.
+                 */
+                if (sign_error || div_by_zero) begin
+                    final_quotient  = 32'hFFFFFFFF;
+                    final_remainder = 32'h00000000;
+                end 
+                else begin
+                    /*
+                     *  Note : This combinational logic enable to negate a number without needing
+                     *  carry chains. The logic is A XOR MASK + 1, where XOR is used as a wanted inverter.
+                     */ 
+                    final_quotient  = (AQ_reg3[31:0] ^ sign_mask_q) + {31'b0, sign_mask_q[0]};
+                    final_remainder = (AQ_reg3[63:32] ^ sign_mask_r) + {31'b0, sign_mask_r[0]};
+                end
+                    
                 next_valid = 1'b1;
                 next_state = IDLE;
             end

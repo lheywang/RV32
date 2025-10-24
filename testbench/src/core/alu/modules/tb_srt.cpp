@@ -44,29 +44,20 @@ int main(int argc, char **argv)
                 tb.tick();
                 tb.dut->start = 0;
 
-                tb.run_until(&tb.dut->valid, 1);
-
-                std::cout << std::hex
-                          << (unsigned int)input1[i]
-                          << " / "
-                          << (unsigned int)input2[ii]
-                          << " = "
-                          << (unsigned int)tb.dut->quotient
-                          << " * "
-                          << (unsigned int)input2[ii]
-                          << " + "
-                          << (unsigned int)tb.dut->remainder
-                          << std::dec
-                          << std::endl;
+                int count = tb.run_until(&tb.dut->valid, 1);
 
                 if (tb.dut->divisor == 0)
                 {
+                    tb.check_equality(count, 2, "Cycle count");
+
                     tb.check_equality((unsigned int)tb.dut->div_by_zero, (unsigned int)1, "Div By Zero");
                     tb.check_equality((unsigned int)tb.dut->quotient, (unsigned int)0xFFFFFFFF, "Result (NULL)");
                     tb.check_equality((unsigned int)tb.dut->remainder, (unsigned int)0, "Result (U % U)");
                 }
                 else
                 {
+                    tb.check_equality(count, 69, "Cycle count");
+
                     tb.check_equality((unsigned int)tb.dut->div_by_zero, (unsigned int)0, "Div By Zero");
 
                     switch (op)
