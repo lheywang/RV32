@@ -24,10 +24,12 @@ int main(int argc, char **argv)
         tb.increment_cycles();
     }
 
-    // --- Test 2: Load a new address ---
+    // --- Test 2: Overflow test ---
     tb.dut->enable = 0;
     tb.dut->load = 1;
+    tb.dut->load2 = 0;
     tb.dut->loaded = 0x10003FF0;
+    tb.dut->loaded2 = 0x10001FFF;
     int ovf[4] = {0, 0, 0, 1};
     tb.tick();
 
@@ -40,6 +42,54 @@ int main(int argc, char **argv)
         if (i != 3)
             tb.dut->loaded += 4;
 
+        tb.check_equality((unsigned int)tb.dut->address, (unsigned int)tb.dut->loaded, "loading");
+        tb.increment_cycles();
+    }
+
+    // --- Test 3: Main port loading ---
+    tb.dut->enable = 1;
+    tb.dut->load = 1;
+    tb.dut->load2 = 0;
+    tb.dut->loaded = 0x10003FF0;
+    tb.dut->loaded2 = 0x10001FFF;
+    tb.tick();
+
+    
+    for (int i = 0; i < 10; i++)
+    {
+        tb.tick();
+        tb.check_equality((unsigned int)tb.dut->address, (unsigned int)tb.dut->loaded, "loading");
+        tb.increment_cycles();
+    }
+
+    // --- Test 4: Aux port loading ---
+    tb.dut->enable = 1;
+    tb.dut->load = 0;
+    tb.dut->load2 = 1;
+    tb.dut->loaded = 0x10003FF0;
+    tb.dut->loaded2 = 0x10001FFF;
+    tb.tick();
+
+    
+    for (int i = 0; i < 10; i++)
+    {
+        tb.tick();
+        tb.check_equality((unsigned int)tb.dut->address, (unsigned int)tb.dut->loaded2, "loading");
+        tb.increment_cycles();
+    }
+
+    // --- Test 5 : Concurrent loading ---
+    tb.dut->enable = 1;
+    tb.dut->load = 1;
+    tb.dut->load2 = 1;
+    tb.dut->loaded = 0x10003FF0;
+    tb.dut->loaded2 = 0x10001FFF;
+    tb.tick();
+
+    
+    for (int i = 0; i < 10; i++)
+    {
+        tb.tick();
         tb.check_equality((unsigned int)tb.dut->address, (unsigned int)tb.dut->loaded, "loading");
         tb.increment_cycles();
     }
