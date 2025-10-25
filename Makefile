@@ -52,9 +52,6 @@ VERILOG_SRCS += $(SRC_DIR)/rv32.sv
 
 # Including memory files
 
-# Including top file 
-VERILOG_SRCS += $(SRC_DIR)/rv32.sv
-
 
 # =======================================================
 # Parameters and public recipes
