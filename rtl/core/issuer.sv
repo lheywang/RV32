@@ -10,8 +10,6 @@
  *              available from the core.
  */
 
-module issuer (
-
-);
+module issuer ();
 
 endmodule

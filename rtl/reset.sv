@@ -10,31 +10,31 @@
  *              rst_in input, or, at natural reset.
  */
 
-`timescale 1ns/1ps
+`timescale 1ns / 1ps
 
 import core_config_pkg::RST_TICK_CNT;
 
 module reset (
-    input   logic                       clk,                // system clock
-    input   logic                       rst_in,             // async active-low input reset (from button, POR, etc.)
-    output  logic                       rst_out             // sync active-high reset output
+    input  logic clk,     // system clock
+    input  logic rst_in,  // async active-low input reset (from button, POR, etc.)
+    output logic rst_out  // sync active-high reset output
 );
 
     // -------------------------------------------------------------------------
     // Internal signals
     // -------------------------------------------------------------------------
-    logic   [1:0]                       sync_rst;          // two-flop synchronizer
-    logic                               reset_active;      // internal "we are in reset" flag
-    integer                             counter;           // countdown register
+    logic   [1:0] sync_rst;  // two-flop synchronizer
+    logic         reset_active;  // internal "we are in reset" flag
+    integer       counter;  // countdown register
 
     // -------------------------------------------------------------------------
     // Power-up initialization (for simulation and synthesis)
     // -------------------------------------------------------------------------
     initial begin
-        sync_rst      = 2'b00;
-        reset_active  = 1'b1;
-        counter       = core_config_pkg::RST_TICK_CNT;
-        rst_out       = 1'b1;
+        sync_rst     = 2'b00;
+        reset_active = 1'b1;
+        counter      = core_config_pkg::RST_TICK_CNT;
+        rst_out      = 1'b1;
     end
 
     // -------------------------------------------------------------------------
@@ -43,13 +43,9 @@ module reset (
     // -------------------------------------------------------------------------
     always_ff @(posedge clk or negedge rst_in) begin
 
-        if (!rst_in)
+        if (!rst_in) sync_rst <= 2'b00;  // immediate async assertion
 
-            sync_rst <= 2'b00;               // immediate async assertion
-
-        else
-
-            sync_rst <= {sync_rst[0], 1'b1}; // synchronize release
+        else sync_rst <= {sync_rst[0], 1'b1};  // synchronize release
 
     end
 
@@ -72,19 +68,19 @@ module reset (
             // Continue holding reset for at least N cycles
             if (counter > 0) begin
 
-                counter  <= counter - 1;
-                rst_out  <= 1'b0;
+                counter <= counter - 1;
+                rst_out <= 1'b0;
 
             end else begin
 
                 reset_active <= 1'b0;
                 rst_out      <= 1'b1;
-                
+
             end
         end else begin
 
             rst_out <= 1'b1;
-            
+
         end
     end
 

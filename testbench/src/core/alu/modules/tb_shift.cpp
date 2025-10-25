@@ -3,7 +3,8 @@
 
 #include "testbench.h"
 
-unsigned int input[20] = {10, 100, 1000, 0xFFFFFFFF, 0, 8, 2, 17, 29, 33, 59, 87, 453610452, 452135, 125245454, 47, 123, 789, 456, 20};
+unsigned int input[20] = {10, 100, 1000,      0xFFFFFFFF, 0,         8,  2,   17,  29,  33,
+                          59, 87,  453610452, 452135,     125245454, 47, 123, 789, 456, 20};
 
 // Main
 int main(int argc, char **argv)
@@ -50,13 +51,19 @@ int main(int argc, char **argv)
                 switch (op)
                 {
                 case 0:
-                    tb.check_equality((unsigned int)tb.dut->data_out, (unsigned int)tb.dut->data_in >> tb.dut->shift_amount, "Shifted");
+                    tb.check_equality((unsigned int)tb.dut->data_out,
+                                      (unsigned int)tb.dut->data_in >> tb.dut->shift_amount,
+                                      "Shifted");
                     break;
                 case 1:
-                    tb.check_equality((signed int)tb.dut->data_out, (signed int)tb.dut->data_in >> tb.dut->shift_amount, "Shifted");
+                    tb.check_equality((signed int)tb.dut->data_out,
+                                      (signed int)tb.dut->data_in >> tb.dut->shift_amount,
+                                      "Shifted");
                     break;
                 case 2:
-                    tb.check_equality((unsigned int)tb.dut->data_out, (unsigned int)tb.dut->data_in << tb.dut->shift_amount, "Shifted");
+                    tb.check_equality((unsigned int)tb.dut->data_out,
+                                      (unsigned int)tb.dut->data_in << tb.dut->shift_amount,
+                                      "Shifted");
                     break;
                 }
 

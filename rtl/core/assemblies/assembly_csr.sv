@@ -9,8 +9,6 @@
  *              more readable.
  */
 
-module assembly_csr (
-
-);
+module assembly_csr ();
 
 endmodule

@@ -57,7 +57,6 @@ int main(int argc, char **argv)
     tb.dut->loaded2 = 0x10001FFF;
     tb.tick();
 
-    
     for (int i = 0; i < 10; i++)
     {
         tb.tick();
@@ -74,7 +73,6 @@ int main(int argc, char **argv)
     tb.dut->loaded2 = 0x10001FFF;
     tb.tick();
 
-    
     for (int i = 0; i < 10; i++)
     {
         tb.tick();
@@ -91,7 +89,6 @@ int main(int argc, char **argv)
     tb.dut->loaded2 = 0x10001FFF;
     tb.tick();
 
-    
     for (int i = 0; i < 10; i++)
     {
         tb.tick();

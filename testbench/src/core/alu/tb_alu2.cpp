@@ -20,17 +20,9 @@ int main(int argc, char **argv)
     int val1 = 0xAAAAAAAA;
     int val2 = 2;
 
-    unsigned int results[] = {0x2AAAAAAA,
-                              0xEAAAAAAA,
-                              0x55555554,
-                              0x00000003,
-                              0x00000003,
-                              0x00000003,
-                              0xD5555555,
-                              0x55555555,
-                              0x00000000,
-                              0x00000000,
-                              0xAAAAAAA8};
+    unsigned int results[] = {0x2AAAAAAA, 0xEAAAAAAA, 0x55555554, 0x00000003,
+                              0x00000003, 0x00000003, 0xD5555555, 0x55555555,
+                              0x00000000, 0x00000000, 0xAAAAAAA8};
 
     int ticks = 0;
 
@@ -89,9 +81,10 @@ int main(int argc, char **argv)
 
         // Wait to finish
         tb.run_until(&tb.dut->valid, 1);
- 
+
         tb.check_equality((unsigned int)tb.dut->valid, (unsigned int)1, "valid");
-        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)results[op - alu_commands_t::c_SRL], "res");
+        tb.check_equality((unsigned int)tb.dut->res,
+                          (unsigned int)results[op - alu_commands_t::c_SRL], "res");
         tb.check_equality((unsigned int)tb.dut->o_rd, (unsigned int)17, "o_rd");
         tb.check_equality((unsigned int)tb.dut->i_error, (unsigned int)0, "i_error");
         tb.check_equality((unsigned int)tb.dut->o_error, (unsigned int)0, "o_error");

@@ -197,8 +197,10 @@ int main(int argc, char **argv)
         tb.check_equality((unsigned int)tb.dut->rs2, (unsigned int)dinstructions[i].rs2, "RS2");
         tb.check_equality((unsigned int)tb.dut->rd, (unsigned int)dinstructions[i].rd, "RD");
         tb.check_equality((unsigned int)tb.dut->imm, (unsigned int)dinstructions[i].imm, "IMM");
-        tb.check_equality((unsigned int)tb.dut->opcode, (unsigned int)dinstructions[i].opcode, "OPCODE");
-        tb.check_equality((unsigned int)tb.dut->illegal, (unsigned int)dinstructions[i].illegal, "ILLEGAL");
+        tb.check_equality((unsigned int)tb.dut->opcode, (unsigned int)dinstructions[i].opcode,
+                          "OPCODE");
+        tb.check_equality((unsigned int)tb.dut->illegal, (unsigned int)dinstructions[i].illegal,
+                          "ILLEGAL");
     }
 
     return tb.get_return();

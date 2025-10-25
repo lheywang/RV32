@@ -86,9 +86,7 @@ def parse_enum_file(filepath):
                 continue
 
             if not current_enum:
-                raise ValueError(
-                    f"Line {line_no}: Value definition outside of enum block"
-                )
+                raise ValueError(f"Line {line_no}: Value definition outside of enum block")
 
             # Type specification
             if line.startswith("type"):
@@ -105,9 +103,7 @@ def parse_enum_file(filepath):
 
                 # Auto-increment from last value
                 auto_value = (
-                    0
-                    if not current_enum["values"]
-                    else current_enum["values"][-1]["value"] + 1
+                    0 if not current_enum["values"] else current_enum["values"][-1]["value"] + 1
                 )
 
                 try:

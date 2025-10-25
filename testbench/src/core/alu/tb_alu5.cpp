@@ -48,13 +48,13 @@ int main(int argc, char **argv)
 
         switch (i)
         {
-        case alu_commands_t::c_SB : 
+        case alu_commands_t::c_SB:
             tb.set_case("SB");
             break;
-        case alu_commands_t::c_SH :
+        case alu_commands_t::c_SH:
             tb.set_case("SH");
             break;
-        case alu_commands_t::c_SW :
+        case alu_commands_t::c_SW:
             tb.set_case("SW");
             break;
         }
@@ -75,52 +75,65 @@ int main(int argc, char **argv)
                 tb.tick();
                 tb.tick();
 
-                tb.check_equality((unsigned int)tb.dut->mem_addr, (unsigned int)target_addr, "Write-memaddr");
+                tb.check_equality((unsigned int)tb.dut->mem_addr, (unsigned int)target_addr,
+                                  "Write-memaddr");
                 tb.check_equality((unsigned int)tb.dut->mem_we, (unsigned int)1, "Write-we");
                 tb.check_equality((unsigned int)tb.dut->mem_req, (unsigned int)1, "Write-req");
                 tb.check_equality((unsigned int)tb.dut->busy, (unsigned int)1, "Write-busy");
 
                 switch (i)
                 {
-                case alu_commands_t::c_SB :
+                case alu_commands_t::c_SB:
                     switch (iii)
                     {
                     case 0:
-                        tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)(writedata[ii] & 0x000000FF), "Write-wdata");
+                        tb.check_equality((unsigned int)tb.dut->mem_wdata,
+                                          (unsigned int)(writedata[ii] & 0x000000FF),
+                                          "Write-wdata");
                         break;
 
                     case 1:
-                        tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)(writedata[ii] & 0x000000FF) << 8, "Write-wdata");
+                        tb.check_equality((unsigned int)tb.dut->mem_wdata,
+                                          (unsigned int)(writedata[ii] & 0x000000FF) << 8,
+                                          "Write-wdata");
                         break;
 
                     case 2:
-                        tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)(writedata[ii] & 0x000000FF) << 16, "Write-wdata");
+                        tb.check_equality((unsigned int)tb.dut->mem_wdata,
+                                          (unsigned int)(writedata[ii] & 0x000000FF) << 16,
+                                          "Write-wdata");
                         break;
 
                     case 3:
-                        tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)(writedata[ii] & 0x000000FF) << 24, "Write-wdata");
+                        tb.check_equality((unsigned int)tb.dut->mem_wdata,
+                                          (unsigned int)(writedata[ii] & 0x000000FF) << 24,
+                                          "Write-wdata");
                         ;
                         break;
                     }
                     break;
 
-                case alu_commands_t::c_SH : 
+                case alu_commands_t::c_SH:
                     switch (iii)
                     {
                     case 0:
                     case 1:
-                        tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)writedata[ii] & 0x0000FFFF, "Write-wdata");
+                        tb.check_equality((unsigned int)tb.dut->mem_wdata,
+                                          (unsigned int)writedata[ii] & 0x0000FFFF, "Write-wdata");
                         break;
 
                     case 2:
                     case 3:
-                        tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)(writedata[ii] & 0x0000FFFF) << 16, "Write-wdata");
+                        tb.check_equality((unsigned int)tb.dut->mem_wdata,
+                                          (unsigned int)(writedata[ii] & 0x0000FFFF) << 16,
+                                          "Write-wdata");
                         break;
                     }
                     break;
 
-                case alu_commands_t::c_SW : 
-                    tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)writedata[ii], "Write-wdata");
+                case alu_commands_t::c_SW:
+                    tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)writedata[ii],
+                                      "Write-wdata");
                     break;
                 }
 
@@ -149,19 +162,19 @@ int main(int argc, char **argv)
 
         switch (i)
         {
-        case alu_commands_t::c_LB : 
+        case alu_commands_t::c_LB:
             tb.set_case("LB");
             break;
-        case alu_commands_t::c_LH :
+        case alu_commands_t::c_LH:
             tb.set_case("LH");
             break;
-        case alu_commands_t::c_LW :
+        case alu_commands_t::c_LW:
             tb.set_case("LW");
             break;
-        case alu_commands_t::c_LBU :
+        case alu_commands_t::c_LBU:
             tb.set_case("LBU");
             break;
-        case alu_commands_t::c_LHU :
+        case alu_commands_t::c_LHU:
             tb.set_case("LHU");
             break;
         }
@@ -185,7 +198,8 @@ int main(int argc, char **argv)
                 tb.tick();
                 tb.tick();
 
-                tb.check_equality((unsigned int)tb.dut->mem_addr, (unsigned int)target_addr, "Read-memaddr");
+                tb.check_equality((unsigned int)tb.dut->mem_addr, (unsigned int)target_addr,
+                                  "Read-memaddr");
                 tb.check_equality((unsigned int)tb.dut->mem_we, (unsigned int)0, "Read-we");
                 tb.check_equality((unsigned int)tb.dut->mem_req, (unsigned int)1, "Read-req");
                 tb.check_equality((unsigned int)tb.dut->busy, (unsigned int)1, "Read-busy");
@@ -195,78 +209,102 @@ int main(int argc, char **argv)
 
                 switch (i)
                 {
-                case alu_commands_t::c_LB : 
+                case alu_commands_t::c_LB:
                     switch (iii)
                     {
                     case 0:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)sext8((writedata[ii] >> 0) & 0x000000FF), "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res,
+                                          (unsigned int)sext8((writedata[ii] >> 0) & 0x000000FF),
+                                          "Read-res");
                         break;
 
                     case 1:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)sext8((writedata[ii] >> 8) & 0x000000FF), "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res,
+                                          (unsigned int)sext8((writedata[ii] >> 8) & 0x000000FF),
+                                          "Read-res");
                         break;
 
                     case 2:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)sext8((writedata[ii] >> 16) & 0x000000FF), "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res,
+                                          (unsigned int)sext8((writedata[ii] >> 16) & 0x000000FF),
+                                          "Read-res");
                         break;
 
                     case 3:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)sext8((writedata[ii] >> 24) & 0x000000FF), "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res,
+                                          (unsigned int)sext8((writedata[ii] >> 24) & 0x000000FF),
+                                          "Read-res");
                         break;
                     }
                     break;
 
-                case alu_commands_t::c_LH : 
+                case alu_commands_t::c_LH:
                     switch (iii)
                     {
                     case 0:
                     case 1:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)sext16((writedata[ii] >> 0) & 0x0000FFFF), "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res,
+                                          (unsigned int)sext16((writedata[ii] >> 0) & 0x0000FFFF),
+                                          "Read-res");
                         break;
 
                     case 2:
                     case 3:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)sext16((writedata[ii] >> 16) & 0x0000FFFF), "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res,
+                                          (unsigned int)sext16((writedata[ii] >> 16) & 0x0000FFFF),
+                                          "Read-res");
                         break;
                     }
                     break;
 
-                case alu_commands_t::c_LW : 
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)writedata[ii], "Read-res");
+                case alu_commands_t::c_LW:
+                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)writedata[ii],
+                                      "Read-res");
                     break;
 
-                case alu_commands_t::c_LBU :
+                case alu_commands_t::c_LBU:
                     switch (iii)
                     {
                     case 0:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(writedata[ii] >> 0) & 0x000000FF, "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res,
+                                          (unsigned int)(writedata[ii] >> 0) & 0x000000FF,
+                                          "Read-res");
                         break;
 
                     case 1:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(writedata[ii] >> 8) & 0x000000FF, "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res,
+                                          (unsigned int)(writedata[ii] >> 8) & 0x000000FF,
+                                          "Read-res");
                         break;
 
                     case 2:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(writedata[ii] >> 16) & 0x000000FF, "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res,
+                                          (unsigned int)(writedata[ii] >> 16) & 0x000000FF,
+                                          "Read-res");
                         break;
 
                     case 3:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(writedata[ii] >> 24) & 0x000000FF, "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res,
+                                          (unsigned int)(writedata[ii] >> 24) & 0x000000FF,
+                                          "Read-res");
                         break;
                     }
                     break;
 
-                case alu_commands_t::c_LHU :
+                case alu_commands_t::c_LHU:
                     switch (iii)
                     {
                     case 0:
                     case 1:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)writedata[ii] & 0x0000FFFF, "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res,
+                                          (unsigned int)writedata[ii] & 0x0000FFFF, "Read-res");
                         break;
 
                     case 2:
                     case 3:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(writedata[ii] >> 16) & 0x0000FFFF, "Read-res");
+                        tb.check_equality((unsigned int)tb.dut->res,
+                                          (unsigned int)(writedata[ii] >> 16) & 0x0000FFFF,
+                                          "Read-res");
                         break;
                     }
                     break;

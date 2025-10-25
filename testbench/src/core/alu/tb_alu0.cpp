@@ -23,19 +23,19 @@ int main(int argc, char **argv)
 
         switch (i)
         {
-        case alu_commands_t::c_ADD : 
+        case alu_commands_t::c_ADD:
             tb.set_case("ADD");
             break;
-        case alu_commands_t::c_SUB : 
+        case alu_commands_t::c_SUB:
             tb.set_case("SUB");
             break;
-        case alu_commands_t::c_AND : 
+        case alu_commands_t::c_AND:
             tb.set_case("AND");
             break;
-        case alu_commands_t::c_OR : 
+        case alu_commands_t::c_OR:
             tb.set_case("OR");
             break;
-        case alu_commands_t::c_XOR : 
+        case alu_commands_t::c_XOR:
             tb.set_case("XOR");
             break;
         }
@@ -55,24 +55,29 @@ int main(int argc, char **argv)
 
                 switch (i)
                 {
-                case alu_commands_t::c_ADD : 
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(inputs1[ii] + inputs2[iii]), "res");
+                case alu_commands_t::c_ADD:
+                    tb.check_equality((unsigned int)tb.dut->res,
+                                      (unsigned int)(inputs1[ii] + inputs2[iii]), "res");
                     break;
 
-                case alu_commands_t::c_SUB : 
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(inputs1[ii] - inputs2[iii]), "res");
+                case alu_commands_t::c_SUB:
+                    tb.check_equality((unsigned int)tb.dut->res,
+                                      (unsigned int)(inputs1[ii] - inputs2[iii]), "res");
                     break;
 
-                case alu_commands_t::c_AND : 
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(inputs1[ii] & inputs2[iii]), "res");
+                case alu_commands_t::c_AND:
+                    tb.check_equality((unsigned int)tb.dut->res,
+                                      (unsigned int)(inputs1[ii] & inputs2[iii]), "res");
                     break;
 
-                case alu_commands_t::c_OR : 
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(inputs1[ii] | inputs2[iii]), "res");
+                case alu_commands_t::c_OR:
+                    tb.check_equality((unsigned int)tb.dut->res,
+                                      (unsigned int)(inputs1[ii] | inputs2[iii]), "res");
                     break;
 
-                case alu_commands_t::c_XOR : 
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(inputs1[ii] ^ inputs2[iii]), "res");
+                case alu_commands_t::c_XOR:
+                    tb.check_equality((unsigned int)tb.dut->res,
+                                      (unsigned int)(inputs1[ii] ^ inputs2[iii]), "res");
                     break;
                 }
 

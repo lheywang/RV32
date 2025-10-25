@@ -9,8 +9,6 @@
  *              core.sv file much more readable.
  */
 
-module assembly_alu (
-
-);
+module assembly_alu ();
 
 endmodule

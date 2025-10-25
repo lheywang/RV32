@@ -10,8 +10,7 @@
 
 `timescale 1ns / 1ps
 
-module rv32 (
+module rv32 ();
 
-);
-
-endmodule;
+endmodule
+;
