@@ -21,6 +21,25 @@ int main(int argc, char **argv)
         tb.dut->cmd = i;
         tb.dut->i_rd = 0x1F;
 
+        switch (i)
+        {
+        case 0:
+            tb.set_case("ADD");
+            break;
+        case 1:
+            tb.set_case("SUB");
+            break;
+        case 2:
+            tb.set_case("AND");
+            break;
+        case 3:
+            tb.set_case("OR");
+            break;
+        case 4:
+            tb.set_case("XOR");
+            break;
+        }
+
         for (int ii = 0; ii < 5; ii++)
         {
             for (int iii = 0; iii < 5; iii++)
@@ -64,6 +83,7 @@ int main(int argc, char **argv)
     }
 
     // Overflow test
+    tb.set_case("Overflow");
     tb.dut->cmd = 0;
     tb.dut->i_rd = 0x1F;
     tb.dut->arg0 = 0xFFFFFFFF;

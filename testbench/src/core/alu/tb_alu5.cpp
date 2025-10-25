@@ -46,6 +46,19 @@ int main(int argc, char **argv)
     {
         tb.dut->cmd = i;
 
+        switch (i)
+        {
+        case 27: 
+            tb.set_case("SB");
+            break;
+        case 28:
+            tb.set_case("SH");
+            break;
+        case 29:
+            tb.set_case("SW");
+            break;
+        }
+
         // Iterate over some data
         for (int ii = 0; ii < 10; ii++)
         {
@@ -133,6 +146,25 @@ int main(int argc, char **argv)
     for (int i = 30; i < 35; i++)
     {
         tb.dut->cmd = i;
+
+        switch (i)
+        {
+        case 30: 
+            tb.set_case("LB");
+            break;
+        case 31:
+            tb.set_case("LH");
+            break;
+        case 32:
+            tb.set_case("LW");
+            break;
+        case 33:
+            tb.set_case("LBU");
+            break;
+        case 34:
+            tb.set_case("LHU");
+            break;
+        }
 
         // Iterate over some data
         for (int ii = 0; ii < 10; ii++)
@@ -258,6 +290,7 @@ int main(int argc, char **argv)
     tb.tick();
 
     // Checking that the ALU does perform the feedback of errors
+    tb.set_case("Error feedback (out)");
     for (int i = 27; i < 35; i++)
     {
         tb.dut->cmd = 30;
@@ -283,6 +316,7 @@ int main(int argc, char **argv)
     tb.dut->clear = 0;
 
     // Checking that the ALU does perform the feedback of errors
+    tb.set_case("Error feedback (in)");
     for (int i = 10; i < 14; i++)
     {
         tb.dut->cmd = 0;

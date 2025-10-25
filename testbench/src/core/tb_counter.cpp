@@ -14,6 +14,7 @@ int main(int argc, char **argv)
     tb.reset();
 
     // Count test
+    tb.set_case("Count");
     for (uint64_t k = 1; k < 1001; k++)
     {
         tb.check_equality((unsigned int)tb.dut->outL, (unsigned int)k, "Count");
@@ -22,6 +23,7 @@ int main(int argc, char **argv)
     }
 
     // Disabled test
+    tb.set_case("Disabled");
     tb.dut->clk_en = 1;
     tb.dut->enable = 0;
     tb.reset();

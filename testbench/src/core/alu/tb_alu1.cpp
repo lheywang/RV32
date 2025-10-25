@@ -20,6 +20,34 @@ int main(int argc, char **argv)
         tb.dut->addr = 0x00001FFF;
         tb.dut->imm = 0x00001FFF;
 
+        switch (i)
+        {
+        case 5: // SLT
+            tb.set_case("SLT");
+            break;
+        case 6: // SLTU
+            tb.set_case("SLTU");
+            break;
+        case 7: // BEQ
+            tb.set_case("BEQ");
+            break;
+        case 8: // BNE
+            tb.set_case("BNE");
+            break;
+        case 9: // BLT
+            tb.set_case("BLT");
+            break;
+        case 10: // BGE
+            tb.set_case("BGE");
+            break;
+        case 11: // BLTU
+            tb.set_case("BLTU");
+            break;
+        case 12: // BGEU
+            tb.set_case("BGEU");
+            break;
+        }
+
         for (int ii = 0; ii < 5; ii++)
         {
             for (int iii = 0; iii < 5; iii++)

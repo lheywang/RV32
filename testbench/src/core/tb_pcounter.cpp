@@ -11,6 +11,7 @@ int main(int argc, char **argv)
     tb.reset();
 
     // --- Test 1: Count until overflow ---
+    tb.set_case("Counting");
     tb.dut->loaded = 0x10000000;
     tb.dut->clk_en = 1;
     tb.dut->load = 0;
@@ -25,6 +26,7 @@ int main(int argc, char **argv)
     }
 
     // --- Test 2: Overflow test ---
+    tb.set_case("Overflowing");
     tb.dut->enable = 0;
     tb.dut->load = 1;
     tb.dut->load2 = 0;
@@ -47,6 +49,7 @@ int main(int argc, char **argv)
     }
 
     // --- Test 3: Main port loading ---
+    tb.set_case("Loading (1)");
     tb.dut->enable = 1;
     tb.dut->load = 1;
     tb.dut->load2 = 0;
@@ -63,6 +66,7 @@ int main(int argc, char **argv)
     }
 
     // --- Test 4: Aux port loading ---
+    tb.set_case("Loading (2)");
     tb.dut->enable = 1;
     tb.dut->load = 0;
     tb.dut->load2 = 1;
@@ -79,6 +83,7 @@ int main(int argc, char **argv)
     }
 
     // --- Test 5 : Concurrent loading ---
+    tb.set_case("Concurrent loading");
     tb.dut->enable = 1;
     tb.dut->load = 1;
     tb.dut->load2 = 1;

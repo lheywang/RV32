@@ -14,6 +14,7 @@ int main(int argc, char **argv)
     tb.dut->lock = 1;
 
     // First, lock some registers
+    tb.set_case("Locking (1)");
     for (int i = 1; i < 32; i += 2)
     {
         tb.dut->source1 = 0;
@@ -26,6 +27,7 @@ int main(int argc, char **argv)
     }
 
     // Then, try to overwrite the same registers (shall be blocked).
+    tb.set_case("Locking (2)");
     for (int i = 1; i < 32; i += 2)
     {
         tb.dut->source1 = 0;
@@ -41,6 +43,7 @@ int main(int argc, char **argv)
     tb.dut->write = 1;
 
     // Then, free them
+    tb.set_case("Freing (1)");
     for (int i = 1; i < 32; i += 2)
     {
         tb.dut->address = i;
@@ -52,6 +55,7 @@ int main(int argc, char **argv)
     tb.dut->lock = 1;
 
     // Finally, relock them
+    tb.set_case("Locking (3)");
     for (int i = 1; i < 32; i += 2)
     {
         tb.dut->source1 = 0;
