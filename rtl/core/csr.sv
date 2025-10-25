@@ -1,3 +1,16 @@
+/*
+ *  File :      rtl/core/csr.sv
+ *
+ *  Author :    l.heywang <leonard.heywang@proton.me>
+ *  Date :      25/10.2025
+ *  
+ *  Brief :     This file define the CSR register array, or, at least 
+ *              emulate it. In fact, there's only 8 registers that are 
+ *              stored, even if 23 of them are available !
+ *              That's because some of them aren't writtable at all, so
+ *              we return 0, some are just "interfaces" to some 
+ */
+
 `timescale 1ns / 1ps
 
 import core_config_pkg::XLEN;
@@ -23,7 +36,11 @@ module csr (
     input   logic   [(core_config_pkg::XLEN - 1) : 0]           waitsL,
     input   logic   [(core_config_pkg::XLEN - 1) : 0]           waitsH,
     input   logic   [(core_config_pkg::XLEN - 1) : 0]           decodedL,
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]           decodedH
+    input   logic   [(core_config_pkg::XLEN - 1) : 0]           decodedH,
+
+    // Interrupt vector input
+    input   logic   [(core_config_pkg::XLEN - 1) : 0]           interrupt_vect,
+    output  logic                                               int_pend
     
 );
 
@@ -133,14 +150,17 @@ module csr (
         if (rid != core_config_pkg::r_NONE) begin
 
             unique case (rid)
+                // Theses registers are all located within the three LSB, thus this expression is correct.
                 core_config_pkg::r_MSTATUS,
                 core_config_pkg::r_MIE,
                 core_config_pkg::r_MTVEC,
                 core_config_pkg::r_MSCRATCH,
                 core_config_pkg::r_MEPC,
                 core_config_pkg::r_MCAUSE,
-                core_config_pkg::r_MTVAL,
-                core_config_pkg::r_MIP :    rd <= csrs[rid[2 : 0]]; // Theses registers are all located within the three LSB, thus this expression is correct.
+                core_config_pkg::r_MTVAL :  rd <= csrs[rid[2 : 0]]; 
+
+                // The MIP register is build on the fly when needed.
+                core_config_pkg::r_MIP :    rd <= interrupt_vect & csrs[core_config_pkg::r_MIE[2:0]]; 
 
                 core_config_pkg::r_CYCLE :  rd <= cycleL;
                 core_config_pkg::r_CYCLEH : rd <= cycleH;
@@ -161,6 +181,8 @@ module csr (
                 core_config_pkg::r_NONE :   rd <= 32'h0;
             endcase
         end  
-     end
+    end
+
+    assign int_pend = |(interrupt_vect & csrs[core_config_pkg::r_MIE[2:0]]);
 
 endmodule

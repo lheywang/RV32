@@ -53,5 +53,10 @@ int main(int argc, char **argv)
         tb.increment_cycles();
     }
 
+    // Interrupt tests (MIE was written)
+    tb.dut->interrupt_vect = 0xFFFFFFFF;
+    tb.tick();
+    tb.check_equality((unsigned int)tb.dut->int_pend, (unsigned int)1, "Interrupt");
+
     return tb.get_return();
 }
