@@ -66,6 +66,7 @@ int main(int argc, char **argv)
             tb.dut->csr_rd = readback[addr];
 
             tb.tick();
+            // tb.tick();
 
             tb.check_equality((unsigned int)tb.dut->csr_ra, (unsigned int)addresses[addr], "CSR_RA");
             tb.check_equality((unsigned int)tb.dut->csr_wa, (unsigned int)0, "CSR_WA");
@@ -90,6 +91,10 @@ int main(int argc, char **argv)
                 tb.check_equality((unsigned int)tb.dut->csr_wd, (unsigned int)0x00000000, "CSR_WD");
                 break;
             }
+
+            tb.dut->clear = 1;
+            tb.tick();
+            tb.dut->clear = 0;
             
         } 
     }
