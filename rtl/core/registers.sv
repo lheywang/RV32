@@ -1,3 +1,13 @@
+/*
+ *  File :      rtl/core/registers.sv
+ *
+ *  Author :    l.heywang <leonard.heywang@proton.me>
+ *  Date :      25/10.2025
+ *  
+ *  Brief :     This file define the register file for the general purpose usage.
+ *              With a decent tool, they shall be inferred into a RAM logic.
+ */
+
 `timescale 1ns / 1ps
 
 import core_config_pkg::XLEN;

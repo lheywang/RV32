@@ -1,3 +1,16 @@
+/*
+ *  File :      rtl/core/decoder.sv
+ *
+ *  Author :    l.heywang <leonard.heywang@proton.me>
+ *  Date :      25/10.2025
+ *  
+ *  Brief :     This file define the instruction decoder, that parse an
+ *              incomming 32 bit instruction into multiple outputs, which 
+ *              correspond to all of the fields contained into.
+ *              Does also perform the data formatting required for the 
+ *              immediates fields.
+ */
+
 `timescale 1ns / 1ps
 
 import core_config_pkg::IF_LEN;

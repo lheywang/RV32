@@ -1,18 +1,18 @@
+/*
+ *  File :      rtl/core/alu/alu0.sv
+ *
+ *  Author :    l.heywang <leonard.heywang@proton.me>
+ *  Date :      25/10.2025
+ *  
+ *  Brief :     This file define the ALU0 module, which handle
+ *              the most basic operations (ADD, SUB, AND, OR, XOR).
+ */
+
 `timescale 1ns / 1ps
 
 import core_config_pkg::XLEN;
 import core_config_pkg::alu_commands_t;
 import core_config_pkg::REG_ADDR_W;
-
-/* 
- *  ALU 0 : Used for doing simple logic and maths 
-        - Additions
-        - Substractions
-        - AND
-        - OR
-        - XOR
- */
-
 
 module alu0 (
     // Standard interface

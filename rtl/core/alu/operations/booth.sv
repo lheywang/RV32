@@ -1,4 +1,16 @@
 /*
+ *  File :      rtl/core/alu/operations/booth.sv
+ *
+ *  Author :    l.heywang <leonard.heywang@proton.me>
+ *  Date :      25/10.2025
+ *  
+ *  Brief :     This file implement a Booth (Radix 2) multiplier
+ *              for the ALU2 implementation.
+ *              It support both signed and unsigned numbers for
+ *              each operands, and thus, four operational modes.        
+ */
+
+/*
  *  This section of code is mostly based on the algorithm here :
  *  https://electrobinary.blogspot.com/2020/08/booth-multiplier-verilog-code.html
  *  

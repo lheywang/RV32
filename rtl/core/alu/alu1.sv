@@ -1,13 +1,20 @@
+/*
+ *  File :      rtl/core/alu/alu1.sv
+ *
+ *  Author :    l.heywang <leonard.heywang@proton.me>
+ *  Date :      25/10.2025
+ *  
+ *  Brief :     This file define the ALU1 module, which
+ *              handle the logic for the branches.
+ *              It compare two values, and compute the associated 
+ *              address, if needed.
+ *              It also expose two signals, in case the logic was correctly predicted, or not.
+ */
+
 `timescale 1ns / 1ps
 
 import core_config_pkg::XLEN;
 import core_config_pkg::alu_commands_t;
-
-/* 
- *  ALU 1 : Used for evalutating conditions before branches, and setting bits
-        - Set less than
-        - Branchs conditions
- */
 
 module alu1 (
     // Standard interface
@@ -23,6 +30,7 @@ module alu1 (
     input   logic   [(core_config_pkg::REG_ADDR_W - 1) : 0] i_rd,
     output  logic                                           busy,
     output  logic                                           i_error,
+    input   logic                                           predict_in,
 
     // Commiter interface
     output  logic   [(core_config_pkg::XLEN - 1) : 0]       res,
@@ -30,10 +38,11 @@ module alu1 (
     output  logic                                           valid,
     output  logic                                           o_error,
     output  logic                                           req,
-    input   logic                                           clear
+    input   logic                                           clear,
 
     // Additionnal interface (optionnal)
-    // None for this ALU.                  
+    output  logic                                           predict_ok,  
+    output  logic                                           mispredict            
 );
     /*
      *  Storages types
@@ -43,6 +52,7 @@ module alu1 (
     logic                                           int_req;
     logic                                           act_needed;
     logic                                           end_of_op;
+    logic                                           predict_value;
 
 
     /*
@@ -61,6 +71,7 @@ module alu1 (
 
                 // Setting flags
                 act_needed      = 1'b0;
+                predict_value   = 1'b0;
                 int_req         = 1'b1;
                 unknown_instr   = 1'b0;
             end
@@ -70,6 +81,7 @@ module alu1 (
 
                 // Setting flags
                 act_needed      = 1'b0;
+                predict_value   = 1'b0;
                 int_req         = 1'b1;
                 unknown_instr   = 1'b0;
             end 
@@ -101,6 +113,7 @@ module alu1 (
 
                 // Setting flags
                 act_needed      = ($signed(arg0) >= $signed(arg1)) ? 1'b1 : 1'b0;
+                predict_value   = predict_in;
                 int_req         = 1'b1;
                 unknown_instr   = 1'b0;
             end
@@ -110,6 +123,7 @@ module alu1 (
 
                 // Setting flags
                 act_needed      = ($signed(arg0) < $signed(arg1)) ? 1'b1 : 1'b0;
+                predict_value   = predict_in;
                 int_req         = 1'b1;
                 unknown_instr   = 1'b0;
             end
@@ -119,6 +133,7 @@ module alu1 (
 
                 // Setting flags
                 act_needed      = ($unsigned(arg0) >= $unsigned(arg1)) ? 1'b1 : 1'b0;
+                predict_value   = predict_in;
                 int_req         = 1'b1;
                 unknown_instr   = 1'b0;
             end
@@ -128,6 +143,7 @@ module alu1 (
 
                 // Setting flags
                 act_needed      = ($unsigned(arg0) < $unsigned(arg1)) ? 1'b1 : 1'b0;
+                predict_value   = predict_in;
                 int_req         = 1'b1;
                 unknown_instr   = 1'b0;
             end
@@ -137,6 +153,7 @@ module alu1 (
 
                 // Setting flags
                 act_needed      = 1'b0;
+                predict_value   = 1'b0;
                 int_req         = 1'b0;
                 unknown_instr   = 1'b1;
             end
@@ -171,6 +188,8 @@ module alu1 (
             o_rd                <= 5'b0;
             valid               <= 1'b0;
             end_of_op           <= 1'b0;
+            predict_ok          <= 1'b0;
+            mispredict          <= 1'b0;
 
         end
         else begin
@@ -183,6 +202,8 @@ module alu1 (
             o_rd                <= i_rd;
             valid               <= 1'b1;
             end_of_op           <= 1'b1;
+            predict_ok          <= ~(act_needed ^ predict_value);
+            mispredict          <= act_needed ^ predict_value;
 
         end
     end

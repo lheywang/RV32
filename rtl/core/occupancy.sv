@@ -1,3 +1,16 @@
+/*
+ *  File :      rtl/core/occupancy.sv
+ *
+ *  Author :    l.heywang <leonard.heywang@proton.me>
+ *  Date :      25/10.2025
+ *  
+ *  Brief :     This file define the module that track dependencies between registers.
+ *              This ensure an instruction won't start until all of it's required data is 
+ *              available, on both the registers or the bypass.
+ *              In the same manner, it will also track writting dependencies to ensure
+ *              the correct order is present.
+ */
+
 `timescale 1ns / 1ps
 
 import core_config_pkg::XLEN;

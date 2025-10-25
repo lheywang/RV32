@@ -1,4 +1,19 @@
+/*
+ *  File :      rtl/core/alu/operations/srt.sv
+ *
+ *  Author :    l.heywang <leonard.heywang@proton.me>
+ *  Date :      25/10.2025
+ *  
+ *  Brief :     This file implement an SRT (Radix 2) divider.
+ *              Used to perform divisions on both signed and unsigned
+ *              numbers (Cross cases aren't supported).
+ *              Due to heavy pipelining, it's result isn't available
+ *              until 71 clock cycles (~36 cpu cycles), unless an error
+ *              occured (2 cycles then).                  
+ */
+
 `timescale 1ns / 1ps
+
 import core_config_pkg::XLEN;
 
 module srt(

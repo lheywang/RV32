@@ -1,3 +1,14 @@
+/*
+ *  File :      rtl/core/clock.sv
+ *
+ *  Author :    l.heywang <leonard.heywang@proton.me>
+ *  Date :      25/10.2025
+ *  
+ *  Brief :     This file define the clock module. It generate the 
+ *              clk_en signal, which will synchronize the stages 
+ *              transfers.
+ */
+
 `timescale 1ns / 1ps
 
 import core_config_pkg::REF_CLK_FREQ;

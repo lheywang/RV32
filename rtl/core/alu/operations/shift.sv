@@ -1,4 +1,18 @@
+/*
+ *  File :      rtl/core/alu/operations/shift.sv
+ *
+ *  Author :    l.heywang <leonard.heywang@proton.me>
+ *  Date :      25/10.2025
+ *  
+ *  Brief :     This file implement a shifter to perform
+ *              SLL / SRA / SRL instructions.
+ *              It can shift up to MAX_SHIFT_PER_CYCLE bits,
+ *              so for large shift, they may need multipe clock cycles.
+ *              
+ */
+
 `timescale 1ns / 1ps
+
 import core_config_pkg::XLEN;
 import core_config_pkg::MAX_SHIFT_PER_CYCLE;
 

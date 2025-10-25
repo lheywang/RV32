@@ -1,16 +1,25 @@
+/*
+ *  File :      rtl/core/alu/alu2.sv
+ *
+ *  Author :    l.heywang <leonard.heywang@proton.me>
+ *  Date :      25/10.2025
+ *  
+ *  Brief :     This file define the ALU2 module, the one
+ *              who's charged to compute multiplication, 
+ *              divisions and bit shifts. It's result may
+ *              take multiple cycles to get finished, up to
+ *              ~80 for the division !
+ *
+ *              This ALU depends on three module, each handling
+ *              one operation, due to the relative complexity of
+ *              theses.
+ */
+
 `timescale 1ns / 1ps
 
 import core_config_pkg::XLEN;
 import core_config_pkg::REG_ADDR_W;
 import core_config_pkg::alu_commands_t;
-
-/* 
- *  ALU 2 & 3 : Used for calculating advanced maths 
-        - Multiplications
-        - Divisions
-        - Bits shifts (multiple cycles to reduce logic cost)
- */
-
 
 module alu2 (
     // Standard interface
@@ -20,10 +29,6 @@ module alu2 (
     // Issuer interface
     input   logic   [(core_config_pkg::XLEN - 1) : 0]       arg0,
     input   logic   [(core_config_pkg::XLEN - 1) : 0]       arg1,
-    /* verilator lint_off UNUSEDSIGNAL */
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]       addr,
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]       imm,
-    /* verilator lint_off UNUSEDSIGNAL */
     input   alu_commands_t                                  cmd,
     input   logic   [(core_config_pkg::REG_ADDR_W - 1) : 0] i_rd,
     output  logic                                           busy,

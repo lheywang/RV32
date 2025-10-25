@@ -1,3 +1,14 @@
+/*
+ *  File :      rtl/packages/core_config_pkg.sv
+ *
+ *  Author :    l.heywang <leonard.heywang@proton.me>
+ *  Date :      25/10.2025
+ *  
+ *  Brief :     This file define the core configuration package, which
+ *              will used only at synthesis stage to configure
+ *              a LOT of submodules.   
+ */
+
 `timescale 1ns / 1ps
 
 package core_config_pkg;

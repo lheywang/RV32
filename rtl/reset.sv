@@ -1,3 +1,15 @@
+/*
+ *  File :      rtl/reset.sv
+ *
+ *  Author :    l.heywang <leonard.heywang@proton.me>
+ *  Date :      
+ *  
+ *  Brief :     This file define the behavior of the reset controller, 
+ *              A module that will ensure at least RST_TICK_CNT clock cycles
+ *              are elapsed in reset state. This state is accesed by de-asserting
+ *              rst_in input, or, at natural reset.
+ */
+
 `timescale 1ns/1ps
 
 import core_config_pkg::RST_TICK_CNT;

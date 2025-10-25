@@ -1,16 +1,20 @@
+/*
+ *  File :      rtl/core/alu/alu4.sv
+ *
+ *  Author :    l.heywang <leonard.heywang@proton.me>
+ *  Date :      25/10.2025
+ *  
+ *  Brief :     This file define the ALU4 module, which handle the
+ *              CSR registers accesses. It handle the swaps and masks
+ *              required for theses operations.
+ */
+
 `timescale 1ns / 1ps
 
 import core_config_pkg::XLEN;
 import core_config_pkg::alu_commands_t;
 import core_config_pkg::CSR_ADDR_W;
 import core_config_pkg::REG_ADDR_W;
-
-/* 
- *  ALU 4 : Used for accessing CSR registers, and perform the swap easily
-        - Reads & Writes
-        - Reads & Sets
-        - Reads & Clear
- */
 
 module alu4 (
     // Standard interface
@@ -19,13 +23,7 @@ module alu4 (
 
     // Issuer interface
     input   logic   [(core_config_pkg::XLEN - 1) : 0]       arg0,
-    /* verilator lint_off UNUSEDSIGNAL */
-    /* verilator lint_off WIDTHEXPAND */
     input   logic   [(core_config_pkg::XLEN - 1) : 0]       imm,
-    /* verilator lint_on WIDTHEXPAND */
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]       addr,
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]       arg1,
-    /* verilator lint_on UNUSEDSIGNAL */
     input   alu_commands_t                                  cmd,
     input   logic   [(core_config_pkg::REG_ADDR_W - 1) : 0] i_rd,
     output  logic                                           busy,

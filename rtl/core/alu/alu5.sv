@@ -1,13 +1,18 @@
+/*
+ *  File :      rtl/core/alu/alu5.sv
+ *
+ *  Author :    l.heywang <leonard.heywang@proton.me>
+ *  Date :      25/10.2025
+ *  
+ *  Brief :     This file define the ALU5 module, which is
+ *              exclusively charged to handle the memory accesses.
+ *              It perform timing and sign extensions if needed.
+ */
+
 `timescale 1ns / 1ps
 
 import core_config_pkg::XLEN;
 import core_config_pkg::alu_commands_t;
-
-/* 
- *  ALU 5 : Used for accessing memory and performing sext if needed.
-        - Writes
-        - Reads, truncating and extension
- */
 
 module alu5 (
     // Standard interface
@@ -17,9 +22,6 @@ module alu5 (
     // Issuer interface
     input   logic   [(core_config_pkg::XLEN - 1) : 0]       arg0,
     input   logic   [(core_config_pkg::XLEN - 1) : 0]       arg1,
-    /* verilator lint_off UNUSEDSIGNAL */
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]       addr,
-    /* verilator lint_on UNUSEDSIGNAL */
     input   logic   [(core_config_pkg::XLEN - 1) : 0]       imm,
     input   alu_commands_t                                  cmd,
     input   logic   [(core_config_pkg::REG_ADDR_W - 1) : 0] i_rd,
