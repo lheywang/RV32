@@ -96,7 +96,7 @@ def sanitize(line):
 def extract_name(line):
 
     tmp = line.split("[")[-1].split("]")
-    return tmp[0].strip()
+    return tmp[0].strip().lower()
 
 
 def parse(lines):
@@ -107,7 +107,7 @@ def parse(lines):
     totals = [0, 0]
 
     test_cases.append(test_case())
-    test_cases[case_id].name = "Init"
+    test_cases[case_id].name = "default"
     test_cases[case_id].data = dict()
 
     sanitized_lines = [sanitize(elem) for elem in lines]
@@ -117,7 +117,7 @@ def parse(lines):
 
             test_cases.append(test_case())
             case_id += 1
-            test_cases[case_id].name = line.split(":")[-1].strip()
+            test_cases[case_id].name = line.split(":")[-1].strip().lower()
             test_cases[case_id].data = dict()
 
         elif "PASS" in line:
