@@ -2,60 +2,23 @@
 # Variables
 # =======================================================
 TOP        ?= pcounter
-SRC_DIR    = rtl
+SRC_DIR    = rtl/
 BUILD_DIR  = build/
 TB_DIR 	   = testbench/
 SIMOUT     = simout/
+UTILS 	   = utils/
+
 TB_UTILS   = $(abspath $(TB_DIR)/include )
-CXX_TB 	   := $(shell find $(abspath $(TB_DIR)/src) -type f -iname "tb_$(TOP).cpp" | head -n 1)
-CCX_UTILS  = $(wildcard $(TB_DIR)/src/utils/*.cpp)
+TB_TOP 	   := $(shell find $(abspath $(TB_DIR)src) -type f -iname "tb_$(TOP).cpp" | head -n 1)
+TB_SRC     := $(shell find $(TB_DIR)src -type f -name "*.cpp")
+PY_SRC     := $(shell find $(UTILS) -type f -name "*.py")
 
-# Including all SV packages files 
-VERILOG_SRCS = $(SRC_DIR)/packages/core_config_pkg.sv 
-
-# Including ALU files
-VERILOG_SRCS += $(SRC_DIR)/core/alu/operations/booth.sv
-VERILOG_SRCS += $(SRC_DIR)/core/alu/operations/srt.sv
-VERILOG_SRCS += $(SRC_DIR)/core/alu/operations/shift.sv
-VERILOG_SRCS += $(SRC_DIR)/core/alu/alu0.sv
-VERILOG_SRCS += $(SRC_DIR)/core/alu/alu1.sv
-VERILOG_SRCS += $(SRC_DIR)/core/alu/alu2.sv
-VERILOG_SRCS += $(SRC_DIR)/core/alu/alu4.sv
-VERILOG_SRCS += $(SRC_DIR)/core/alu/alu5.sv
-
-# Including all core files
-VERILOG_SRCS += $(SRC_DIR)/core/pcounter.sv
-VERILOG_SRCS += $(SRC_DIR)/core/counter.sv
-VERILOG_SRCS += $(SRC_DIR)/core/clock.sv
-VERILOG_SRCS += $(SRC_DIR)/core/csr.sv
-VERILOG_SRCS += $(SRC_DIR)/core/decoder.sv
-VERILOG_SRCS += $(SRC_DIR)/core/endianess.sv
-VERILOG_SRCS += $(SRC_DIR)/core/registers.sv
-VERILOG_SRCS += $(SRC_DIR)/core/occupancy.sv
-VERILOG_SRCS += $(SRC_DIR)/core/issuer.sv
-VERILOG_SRCS += $(SRC_DIR)/core/commiter.sv
-VERILOG_SRCS += $(SRC_DIR)/core/prediction.sv
-VERILOG_SRCS += $(SRC_DIR)/core/core.sv
-
-# Including all peripherals files
-VERILOG_SRCS += $(SRC_DIR)/peripherals/argb.sv
-VERILOG_SRCS += $(SRC_DIR)/peripherals/gpio.sv
-VERILOG_SRCS += $(SRC_DIR)/peripherals/interrupt.sv
-VERILOG_SRCS += $(SRC_DIR)/peripherals/keys.sv
-VERILOG_SRCS += $(SRC_DIR)/peripherals/serial.sv
-VERILOG_SRCS += $(SRC_DIR)/peripherals/timer.sv
-VERILOG_SRCS += $(SRC_DIR)/peripherals/ulpi.sv
-
-# Assemblies
-VERILOG_SRCS += $(SRC_DIR)/core/assemblies/assembly_alu.sv
-VERILOG_SRCS += $(SRC_DIR)/core/assemblies/assembly_csr.sv
-
-# Top files
-VERILOG_SRCS += $(SRC_DIR)/reset.sv
-VERILOG_SRCS += $(SRC_DIR)/rv32.sv
-
-# Including memory files
-
+# We need to use different commands to ensure the right order is outputed...
+RTL_SRC    := $(shell find $(SRC_DIR)packages -type f -name "*.sv")
+RTL_SRC    += $(shell find $(SRC_DIR)core -type f -name "*.sv")
+RTL_SRC    += $(shell find $(SRC_DIR)peripherals -type f -name "*.sv")
+RTL_SRC    += $(SRC_DIR)reset.sv
+RTL_SRC    += $(SRC_DIR)rv32.sv
 
 # =======================================================
 # Parameters and public recipes
@@ -65,11 +28,11 @@ NPROC = $(shell nproc)
 # --- Verilator options ---
 VERILATOR_FLAGS = -Wall \
 				  --trace \
-				  -j 8 \
-				  --cc $(VERILOG_SRCS) \
+				  -j $(NPROC) \
+				  --cc $(RTL_SRC) \
 				  -O3 \
 				  --top-module $(TOP) \
-				  --exe $(CXX_TB) $(CCX_UTILS) \
+				  --exe $(TB_TOP) $(CCX_UTILS) \
 				  -Mdir $(BUILD_DIR) \
 				  -I$(BUILD_DIR) \
 				  -CFLAGS "-I$(TB_UTILS)"
@@ -93,7 +56,7 @@ run: $(BUILD_DIR)/V$(TOP)
 	@$(BUILD_DIR)V$(TOP)
 
 # Compile generated C++ from Verilator
-$(BUILD_DIR)/V$(TOP): $(BUILD_DIR) $(VERILOG_SRCS) $(CXX_TB) $(CXX_HEADERS) $(SYSTEMVERILOG_HEADERS) 
+$(BUILD_DIR)/V$(TOP): $(BUILD_DIR) $(RTL_SRC) $(CXX_TB) $(CXX_HEADERS) $(SYSTEMVERILOG_HEADERS) 
 	verilator $(VERILATOR_FLAGS)
 	make -C $(BUILD_DIR) -f V$(TOP).mk V$(TOP) -j8 CXX="ccache g++"
 
@@ -109,15 +72,15 @@ clean:
 	rm -rf documentation/latex
 
 tests:
-	python utils/tests.py
-
-doc: FORCE
-	doxygen DoxyFile && cd documentation/latex && make pdf
-
-FORCE: ;
+	@python utils/tests.py
 
 wave: run
-	gtkwave $(SIMOUT)$(TOP).vcd
+	@gtkwave $(SIMOUT)$(TOP).vcd
+
+format:
+	@verible-verilog-format --inplace --flagfile=.verible-format $(RTL_SRC)
+	@clang-format -i --style=file $(TB_SRC)
+	@black --line-length 100 $(PY_SRC)
 
 .PHONY: all run clean tests doc
 
