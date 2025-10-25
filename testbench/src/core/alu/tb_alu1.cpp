@@ -14,7 +14,7 @@ int main(int argc, char **argv)
     tb.reset();
 
     // Formal calculation test
-    for (int i = 5; i < 13; i++)
+    for (int i = alu_commands_t::c_SLT; i < (alu_commands_t::c_BGEU + 1); i++)
     {
         tb.dut->cmd = i;
         tb.dut->addr = 0x00001FFF;
@@ -22,28 +22,28 @@ int main(int argc, char **argv)
 
         switch (i)
         {
-        case 5: // SLT
+        case alu_commands_t::c_SLT :
             tb.set_case("SLT");
             break;
-        case 6: // SLTU
+        case alu_commands_t::c_SLTU :
             tb.set_case("SLTU");
             break;
-        case 7: // BEQ
+        case alu_commands_t::c_BEQ :
             tb.set_case("BEQ");
             break;
-        case 8: // BNE
+        case alu_commands_t::c_BNE :
             tb.set_case("BNE");
             break;
-        case 9: // BLT
+        case alu_commands_t::c_BLT :
             tb.set_case("BLT");
             break;
-        case 10: // BGE
+        case alu_commands_t::c_BGE :
             tb.set_case("BGE");
             break;
-        case 11: // BLTU
+        case alu_commands_t::c_BLTU : 
             tb.set_case("BLTU");
             break;
-        case 12: // BGEU
+        case alu_commands_t::c_BGEU : 
             tb.set_case("BGEU");
             break;
         }
@@ -63,41 +63,41 @@ int main(int argc, char **argv)
 
                 switch (i)
                 {
-                case 5: // SLT
-                    tb.check_equality((int)tb.dut->res, ((static_cast<int32_t>(inputs1[ii]) < static_cast<int32_t>(inputs2[iii])) ? 1 : 0), "SLTU - req");
-                    tb.check_equality((unsigned int)tb.dut->req, (unsigned int)0, "valid");
+                case alu_commands_t::c_SLT : 
+                    tb.check_equality((int)tb.dut->res, ((static_cast<int32_t>(inputs1[ii]) < static_cast<int32_t>(inputs2[iii])) ? 1 : 0), "res");
+                    tb.check_equality((unsigned int)tb.dut->req, (unsigned int)0, "req");
                     break;
 
-                case 6: // SLTU
-                    tb.check_equality((int)tb.dut->res, (static_cast<uint32_t>(inputs1[ii]) < static_cast<uint32_t>(inputs2[iii]) ? 1 : 0), "SLTU - req");
-                    tb.check_equality((unsigned int)tb.dut->req, (unsigned int)0, "valid");
+                case alu_commands_t::c_SLTU : 
+                    tb.check_equality((int)tb.dut->res, (static_cast<uint32_t>(inputs1[ii]) < static_cast<uint32_t>(inputs2[iii]) ? 1 : 0), "res");
+                    tb.check_equality((unsigned int)tb.dut->req, (unsigned int)0, "req");
                     break;
 
-                case 7: // BEQ
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)16382, "BEQ - res");
-                    tb.check_equality((int)tb.dut->req, ((static_cast<int32_t>(inputs1[ii]) == static_cast<int32_t>(inputs2[iii])) ? 1 : 0), "BEQ - req");
+                case alu_commands_t::c_BEQ : 
+                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)16382, "req");
+                    tb.check_equality((int)tb.dut->req, ((static_cast<int32_t>(inputs1[ii]) == static_cast<int32_t>(inputs2[iii])) ? 1 : 0), "res");
                     break;
 
-                case 8: // BNE
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)16382, "BNE - res");
-                    tb.check_equality((int)tb.dut->req, ((static_cast<int32_t>(inputs1[ii]) == static_cast<int32_t>(inputs2[iii])) ? 0 : 1), "BNE - req");
+                case alu_commands_t::c_BNE : 
+                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)16382, "req");
+                    tb.check_equality((int)tb.dut->req, ((static_cast<int32_t>(inputs1[ii]) == static_cast<int32_t>(inputs2[iii])) ? 0 : 1), "res");
                     break;
 
-                case 9: // BLT
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)16382, "BLT - res");
-                    tb.check_equality((int)tb.dut->req, ((static_cast<int32_t>(inputs1[ii]) < static_cast<int32_t>(inputs2[iii])) ? 1 : 0), "BLT - req");
+                case alu_commands_t::c_BLT : 
+                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)16382, "req");
+                    tb.check_equality((int)tb.dut->req, ((static_cast<int32_t>(inputs1[ii]) < static_cast<int32_t>(inputs2[iii])) ? 1 : 0), "res");
                     break;
-                case 10: // BGE
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)16382, "BGE - res");
-                    tb.check_equality((int)tb.dut->req, ((static_cast<int32_t>(inputs1[ii]) >= static_cast<int32_t>(inputs2[iii])) ? 1 : 0), "BGE - req");
+                case alu_commands_t::c_BGE : 
+                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)16382, "req");
+                    tb.check_equality((int)tb.dut->req, ((static_cast<int32_t>(inputs1[ii]) >= static_cast<int32_t>(inputs2[iii])) ? 1 : 0), "res");
                     break;
-                case 11: // BLTU
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)16382, "BLTU - res");
-                    tb.check_equality((int)tb.dut->req, (static_cast<uint32_t>(inputs1[ii]) < static_cast<uint32_t>(inputs2[iii]) ? 1 : 0), "BLTU - req");
+                case alu_commands_t::c_BLTU : 
+                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)16382, "req");
+                    tb.check_equality((int)tb.dut->req, (static_cast<uint32_t>(inputs1[ii]) < static_cast<uint32_t>(inputs2[iii]) ? 1 : 0), "res");
                     break;
-                case 12: // BGEU
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)16382, "BGEU - res");
-                    tb.check_equality((int)tb.dut->req, (static_cast<uint32_t>(inputs1[ii]) >= static_cast<uint32_t>(inputs2[iii]) ? 1 : 0), "BGEU - req");
+                case alu_commands_t::c_BGEU : 
+                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)16382, "req");
+                    tb.check_equality((int)tb.dut->req, (static_cast<uint32_t>(inputs1[ii]) >= static_cast<uint32_t>(inputs2[iii]) ? 1 : 0), "res");
                     break;
                 }
 

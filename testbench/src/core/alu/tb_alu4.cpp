@@ -38,23 +38,21 @@ int main(int argc, char **argv)
     tb.dut->clear = 0;
     tb.dut->csr_err = 0;
 
-    for (int op = 0; op < 3; op += 1)
+    for (int op = alu_commands_t::c_CSRRW; op < (alu_commands_t::c_CSRRC + 1); op += 1)
     {
         // Setting up the command
+        tb.dut->cmd = op;
         switch (op)
         {
-        case 0 : 
-            tb.dut->cmd = alu_commands_t::c_CSRRW;
+        case alu_commands_t::c_CSRRW :    
             tb.set_case("CSRRW");
             break;
 
-        case 1:
-            tb.dut->cmd = alu_commands_t::c_CSRRS;
+        case alu_commands_t::c_CSRRS :
             tb.set_case("CSRRS");
             break; 
 
-        case 2: 
-            tb.dut->cmd = alu_commands_t::c_CSRRC;
+        case alu_commands_t::c_CSRRC: 
             tb.set_case("CSRRC");
             break;
         }
@@ -82,12 +80,12 @@ int main(int argc, char **argv)
 
             switch (op)
             {
-            case 0 : 
-            case 1:
+            case alu_commands_t::c_CSRRW : 
+            case alu_commands_t::c_CSRRS :
                 tb.check_equality((unsigned int)tb.dut->csr_wd, (unsigned int)0xFFFFFFFF, "CSR_WD");
                 break; 
 
-            case 2: 
+            case alu_commands_t::c_CSRRC : 
                 tb.check_equality((unsigned int)tb.dut->csr_wd, (unsigned int)0x00000000, "CSR_WD");
                 break;
             }

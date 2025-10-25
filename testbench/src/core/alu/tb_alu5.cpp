@@ -42,19 +42,19 @@ int main(int argc, char **argv)
     int cycle = 0;
 
     // Performing writes
-    for (int i = 27; i < 30; i++)
+    for (int i = alu_commands_t::c_SB; i < (alu_commands_t::c_SW + 1); i++)
     {
         tb.dut->cmd = i;
 
         switch (i)
         {
-        case 27: 
+        case alu_commands_t::c_SB : 
             tb.set_case("SB");
             break;
-        case 28:
+        case alu_commands_t::c_SH :
             tb.set_case("SH");
             break;
-        case 29:
+        case alu_commands_t::c_SW :
             tb.set_case("SW");
             break;
         }
@@ -82,7 +82,7 @@ int main(int argc, char **argv)
 
                 switch (i)
                 {
-                case 27: // SB
+                case alu_commands_t::c_SB :
                     switch (iii)
                     {
                     case 0:
@@ -104,7 +104,7 @@ int main(int argc, char **argv)
                     }
                     break;
 
-                case 28: // SH
+                case alu_commands_t::c_SH : 
                     switch (iii)
                     {
                     case 0:
@@ -119,7 +119,7 @@ int main(int argc, char **argv)
                     }
                     break;
 
-                case 29: // SW
+                case alu_commands_t::c_SW : 
                     tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)writedata[ii], "Write-wdata");
                     break;
                 }
@@ -143,25 +143,25 @@ int main(int argc, char **argv)
     tb.dut->arg0 = 0x1000F0F0;
 
     // Performing reads
-    for (int i = 30; i < 35; i++)
+    for (int i = alu_commands_t::c_LB; i < (alu_commands_t::c_LHU + 1); i++)
     {
         tb.dut->cmd = i;
 
         switch (i)
         {
-        case 30: 
+        case alu_commands_t::c_LB : 
             tb.set_case("LB");
             break;
-        case 31:
+        case alu_commands_t::c_LH :
             tb.set_case("LH");
             break;
-        case 32:
+        case alu_commands_t::c_LW :
             tb.set_case("LW");
             break;
-        case 33:
+        case alu_commands_t::c_LBU :
             tb.set_case("LBU");
             break;
-        case 34:
+        case alu_commands_t::c_LHU :
             tb.set_case("LHU");
             break;
         }
@@ -195,7 +195,7 @@ int main(int argc, char **argv)
 
                 switch (i)
                 {
-                case 30: // LB
+                case alu_commands_t::c_LB : 
                     switch (iii)
                     {
                     case 0:
@@ -216,7 +216,7 @@ int main(int argc, char **argv)
                     }
                     break;
 
-                case 31: // LH
+                case alu_commands_t::c_LH : 
                     switch (iii)
                     {
                     case 0:
@@ -231,11 +231,11 @@ int main(int argc, char **argv)
                     }
                     break;
 
-                case 32: // LW
+                case alu_commands_t::c_LW : 
                     tb.check_equality((unsigned int)tb.dut->res, (unsigned int)writedata[ii], "Read-res");
                     break;
 
-                case 33: // LBU
+                case alu_commands_t::c_LBU :
                     switch (iii)
                     {
                     case 0:
@@ -256,7 +256,7 @@ int main(int argc, char **argv)
                     }
                     break;
 
-                case 34: // LHU
+                case alu_commands_t::c_LHU :
                     switch (iii)
                     {
                     case 0:
