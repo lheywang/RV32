@@ -1,0 +1,29 @@
+# RiscV CSR registers names
+
+[csr_t]
+type = logic
+
+r_MSTATUS
+r_MIE
+r_MTVEC
+r_MSCRATCH
+r_MEPC
+r_MCAUSE
+r_MTVAL
+r_MIP
+r_MVENDORID
+r_MARCHID
+r_MIMPID
+r_MHARTID
+r_MISA
+r_CYCLE
+r_CYCLEH 
+r_INSTR
+r_INSTRH 
+r_FLUSH
+r_FLUSHH
+r_WAIT
+r_WAITH   
+r_DECOD
+r_DECODH
+r_NONE 

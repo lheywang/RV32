@@ -1,12 +1,5 @@
 # .gitignore
 
-# Remove files without extension
-*
-!*/
-!*.*
-!DoxyFile
-!Makefile
-
 # Then, removes some specifics patterns
 # Compiled files
 *.o
@@ -28,10 +21,16 @@
 
 # Verilator files
 obj_dir
+logs
 
 # Doxygen outputs
-documentation/*
+documentation/latex/
+documentation/html/
 
 # VSCode extensions
 .VSCodeCounter/*
 .vscode/*
+
+# Ramdisk files
+*.swp
+build/
