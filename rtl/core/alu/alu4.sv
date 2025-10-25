@@ -23,7 +23,9 @@ module alu4 (
 
     // Issuer interface
     input   logic   [(core_config_pkg::XLEN - 1) : 0]       arg0,
+    /* verilator lint_off UNUSEDSIGNAL */
     input   logic   [(core_config_pkg::XLEN - 1) : 0]       imm,
+    /* verilator lint_on UNUSEDSIGNAL */
     input   alu_commands_t                                  cmd,
     input   logic   [(core_config_pkg::REG_ADDR_W - 1) : 0] i_rd,
     output  logic                                           busy,
