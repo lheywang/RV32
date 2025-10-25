@@ -37,8 +37,6 @@ package core_config_pkg;
     parameter int REG_COUNT                     = 32;               // Number of general-purpose registers
     parameter int CSR_ADDR_W                    = 12;               // Number of bits for register index (32 registers)
     parameter int CSR_COUNT                     = 23;               // Number of CSR registers
-
-    // CSR Addresses
     
     // -------------------------------------------------------------------------
     // Instruction fetch parameters
@@ -47,6 +45,11 @@ package core_config_pkg;
     parameter int IF_INC                        = 4;                // Offset between two memory addresses.
     parameter int IF_MAX_ADDR                   = 32'h1000_3FFF;    // Maximal address possible.
     parameter int IF_BASE_ADDR                  = 32'h1000_0000;    // Base address of IF stage.
+
+    // -------------------------------------------------------------------------
+    // Branch prediction unit config
+    // -------------------------------------------------------------------------
+    parameter int BPU_BITS_NB                   = 2;                // Number of bits used for the BPU counter.
 
     // -------------------------------------------------------------------------
     // Decoder internal settings
