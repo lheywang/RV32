@@ -9,3 +9,10 @@
  *              It also expose an address load bus, in case a branch instruction
  *              was mispredicted, and we need to flush the pipeline.
  */
+`timescale 1ns / 1ps
+
+module commiter (
+
+);
+
+endmodule

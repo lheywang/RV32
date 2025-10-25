@@ -63,7 +63,6 @@ module alu2 (
 
     // Generics
     logic                                                   unknown_instr;
-    logic                                                   next_o_error;
     logic   [(core_config_pkg::XLEN - 1) : 0]               next_res;
     logic   [(core_config_pkg::XLEN - 1) : 0]               res_int;
 

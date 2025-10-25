@@ -95,6 +95,7 @@ module alu1 (
 
                 // Setting flags
                 act_needed      = (arg0 == arg1) ? 1'b1 : 1'b0;
+                predict_value   = predict_in;
                 int_req         = 1'b1;
                 unknown_instr   = 1'b0;
             end
@@ -104,6 +105,7 @@ module alu1 (
 
                 // Setting flags
                 act_needed      = (arg0 == arg1) ? 1'b0 : 1'b1;
+                predict_value   = predict_in;
                 int_req         = 1'b1;
                 unknown_instr   = 1'b0;
             end
