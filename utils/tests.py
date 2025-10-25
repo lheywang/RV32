@@ -74,8 +74,13 @@ def main():
     with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
         for res in executor.map(run_target, targets):
             target, status, passed, failed, percent = res
-            emoji = "✅" if status == "PASS" else "❌"
-            print(f"{emoji} {target:10s} → {status:4s} ({percent:.2f}%)")
+            emoji = "✅" if status == "PASS" and passed != 0 else "❌"
+            msg = (
+                " : No tests detected, perhaps check for build errors ?"
+                if passed == 0 and failed == 0
+                else ""
+            )
+            print(f"{emoji} {target:10s} → {status:4s} ({percent:.2f}%){msg}")
             results.append(res)
 
     # === Generate global summary ===
@@ -88,7 +93,7 @@ def main():
         f.write("| Module | Status | Passed | Failed | Success (%) |\n")
         f.write("| ------- | ------- | ------- | ------- | ------------ |\n")
         for target, status, passed, failed, percent in results:
-            emoji = "✅" if status == "PASS" else "❌"
+            emoji = "✅" if status == "PASS" and passed != 0 else "❌"
             f.write(
                 f"| [{target}](./{target}.md) | {emoji} {status} | {passed} | {failed} | {percent:.2f} |\n"
             )
@@ -100,6 +105,10 @@ def main():
 
     print(f"\n📄 Summary written to: {summary_file}")
     print(f"📁 Reports directory: {report_dir}")
+    print()
+    print(f"Total passed: {total_pass}")
+    print(f"Total failed: {total_fail}")
+    print(f"Average success: {avg_percent:.2f}%")
 
 
 if __name__ == "__main__":
