@@ -101,7 +101,7 @@ module prediction (
             core_config_pkg::i_BLTU : begin
 
                 next_addr = $signed(actual_addr) + $signed(actual_imm);
-                updated_needed  = counter[core_config_pkg::BPU_BITS_NB]; // Look for the MSB if needed
+                updated_needed  = counter[core_config_pkg::BPU_BITS_NB - 1]; // Look for the MSB if needed
 
             end
 

@@ -10,11 +10,12 @@ int main(int argc, char **argv)
     Testbench<Vprediction> tb("Prediction");
     tb.reset();
 
+    int base = 0x10001FFF;
+
     // Ensuring that the adder works correctly
     tb.set_case("Always jumpeds");
     for (int i = opcodes_t::i_JAL; i < (opcodes_t::i_JALR + 1); i += 1)
     {
-        int base = 0x10001FFF;
         tb.dut->addr_in = base;
         tb.dut->actual_addr = base + 0x8;
         tb.dut->actual_imm = 0x00000100;
@@ -23,14 +24,173 @@ int main(int argc, char **argv)
         tb.run_until(&tb.dut->PC_write, 1);
 
         tb.check_equality((int)tb.dut->PC_value, (int)(base + 0x8 + 0x00000100), "jump value");
+        tb.check_equality((int)tb.dut->addr_out, (int)(base + 0x8 + 0x00000100), "addr out");
+        tb.check_equality((int)tb.dut->PC_write, (int)1, "PC_write");
 
         tb.tick();
 
         tb.check_equality((int)tb.dut->PC_write, (int)0, "PC_write");
         tb.check_equality((int)tb.dut->PC_value, (int)0, "jump value");
+        tb.check_equality((int)tb.dut->addr_out, (int)base, "addr out");
     }
 
     // Second tests, we need to check the dynamic behavior of the BPU
+    for (int i = opcodes_t::i_BEQ; i < (opcodes_t::i_BGEU + 1); i += 1)
+    {
+        tb.reset();
+        tb.dut->addr_in = base;
+        tb.dut->actual_addr = base + 0x8;
+        tb.dut->actual_imm = 0x00000100;
+        tb.dut->actual_instr = i;
+
+        // switch (i)
+        // {
+        // case opcodes_t::i_BEQ:
+        //     tb.set_case("Taken : BEQ");
+        //     break;
+        // case opcodes_t::i_BNE:
+        //     tb.set_case("Taken : BNE");
+        //     break;
+        // case opcodes_t::i_BLT:
+        //     tb.set_case("Taken : BLT");
+        //     break;
+        // case opcodes_t::i_BGE:
+        //     tb.set_case("Taken : BGE");
+        //     break;
+        // case opcodes_t::i_BLTU:
+        //     tb.set_case("Taken : BLTU");
+        //     break;
+        // case opcodes_t::i_BGEU:
+        //     tb.set_case("Taken : BGEU");
+        //     break;
+        // }
+
+        tb.set_case(get_name((opcodes_t)i));
+
+        // Looping over some positive predictions results
+        for (int k = 0; k < 4; k += 1)
+        {
+            tb.dut->predict_ok = 1;
+            tb.tick();
+            tb.dut->predict_ok = 0;
+            tb.tick();
+
+            // Branch shall NOT be taken
+            if (k < 2)
+            {
+                tb.check_equality((int)tb.dut->PC_value, (int)0, "jump value");
+                tb.check_equality((int)tb.dut->PC_write, (int)0, "PC_write");
+                tb.check_equality((int)tb.dut->addr_out, (int)base, "addr out");
+
+                tb.tick();
+
+                tb.check_equality((int)tb.dut->PC_write, (int)0, "PC_write");
+                tb.check_equality((int)tb.dut->PC_value, (int)0, "jump value");
+                tb.check_equality((int)tb.dut->addr_out, (int)base, "addr out");
+            }
+
+            // Branch shall be taken
+            else
+            {
+                tb.check_equality((int)tb.dut->PC_value, (int)(base + 0x8 + 0x00000100),
+                                  "jump value");
+                tb.check_equality((int)tb.dut->PC_write, (int)1, "PC_write");
+                tb.check_equality((int)tb.dut->addr_out, (int)(base + 0x8 + 0x00000100),
+                                  "addr out");
+
+                tb.tick();
+
+                tb.check_equality((int)tb.dut->PC_write, (int)(base + 0x8 + 0x00000100),
+                                  "PC_write");
+                tb.check_equality((int)tb.dut->PC_value, (int)0, "jump value");
+                tb.check_equality((int)tb.dut->addr_out, (int)(base + 0x8 + 0x00000100),
+                                  "addr out");
+            }
+        }
+    }
+
+    // Third test, testing counter decrementation
+    for (int i = opcodes_t::i_BEQ; i < (opcodes_t::i_BGEU + 1); i += 1)
+    {
+        tb.reset();
+        tb.dut->addr_in = base;
+        tb.dut->actual_addr = base + 0x8;
+        tb.dut->actual_imm = 0x00000100;
+        tb.dut->actual_instr = i;
+
+        switch (i)
+        {
+        case opcodes_t::i_BEQ:
+            tb.set_case("Taken : BEQ");
+            break;
+        case opcodes_t::i_BNE:
+            tb.set_case("Taken : BNE");
+            break;
+        case opcodes_t::i_BLT:
+            tb.set_case("Taken : BLT");
+            break;
+        case opcodes_t::i_BGE:
+            tb.set_case("Taken : BGE");
+            break;
+        case opcodes_t::i_BLTU:
+            tb.set_case("Taken : BLTU");
+            break;
+        case opcodes_t::i_BGEU:
+            tb.set_case("Taken : BGEU");
+            break;
+        }
+
+        // Setting the counter up to the top
+        for (int k = 0; k < 4; k += 1)
+        {
+            tb.dut->predict_ok = 1;
+            tb.tick();
+            tb.dut->predict_ok = 0;
+            tb.tick();
+        }
+
+        // Looping over some positive predictions results
+        for (int k = 0; k < 4; k += 1)
+        {
+            tb.dut->mispredict = 1;
+            tb.tick();
+            tb.dut->mispredict = 0;
+            tb.tick();
+
+            // Branch shall NOT be taken
+            if (k < 2)
+            {
+                tb.check_equality((int)tb.dut->PC_value, (int)(base + 0x8 + 0x00000100),
+                                  "jump value");
+                tb.check_equality((int)tb.dut->PC_write, (int)1, "PC_write");
+                tb.check_equality((int)tb.dut->addr_out, (int)(base + 0x8 + 0x00000100),
+                                  "addr out");
+
+                tb.tick();
+
+                tb.check_equality((int)tb.dut->PC_write, (int)(base + 0x8 + 0x00000100),
+                                  "PC_write");
+                tb.check_equality((int)tb.dut->PC_value, (int)0, "jump value");
+                tb.check_equality((int)tb.dut->addr_out, (int)(base + 0x8 + 0x00000100),
+                                  "addr out");
+            }
+
+            // Branch shall be taken
+            else
+            {
+
+                tb.check_equality((int)tb.dut->PC_value, (int)0, "jump value");
+                tb.check_equality((int)tb.dut->PC_write, (int)0, "PC_write");
+                tb.check_equality((int)tb.dut->addr_out, (int)base, "addr out");
+
+                tb.tick();
+
+                tb.check_equality((int)tb.dut->PC_write, (int)0, "PC_write");
+                tb.check_equality((int)tb.dut->PC_value, (int)0, "jump value");
+                tb.check_equality((int)tb.dut->addr_out, (int)base, "addr out");
+            }
+        }
+    }
 
     return tb.get_return();
 }
