@@ -13,13 +13,14 @@ int main(int argc, char **argv)
     int base = 0x10001FFF;
 
     // Ensuring that the adder works correctly
-    tb.set_case("Always jumpeds");
-    for (int i = opcodes_t::i_JAL; i < (opcodes_t::i_JALR + 1); i += 1)
+    for (auto op : EnumRange<opcodes_t>(opcodes_t::i_JAL, opcodes_t::i_JALR))
     {
+        tb.set_case_enum("Always", op);
+
         tb.dut->addr_in = base;
         tb.dut->actual_addr = base + 0x8;
         tb.dut->actual_imm = 0x00000100;
-        tb.dut->actual_instr = i;
+        tb.dut->actual_instr = op;
 
         tb.run_until(&tb.dut->PC_write, 1);
 
@@ -35,37 +36,15 @@ int main(int argc, char **argv)
     }
 
     // Second tests, we need to check the dynamic behavior of the BPU
-    for (int i = opcodes_t::i_BEQ; i < (opcodes_t::i_BGEU + 1); i += 1)
+    for (auto op : EnumRange<opcodes_t>(opcodes_t::i_BEQ, opcodes_t::i_BGEU))
     {
+        tb.set_case_enum("Increment", op);
+
         tb.reset();
         tb.dut->addr_in = base;
         tb.dut->actual_addr = base + 0x8;
         tb.dut->actual_imm = 0x00000100;
-        tb.dut->actual_instr = i;
-
-        // switch (i)
-        // {
-        // case opcodes_t::i_BEQ:
-        //     tb.set_case("Taken : BEQ");
-        //     break;
-        // case opcodes_t::i_BNE:
-        //     tb.set_case("Taken : BNE");
-        //     break;
-        // case opcodes_t::i_BLT:
-        //     tb.set_case("Taken : BLT");
-        //     break;
-        // case opcodes_t::i_BGE:
-        //     tb.set_case("Taken : BGE");
-        //     break;
-        // case opcodes_t::i_BLTU:
-        //     tb.set_case("Taken : BLTU");
-        //     break;
-        // case opcodes_t::i_BGEU:
-        //     tb.set_case("Taken : BGEU");
-        //     break;
-        // }
-
-        tb.set_case(get_name((opcodes_t)i));
+        tb.dut->actual_instr = op;
 
         // Looping over some positive predictions results
         for (int k = 0; k < 4; k += 1)
@@ -110,35 +89,17 @@ int main(int argc, char **argv)
     }
 
     // Third test, testing counter decrementation
-    for (int i = opcodes_t::i_BEQ; i < (opcodes_t::i_BGEU + 1); i += 1)
+    for (auto op : EnumRange<opcodes_t>(opcodes_t::i_BEQ, opcodes_t::i_BGEU))
     {
+        tb.set_case_enum(op);
+
         tb.reset();
         tb.dut->addr_in = base;
         tb.dut->actual_addr = base + 0x8;
         tb.dut->actual_imm = 0x00000100;
-        tb.dut->actual_instr = i;
+        tb.dut->actual_instr = op;
 
-        switch (i)
-        {
-        case opcodes_t::i_BEQ:
-            tb.set_case("Taken : BEQ");
-            break;
-        case opcodes_t::i_BNE:
-            tb.set_case("Taken : BNE");
-            break;
-        case opcodes_t::i_BLT:
-            tb.set_case("Taken : BLT");
-            break;
-        case opcodes_t::i_BGE:
-            tb.set_case("Taken : BGE");
-            break;
-        case opcodes_t::i_BLTU:
-            tb.set_case("Taken : BLTU");
-            break;
-        case opcodes_t::i_BGEU:
-            tb.set_case("Taken : BGEU");
-            break;
-        }
+        tb.set_case_enum("Decrement", op);
 
         // Setting the counter up to the top
         for (int k = 0; k < 4; k += 1)
