@@ -49,7 +49,7 @@ constexpr char NAME_FILL = ' ';
 constexpr char TIME_FILL = ' ';
 constexpr char SIGNAL_FILL = ' ';
 
-static const std::string HEADER = std::string("==================================================================");
+static const std::string HEADER = std::string("===============================================================================");
 
 /*
  * ===========================================================================================
@@ -257,8 +257,8 @@ public:
     template <typename TYPE1, typename TYPE2>
     int run_until(TYPE1 *signal, TYPE2 value, int max_cycles = 1000)
     {
-        this->tick(); // This tick is needed to ensure the DUT will register any input previously applied.
-        int cycles = 1;
+        this->dut->eval(); // Registering the inputs applied.
+        int cycles = 0;
         do
         {
             this->tick();
