@@ -21,6 +21,7 @@ targets = [
     "alu0",
     "alu1",
     "alu2",
+    "alu4",
     "alu5",
 ]
 log_dir = "logs"
