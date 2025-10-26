@@ -52,19 +52,20 @@ module prediction (
 
         end else if (!counter_ack) begin
 
-            unique case ({
-                predict_ok, mispredict
-            })
+            if (mispredict && counter != 0) begin
 
-                2'b01:   counter <= counter - 1;
-                2'b10:   counter <= counter + 1;
-                default: counter <= counter;
+                counter <= counter - 1;
+                counter_ack <= 1'b1;
+                
+            end
+            else if (predict_ok && counter != '1) begin
 
-            endcase
+                counter <= counter + 1;
+                counter_ack <= 1'b1;
 
-            counter_ack <= 1'b1;
+            end
 
-        end else if ({predict_ok, mispredict} == 2'b00) begin
+        end else if (predict_ok == 1'b0 && mispredict == 1'b0) begin
 
             counter_ack <= 1'b0;
 
