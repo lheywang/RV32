@@ -52,8 +52,9 @@ constexpr char NAME_FILL = ' ';
 constexpr char TIME_FILL = ' ';
 constexpr char SIGNAL_FILL = ' ';
 
-static const std::string HEADER =
-    std::string("===============================================================================");
+static const std::string HEADER = std::string(
+    "============================================================================================="
+    "====================");
 
 /*
  * ===========================================================================================
@@ -729,6 +730,23 @@ template <class MODULE> class Testbench
         std::cout << std::dec << KRED << tstatus
                   << this->center_text(this->name, NAME_WIDTH, NAME_FILL) << ") " << message << RST
                   << std::endl;
+
+        return 0;
+    }
+
+    /**
+     *  @brief  Show to the user an integer number as an INFO message. Mostly used
+     *          to indicate an interation inside a for loop.
+     *
+     *  @return int 0.
+     */
+    int set_iter(int iter)
+    {
+        std::stringstream ss;
+        ss << "[" << this->center_text("ITER", NAME_WIDTH, NAME_FILL) << "] (";
+        std::string tstatus = ss.str();
+
+        std::cout << std::dec << KMAG << tstatus << this->name << ") " << iter << RST << std::endl;
 
         return 0;
     }
