@@ -252,20 +252,16 @@ module alu5 (
 
     always_comb begin
 
-        i_error = 0;
-
         unique case (state)
 
             IDLE: begin
                 if (!unknown_instr) begin
 
                     next_state = REQ;
-                    i_error    = 1'b0;
 
                 end else begin
 
                     next_state = IDLE;
-                    i_error    = 1'b1;
 
                 end
             end
@@ -424,5 +420,7 @@ module alu5 (
             end
         endcase
     end
+
+    assign i_error = unknown_instr;
 
 endmodule
