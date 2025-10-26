@@ -10,5 +10,27 @@ int main(int argc, char **argv)
     Testbench<Vprediction> tb("Prediction");
     tb.reset();
 
+    // Ensuring that the adder works correctly
+    tb.set_case("Always jumpeds");
+    for (int i = opcodes_t::i_JAL; i < (opcodes_t::i_JALR + 1); i += 1)
+    {
+        int base = 0x10001FFF;
+        tb.dut->addr_in = base;
+        tb.dut->actual_addr = base + 0x8;
+        tb.dut->actual_imm = 0x00000100;
+        tb.dut->actual_instr = i;
+
+        tb.run_until(&tb.dut->PC_write, 1);
+
+        tb.check_equality((int)tb.dut->PC_value, (int)(base + 0x8 + 0x00000100), "jump value");
+
+        tb.tick();
+
+        tb.check_equality((int)tb.dut->PC_write, (int)0, "PC_write");
+        tb.check_equality((int)tb.dut->PC_value, (int)0, "jump value");
+    }
+
+    // Second tests, we need to check the dynamic behavior of the BPU
+
     return tb.get_return();
 }
