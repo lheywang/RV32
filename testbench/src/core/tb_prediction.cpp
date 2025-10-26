@@ -21,6 +21,8 @@ int main(int argc, char **argv)
         tb.dut->actual_addr = base + 0x8;
         tb.dut->actual_imm = 0x00000100;
         tb.dut->actual_instr = op;
+        tb.dut->predict_ok = 0;
+        tb.dut->mispredict = 0;
 
         tb.run_until(&tb.dut->PC_write, 1);
 
@@ -34,6 +36,10 @@ int main(int argc, char **argv)
         tb.check_equality((int)tb.dut->PC_value, (int)0, "jump value");
         tb.check_equality((int)tb.dut->addr_out, (int)base, "addr out");
     }
+
+    // adding some cooldown to make debugging easier
+    tb.dut->actual_instr = 0;
+    tb.run_for(8);
 
     // Second tests, we need to check the dynamic behavior of the BPU
     for (auto op : EnumRange<opcodes_t>(opcodes_t::i_BEQ, opcodes_t::i_BGEU))
@@ -49,10 +55,6 @@ int main(int argc, char **argv)
         // Looping over some positive predictions results
         for (int k = 0; k < 4; k += 1)
         {
-            tb.dut->predict_ok = 1;
-            tb.tick();
-            tb.dut->predict_ok = 0;
-            tb.tick();
 
             // Branch shall NOT be taken
             if (k < 2)
@@ -60,15 +62,7 @@ int main(int argc, char **argv)
                 tb.check_equality((int)tb.dut->PC_value, (int)0, "jump value");
                 tb.check_equality((int)tb.dut->PC_write, (int)0, "PC_write");
                 tb.check_equality((int)tb.dut->addr_out, (int)base, "addr out");
-
-                tb.tick();
-
-                tb.check_equality((int)tb.dut->PC_write, (int)0, "PC_write");
-                tb.check_equality((int)tb.dut->PC_value, (int)0, "jump value");
-                tb.check_equality((int)tb.dut->addr_out, (int)base, "addr out");
             }
-
-            // Branch shall be taken
             else
             {
                 tb.check_equality((int)tb.dut->PC_value, (int)(base + 0x8 + 0x00000100),
@@ -76,29 +70,29 @@ int main(int argc, char **argv)
                 tb.check_equality((int)tb.dut->PC_write, (int)1, "PC_write");
                 tb.check_equality((int)tb.dut->addr_out, (int)(base + 0x8 + 0x00000100),
                                   "addr out");
-
-                tb.tick();
-
-                tb.check_equality((int)tb.dut->PC_write, (int)(base + 0x8 + 0x00000100),
-                                  "PC_write");
-                tb.check_equality((int)tb.dut->PC_value, (int)0, "jump value");
-                tb.check_equality((int)tb.dut->addr_out, (int)(base + 0x8 + 0x00000100),
-                                  "addr out");
             }
+
+            tb.tick();
+
+            tb.check_equality((int)tb.dut->PC_write, (int)0, "PC_write2");
+            tb.check_equality((int)tb.dut->PC_value, (int)0, "jump value2");
+            tb.check_equality((int)tb.dut->addr_out, (int)base, "addr out2");
+
+            tb.dut->predict_ok = 1;
+            tb.tick();
+            tb.dut->predict_ok = 0;
+            tb.tick();
         }
     }
+    tb.dut->actual_instr = 0;
 
     // Third test, testing counter decrementation
     for (auto op : EnumRange<opcodes_t>(opcodes_t::i_BEQ, opcodes_t::i_BGEU))
     {
-        tb.set_case_enum(op);
-
         tb.reset();
         tb.dut->addr_in = base;
         tb.dut->actual_addr = base + 0x8;
         tb.dut->actual_imm = 0x00000100;
-        tb.dut->actual_instr = op;
-
         tb.set_case_enum("Decrement", op);
 
         // Setting the counter up to the top
@@ -110,13 +104,11 @@ int main(int argc, char **argv)
             tb.tick();
         }
 
+        tb.dut->actual_instr = op;
+
         // Looping over some positive predictions results
         for (int k = 0; k < 4; k += 1)
         {
-            tb.dut->mispredict = 1;
-            tb.tick();
-            tb.dut->mispredict = 0;
-            tb.tick();
 
             // Branch shall NOT be taken
             if (k < 2)
@@ -126,30 +118,25 @@ int main(int argc, char **argv)
                 tb.check_equality((int)tb.dut->PC_write, (int)1, "PC_write");
                 tb.check_equality((int)tb.dut->addr_out, (int)(base + 0x8 + 0x00000100),
                                   "addr out");
-
-                tb.tick();
-
-                tb.check_equality((int)tb.dut->PC_write, (int)(base + 0x8 + 0x00000100),
-                                  "PC_write");
-                tb.check_equality((int)tb.dut->PC_value, (int)0, "jump value");
-                tb.check_equality((int)tb.dut->addr_out, (int)(base + 0x8 + 0x00000100),
-                                  "addr out");
             }
-
-            // Branch shall be taken
             else
             {
-
                 tb.check_equality((int)tb.dut->PC_value, (int)0, "jump value");
                 tb.check_equality((int)tb.dut->PC_write, (int)0, "PC_write");
-                tb.check_equality((int)tb.dut->addr_out, (int)base, "addr out");
-
-                tb.tick();
-
-                tb.check_equality((int)tb.dut->PC_write, (int)0, "PC_write");
-                tb.check_equality((int)tb.dut->PC_value, (int)0, "jump value");
                 tb.check_equality((int)tb.dut->addr_out, (int)base, "addr out");
             }
+
+            tb.tick();
+            tb.tick();
+
+            tb.check_equality((int)tb.dut->PC_write, (int)0, "PC_write2");
+            tb.check_equality((int)tb.dut->PC_value, (int)0, "jump value2");
+            tb.check_equality((int)tb.dut->addr_out, (int)base, "addr out2");
+
+            tb.dut->mispredict = 1;
+            tb.tick();
+            tb.dut->mispredict = 0;
+            tb.tick();
         }
     }
 
