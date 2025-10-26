@@ -23,6 +23,7 @@ targets = [
     "alu2",
     "alu4",
     "alu5",
+    "prediction"
 ]
 log_dir = "logs"
 report_dir = os.path.join(log_dir, "reports")
