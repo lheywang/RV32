@@ -45,6 +45,10 @@ package core_config_pkg;
     parameter int IF_INC = 4;  // Offset between two memory addresses.
     parameter int IF_MAX_ADDR = 32'h1000_3FFF;  // Maximal address possible.
     parameter int IF_BASE_ADDR = 32'h1000_0000;  // Base address of IF stage.
+    parameter int IF_BOOT_UCODE = IF_BASE_ADDR;
+    parameter int IF_TRAP_UCODE = 32'h1000_0100;  // Trap handler microcode address
+    parameter int IF_MRET_UCODE = 32'h1000_0200;  // Mret trap handler
+    parameter int IF_MAIN_CODE = 32'h1000_1000;  // Base for the main program.
 
     // -------------------------------------------------------------------------
     // Branch prediction unit config
