@@ -56,9 +56,8 @@ module prediction (
 
                 counter <= counter - 1;
                 counter_ack <= 1'b1;
-                
-            end
-            else if (predict_ok && counter != '1) begin
+
+            end else if (predict_ok && counter != '1) begin
 
                 counter <= counter + 1;
                 counter_ack <= 1'b1;
