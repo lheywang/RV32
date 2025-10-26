@@ -213,7 +213,6 @@ def generate_cpp(enums, output_path):
         lines.append(f"    return __{enum['name']}_names[static_cast<int>(op)];")
         lines.append("}")
 
-
     lines.append(f"\n#endif // _{output_path.split("/")[-1].split(".")[0].upper()}_H")
 
     with open(output_path, "w") as f:
