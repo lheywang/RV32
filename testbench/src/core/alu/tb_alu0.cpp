@@ -16,29 +16,12 @@ int main(int argc, char **argv)
     int cycle = 0;
 
     // Formal calculation test
-    for (int i = alu_commands_t::c_ADD; i < (alu_commands_t::c_XOR + 1); i++)
+    for (auto op : EnumRange<alu_commands_t>(alu_commands_t::c_ADD, alu_commands_t::c_XOR))
     {
-        tb.dut->cmd = i;
+        tb.dut->cmd = op;
         tb.dut->i_rd = 0x1F;
 
-        switch (i)
-        {
-        case alu_commands_t::c_ADD:
-            tb.set_case("ADD");
-            break;
-        case alu_commands_t::c_SUB:
-            tb.set_case("SUB");
-            break;
-        case alu_commands_t::c_AND:
-            tb.set_case("AND");
-            break;
-        case alu_commands_t::c_OR:
-            tb.set_case("OR");
-            break;
-        case alu_commands_t::c_XOR:
-            tb.set_case("XOR");
-            break;
-        }
+        tb.set_case_enum(op);
 
         for (int ii = 0; ii < 5; ii++)
         {
@@ -53,7 +36,7 @@ int main(int argc, char **argv)
                 tb.check_equality((unsigned int)tb.dut->valid, (unsigned int)1, "valid");
                 tb.check_equality((unsigned int)tb.dut->o_rd, (unsigned int)0x1F, "o_rd");
 
-                switch (i)
+                switch (op)
                 {
                 case alu_commands_t::c_ADD:
                     tb.check_equality((unsigned int)tb.dut->res,
@@ -79,9 +62,12 @@ int main(int argc, char **argv)
                     tb.check_equality((unsigned int)tb.dut->res,
                                       (unsigned int)(inputs1[ii] ^ inputs2[iii]), "res");
                     break;
+
+                default:
+                    break;
                 }
 
-                tb.dut->clear = 1;
+                tb.clear();
                 tb.increment_cycles();
             }
         }

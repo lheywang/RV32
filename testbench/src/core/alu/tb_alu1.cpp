@@ -14,39 +14,13 @@ int main(int argc, char **argv)
     tb.reset();
 
     // Formal calculation test
-    for (int i = alu_commands_t::c_SLT; i < (alu_commands_t::c_BGEU + 1); i++)
+    for (auto op : EnumRange<alu_commands_t>(alu_commands_t::c_SLT, alu_commands_t::c_BGEU))
     {
-        tb.dut->cmd = i;
+        tb.dut->cmd = op;
         tb.dut->addr = 0x00001FFF;
         tb.dut->imm = 0x00001FFF;
 
-        switch (i)
-        {
-        case alu_commands_t::c_SLT:
-            tb.set_case("SLT");
-            break;
-        case alu_commands_t::c_SLTU:
-            tb.set_case("SLTU");
-            break;
-        case alu_commands_t::c_BEQ:
-            tb.set_case("BEQ");
-            break;
-        case alu_commands_t::c_BNE:
-            tb.set_case("BNE");
-            break;
-        case alu_commands_t::c_BLT:
-            tb.set_case("BLT");
-            break;
-        case alu_commands_t::c_BGE:
-            tb.set_case("BGE");
-            break;
-        case alu_commands_t::c_BLTU:
-            tb.set_case("BLTU");
-            break;
-        case alu_commands_t::c_BGEU:
-            tb.set_case("BGEU");
-            break;
-        }
+        tb.set_case_enum(op);
 
         for (int ii = 0; ii < 5; ii++)
         {
@@ -61,7 +35,7 @@ int main(int argc, char **argv)
                 tb.check_equality((unsigned int)tb.dut->busy, (unsigned int)1, "busy");
                 tb.check_equality((unsigned int)tb.dut->valid, (unsigned int)1, "valid");
 
-                switch (i)
+                switch (op)
                 {
                 case alu_commands_t::c_SLT:
                     tb.check_equality(
@@ -139,10 +113,12 @@ int main(int argc, char **argv)
                              : 0),
                         "res");
                     break;
+
+                default:
+                    break;
                 }
 
-                tb.dut->clear = 1;
-
+                tb.clear();
                 tb.increment_cycles();
             }
         }

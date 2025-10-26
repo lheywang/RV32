@@ -26,45 +26,9 @@ int main(int argc, char **argv)
 
     int ticks = 0;
 
-    for (int op = alu_commands_t::c_SRL; op < (alu_commands_t::c_REMU + 1); op++)
+    for (auto op : EnumRange<alu_commands_t>(alu_commands_t::c_SRL, alu_commands_t::c_REMU))
     {
-        // Initial print for the case
-        switch (op)
-        {
-        case alu_commands_t::c_MUL:
-            tb.set_case("MUL");
-            break;
-        case alu_commands_t::c_MULH:
-            tb.set_case("MULH");
-            break;
-        case alu_commands_t::c_MULHSU:
-            tb.set_case("MULHSU");
-            break;
-        case alu_commands_t::c_MULHU:
-            tb.set_case("MULHU");
-            break;
-        case alu_commands_t::c_DIV:
-            tb.set_case("DIV");
-            break;
-        case alu_commands_t::c_DIVU:
-            tb.set_case("DIVU");
-            break;
-        case alu_commands_t::c_REM:
-            tb.set_case("REM");
-            break;
-        case alu_commands_t::c_REMU:
-            tb.set_case("REMU");
-            break;
-        case alu_commands_t::c_SLL:
-            tb.set_case("SLL");
-            break;
-        case alu_commands_t::c_SRL:
-            tb.set_case("SRL");
-            break;
-        case alu_commands_t::c_SRA:
-            tb.set_case("SRA");
-            break;
-        }
+        tb.set_case_enum(op);
 
         // The usage of both tb.set and direct assignement work.
         tb.dut->cmd = op;
@@ -91,13 +55,8 @@ int main(int argc, char **argv)
         tb.check_equality((unsigned int)tb.dut->req, (unsigned int)0, "req");
 
         // Finally, clearing the output
-
-        tb.dut->clear = 1;
-        tb.tick();
-        tb.dut->clear = 0;
-
+        tb.clear();
         tb.check_equality((unsigned int)tb.dut->busy, (unsigned int)0, "busy");
-
         tb.increment_cycles();
     }
 

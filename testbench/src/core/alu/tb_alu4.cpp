@@ -30,24 +30,11 @@ int main(int argc, char **argv)
     tb.dut->clear = 0;
     tb.dut->csr_err = 0;
 
-    for (int op = alu_commands_t::c_CSRRW; op < (alu_commands_t::c_CSRRC + 1); op += 1)
+    for (auto op : EnumRange<alu_commands_t>(alu_commands_t::c_CSRRW, alu_commands_t::c_CSRRC))
     {
         // Setting up the command
         tb.dut->cmd = op;
-        switch (op)
-        {
-        case alu_commands_t::c_CSRRW:
-            tb.set_case("CSRRW");
-            break;
-
-        case alu_commands_t::c_CSRRS:
-            tb.set_case("CSRRS");
-            break;
-
-        case alu_commands_t::c_CSRRC:
-            tb.set_case("CSRRC");
-            break;
-        }
+        tb.set_case_enum(op);
 
         // Setting up the address
         for (int addr = 0; addr < 23; addr += 1)
@@ -56,7 +43,6 @@ int main(int argc, char **argv)
             tb.dut->csr_rd = readback[addr];
 
             tb.tick();
-            // tb.tick();
 
             tb.check_equality((unsigned int)tb.dut->csr_ra, (unsigned int)addresses[addr],
                               "CSR_RA");
@@ -81,6 +67,8 @@ int main(int argc, char **argv)
 
             case alu_commands_t::c_CSRRC:
                 tb.check_equality((unsigned int)tb.dut->csr_wd, (unsigned int)0x00000000, "CSR_WD");
+                break;
+            default:
                 break;
             }
 
