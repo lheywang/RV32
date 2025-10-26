@@ -35,6 +35,8 @@ int main(int argc, char **argv)
         tb.check_equality((int)tb.dut->PC_write, (int)0, "PC_write");
         tb.check_equality((int)tb.dut->PC_value, (int)0, "jump value");
         tb.check_equality((int)tb.dut->addr_out, (int)base, "addr out");
+
+        tb.increment_cycles();
     }
 
     // adding some cooldown to make debugging easier
@@ -50,11 +52,13 @@ int main(int argc, char **argv)
         tb.dut->addr_in = base;
         tb.dut->actual_addr = base + 0x8;
         tb.dut->actual_imm = 0x00000100;
-        tb.dut->actual_instr = op;
 
         // Looping over some positive predictions results
         for (int k = 0; k < 4; k += 1)
         {
+            tb.dut->actual_instr = op;
+            tb.tick();
+            tb.set_iter(k);
 
             // Branch shall NOT be taken
             if (k < 2)
@@ -73,6 +77,7 @@ int main(int argc, char **argv)
             }
 
             tb.tick();
+            tb.dut->actual_instr = 0;
 
             tb.check_equality((int)tb.dut->PC_write, (int)0, "PC_write2");
             tb.check_equality((int)tb.dut->PC_value, (int)0, "jump value2");
@@ -82,6 +87,8 @@ int main(int argc, char **argv)
             tb.tick();
             tb.dut->predict_ok = 0;
             tb.tick();
+
+            tb.increment_cycles();
         }
     }
     tb.dut->actual_instr = 0;
@@ -104,11 +111,12 @@ int main(int argc, char **argv)
             tb.tick();
         }
 
-        tb.dut->actual_instr = op;
-
         // Looping over some positive predictions results
         for (int k = 0; k < 4; k += 1)
         {
+            tb.dut->actual_instr = op;
+            tb.tick();
+            tb.set_iter(k);
 
             // Branch shall NOT be taken
             if (k < 2)
@@ -127,7 +135,7 @@ int main(int argc, char **argv)
             }
 
             tb.tick();
-            tb.tick();
+            tb.dut->actual_instr = 0;
 
             tb.check_equality((int)tb.dut->PC_write, (int)0, "PC_write2");
             tb.check_equality((int)tb.dut->PC_value, (int)0, "jump value2");
@@ -137,6 +145,8 @@ int main(int argc, char **argv)
             tb.tick();
             tb.dut->mispredict = 0;
             tb.tick();
+
+            tb.increment_cycles();
         }
     }
 
