@@ -3,11 +3,299 @@
 
 #include "testbench.h"
 
+void test_clear(Testbench<Vcommiter> *tb, int id)
+{
+    unsigned int states[7][6] = {{1, 0, 0, 0, 0, 0}, {0, 1, 0, 0, 0, 0}, {0, 0, 1, 0, 0, 0},
+                                 {0, 0, 0, 1, 0, 0}, {0, 0, 0, 0, 1, 0}, {0, 0, 0, 0, 0, 1},
+                                 {0, 0, 0, 0, 0, 0}};
+
+    tb->check_equality((unsigned int)tb->dut->alu0_clear, states[id][0], "clear 0");
+    tb->check_equality((unsigned int)tb->dut->alu1_clear, states[id][1], "clear 1");
+    tb->check_equality((unsigned int)tb->dut->alu2_clear, states[id][2], "clear 2");
+    tb->check_equality((unsigned int)tb->dut->alu3_clear, states[id][3], "clear 3");
+    tb->check_equality((unsigned int)tb->dut->alu4_clear, states[id][4], "clear 4");
+    tb->check_equality((unsigned int)tb->dut->alu5_clear, states[id][5], "clear 5");
+
+    return;
+}
+
 // Main
 int main(int argc, char **argv)
 {
     Verilated::commandArgs(argc, argv);
     Testbench<Vcommiter> tb("Commit");
+    tb.reset();
+
+    unsigned int data = 0xAAAAAAAA;
+    unsigned short reg = 0x1F;
+
+    // First, we need to test that single request are properly handled.
+    for (int alu = 0; alu < 6; alu += 1)
+    {
+        // First, we set the ALU as ready
+        switch (alu)
+        {
+        case 0:
+            tb.set_case("ALU0");
+            tb.dut->alu0_res = data;
+            tb.dut->alu0_valid = 1;
+            tb.dut->alu0_rd = reg;
+            break;
+        case 1:
+            tb.set_case("ALU1");
+            tb.dut->alu1_res = data;
+            tb.dut->alu1_valid = 1;
+            tb.dut->alu1_rd = reg;
+            break;
+        case 2:
+            tb.set_case("ALU2");
+            tb.dut->alu2_res = data;
+            tb.dut->alu2_valid = 1;
+            tb.dut->alu2_rd = reg;
+            break;
+        case 3:
+            tb.set_case("ALU3");
+            tb.dut->alu3_res = data;
+            tb.dut->alu3_valid = 1;
+            tb.dut->alu3_rd = reg;
+            break;
+        case 4:
+            tb.set_case("ALU4");
+            tb.dut->alu4_res = data;
+            tb.dut->alu4_valid = 1;
+            tb.dut->alu4_rd = reg;
+            break;
+        case 5:
+            tb.set_case("ALU5");
+            tb.dut->alu5_res = data;
+            tb.dut->alu5_valid = 1;
+            tb.dut->alu5_rd = reg;
+            break;
+        }
+
+        // Trigger the eval signal
+        tb.tick();
+
+        // Checking outputs
+        tb.check_equality((unsigned int)tb.dut->reg_data, (unsigned int)data, "reg data");
+        tb.check_equality((unsigned int)tb.dut->reg_addr, (unsigned int)reg, "reg addr");
+        tb.check_equality((unsigned int)tb.dut->reg_we, (unsigned int)1, "reg we");
+
+        switch (alu)
+        {
+        case 0:
+            test_clear(&tb, 0);
+
+            tb.dut->alu0_res = 0;
+            tb.dut->alu0_valid = 0;
+            tb.dut->alu0_rd = 0;
+            break;
+
+        case 1:
+            test_clear(&tb, 1);
+
+            tb.dut->alu1_res = 0;
+            tb.dut->alu1_valid = 0;
+            tb.dut->alu1_rd = 0;
+            break;
+
+        case 2:
+            test_clear(&tb, 2);
+
+            tb.dut->alu2_res = 0;
+            tb.dut->alu2_valid = 0;
+            tb.dut->alu2_rd = 0;
+            break;
+
+        case 3:
+            test_clear(&tb, 3);
+
+            tb.dut->alu3_res = 0;
+            tb.dut->alu3_valid = 0;
+            tb.dut->alu3_rd = 0;
+            break;
+
+        case 4:
+            test_clear(&tb, 4);
+            tb.dut->alu4_res = 0;
+            tb.dut->alu4_valid = 0;
+            tb.dut->alu4_rd = 0;
+            break;
+        case 5:
+            test_clear(&tb, 5);
+
+            tb.dut->alu5_res = 0;
+            tb.dut->alu5_valid = 0;
+            tb.dut->alu5_rd = 0;
+            break;
+        }
+
+        tb.tick();
+        test_clear(&tb, 6); // ID 6 = NULL
+        tb.tick();
+        tb.increment_cycles();
+    }
+
+    tb.set_case("All");
+
+    unsigned int data2[6] = {0x11111111, 0x22222222, 0x33333333,
+                             0x44444444, 0x55555555, 0x66666666};
+    unsigned int reg2[6] = {1, 2, 3, 4, 5, 6};
+    int aluid[6] = {1, 2, 3, 5, 4, 0};
+
+    // Then, we perform a all in the same time request test
+    tb.dut->alu0_res = data2[5];
+    tb.dut->alu0_valid = 1;
+    tb.dut->alu0_rd = reg2[5];
+
+    tb.dut->alu1_res = data2[0];
+    tb.dut->alu1_valid = 1;
+    tb.dut->alu1_rd = reg2[0];
+
+    tb.dut->alu2_res = data2[1];
+    tb.dut->alu2_valid = 1;
+    tb.dut->alu2_rd = reg2[1];
+
+    tb.dut->alu3_res = data2[2];
+    tb.dut->alu3_valid = 1;
+    tb.dut->alu3_rd = reg2[2];
+
+    tb.dut->alu4_res = data2[4];
+    tb.dut->alu4_valid = 1;
+    tb.dut->alu4_rd = reg2[4];
+
+    tb.dut->alu5_res = data2[3];
+    tb.dut->alu5_valid = 1;
+    tb.dut->alu5_rd = reg2[3];
+
+    for (int alu = 0; alu < 6; alu += 1)
+    {
+        // Then, ensure order is respected
+        tb.tick();
+
+        // Checking outputs
+        tb.check_equality((unsigned int)tb.dut->reg_data, data2[alu], "reg data");
+        tb.check_equality((unsigned int)tb.dut->reg_addr, reg2[alu], "reg addr");
+        tb.check_equality((unsigned int)tb.dut->reg_we, (unsigned int)1, "reg we");
+
+        test_clear(&tb, aluid[alu]);
+
+        switch (alu)
+        {
+        case 0:
+            tb.dut->alu1_valid = 0;
+            break;
+        case 1:
+            tb.dut->alu2_valid = 0;
+            break;
+        case 2:
+            tb.dut->alu3_valid = 0;
+            break;
+        case 3:
+            tb.dut->alu5_valid = 0;
+            break;
+        case 4:
+            tb.dut->alu4_valid = 0;
+            break;
+        case 5:
+            tb.dut->alu0_valid = 0;
+            break;
+        }
+
+        tb.tick();
+
+        // Handling the fact that we're actually outputing the NEXT cycle.
+        if (alu < 5)
+            test_clear(&tb, aluid[alu + 1]);
+        else
+            test_clear(&tb, 6);
+
+        tb.increment_cycles();
+    }
+
+    // Handling pure comb logic
+    tb.set_case("Commit error reporting");
+    for (int alu = 0; alu < 6; alu += 1)
+    {
+        switch (alu)
+        {
+        case 0:
+            tb.dut->alu0_error = 1;
+            break;
+        case 1:
+            tb.dut->alu1_error = 1;
+            break;
+        case 2:
+            tb.dut->alu2_error = 1;
+            break;
+        case 3:
+            tb.dut->alu3_error = 1;
+            break;
+        case 4:
+            tb.dut->alu4_error = 1;
+            break;
+        case 5:
+            tb.dut->alu5_error = 1;
+            break;
+        }
+
+        tb.tick();
+        tb.check_equality((int)tb.dut->commit_err, 1, "error_out");
+        tb.tick();
+
+        tb.dut->alu0_error = 0;
+        tb.dut->alu1_error = 0;
+        tb.dut->alu2_error = 0;
+        tb.dut->alu3_error = 0;
+        tb.dut->alu4_error = 0;
+        tb.dut->alu5_error = 0;
+
+        tb.tick();
+        tb.check_equality((int)tb.dut->commit_err, 0, "error_out");
+
+        tb.increment_cycles();
+    }
+
+    // Handling the ALU1 jumps
+    tb.set_case("Checking jumps");
+    tb.dut->alu1_req = 1;
+    tb.dut->alu1_valid = 1;
+    tb.dut->alu1_res = 0xFFFFFFFF;
+
+    tb.tick();
+
+    tb.check_equality((unsigned)tb.dut->pc_value, (unsigned)0xFFFFFFFF, "pc value");
+    tb.check_equality((unsigned)tb.dut->pc_we, (unsigned)1, "pc we");
+    tb.check_equality((unsigned)tb.dut->issuer_flush, (unsigned)1, "flush");
+
+    tb.dut->alu1_req = 0;
+    tb.dut->alu1_valid = 0;
+    tb.tick();
+
+    tb.check_equality((unsigned)tb.dut->pc_value, (unsigned)0, "pc value");
+    tb.check_equality((unsigned)tb.dut->pc_we, (unsigned)0, "pc we");
+    tb.check_equality((unsigned)tb.dut->issuer_flush, (unsigned)0, "flush");
+
+    tb.tick();
+    tb.tick();
+
+    // Handling the ALU1 jumps
+    tb.set_case("HALT request");
+
+    tb.dut->halt_needed = 1;
+
+    tb.tick();
+
+    tb.check_equality((unsigned)tb.dut->pc_value, (unsigned)0x10000100, "trap code");
+    tb.check_equality((unsigned)tb.dut->pc_we, (unsigned)1, "pc we");
+    tb.check_equality((unsigned)tb.dut->issuer_flush, (unsigned)1, "flush");
+
+    tb.dut->halt_needed = 0;
+    tb.tick();
+
+    tb.check_equality((unsigned)tb.dut->pc_value, (unsigned)0, "trap code");
+    tb.check_equality((unsigned)tb.dut->pc_we, (unsigned)0, "pc we");
+    tb.check_equality((unsigned)tb.dut->issuer_flush, (unsigned)0, "flush");
 
     return tb.get_return();
 }
