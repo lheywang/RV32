@@ -11,6 +11,7 @@
 
 # Assembles / compilations outputs
 *.elf
+*.txt
 *.hex
 *.bin
 *.o
