@@ -24,6 +24,7 @@ targets = [
     "alu4",
     "alu5",
     "prediction",
+    "commiter",
 ]
 log_dir = "logs"
 report_dir = os.path.join(log_dir, "reports")
@@ -70,6 +71,14 @@ def run_target(target: str):
 
 
 def main():
+
+    print(f"🔧 Preparing the build files ...")
+    subprocess.run(
+        ["make", "prepare"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
     print(f"🔧 Running Verilator builds in parallel ({os.cpu_count()} threads)...\n")
 
     results = []
