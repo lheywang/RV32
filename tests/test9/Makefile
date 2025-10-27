@@ -1,7 +1,7 @@
 # This small makefile handle the build of this source into the final executable, 
 # and it's associated products files.
 
-SOURCE =
+SOURCE = 
 EXE = program.elf
 BIN = program.bin
 ASM = program.txt 
