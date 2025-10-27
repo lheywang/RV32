@@ -15,21 +15,26 @@ PY_SRC     := $(shell find $(UTILS) -type f -name "*.py")
 
 # We need to use different commands to ensure the right order is outputed...
 RTL_SRC    := $(shell find $(SRC_DIR)packages -type f -name "*.sv")
+RTL_SRC    += $(shell find $(SRC_DIR)memory -type f -name "*.v")
 RTL_SRC    += $(shell find $(SRC_DIR)core -type f -name "*.sv")
 RTL_SRC    += $(shell find $(SRC_DIR)peripherals -type f -name "*.sv")
 RTL_SRC    += $(SRC_DIR)reset.sv
 RTL_SRC    += $(SRC_DIR)rv32.sv
 
+VERILATOR_CFG = verilatorcfg.vlt
+
 # =======================================================
 # Parameters and public recipes
 # =======================================================
-NPROC = $(shell nproc)
+NPROC ?= $(shell nproc)
+
+FILE_LIST = $(BUILD_DIR)sources.f
 
 # --- Verilator options ---
 VERILATOR_FLAGS = -Wall \
 				  --trace \
 				  -j $(NPROC) \
-				  --cc $(RTL_SRC) \
+				  --cc -f $(FILE_LIST) $(VERILATOR_CFG) \
 				  -O3 \
 				  --top-module $(TOP) \
 				  --exe $(TB_TOP) $(CCX_UTILS) \
@@ -56,9 +61,13 @@ run: $(BUILD_DIR)/V$(TOP)
 	@$(BUILD_DIR)V$(TOP)
 
 # Compile generated C++ from Verilator
-$(BUILD_DIR)/V$(TOP): $(BUILD_DIR) $(RTL_SRC) $(CXX_TB) $(CXX_HEADERS) $(SYSTEMVERILOG_HEADERS) $(TB_TOP)
+$(BUILD_DIR)/V$(TOP): prepare $(RTL_SRC) $(CXX_TB)  $(TB_TOP)
 	verilator $(VERILATOR_FLAGS)
 	make -C $(BUILD_DIR) -f V$(TOP).mk V$(TOP) -j8 CXX="ccache g++"
+
+# List the files used for verilator.
+$(FILE_LIST) :
+	echo "$(RTL_SRC)" | tr ' ' '\n' >> $@
 
 # Clean
 clean:
@@ -81,6 +90,8 @@ format:
 	@verible-verilog-format --inplace --flagfile=.verible-format $(RTL_SRC)
 	@clang-format -i --style=file $(TB_SRC)
 	@black --line-length 100 $(PY_SRC)
+
+prepare : $(BUILD_DIR) $(SYSTEMVERILOG_HEADERS) $(FILE_LIST)
 
 .PHONY: all run clean tests doc
 
