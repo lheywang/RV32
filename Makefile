@@ -56,7 +56,7 @@ run: $(BUILD_DIR)/V$(TOP)
 	@$(BUILD_DIR)V$(TOP)
 
 # Compile generated C++ from Verilator
-$(BUILD_DIR)/V$(TOP): $(BUILD_DIR) $(RTL_SRC) $(CXX_TB) $(CXX_HEADERS) $(SYSTEMVERILOG_HEADERS) 
+$(BUILD_DIR)/V$(TOP): $(BUILD_DIR) $(RTL_SRC) $(CXX_TB) $(CXX_HEADERS) $(SYSTEMVERILOG_HEADERS) $(TB_TOP)
 	verilator $(VERILATOR_FLAGS)
 	make -C $(BUILD_DIR) -f V$(TOP).mk V$(TOP) -j8 CXX="ccache g++"
 
