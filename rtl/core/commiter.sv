@@ -221,6 +221,9 @@ module commiter (
     /*
      *  Some synchronous logic to handle the clear signal
      *  to reset the different ALUs.
+     *
+     *  Note : An additional register may be needed, if the ALU
+     *  does clear it's output too fast.
      */
     always_ff @(posedge clk or negedge rst_n) begin
 
