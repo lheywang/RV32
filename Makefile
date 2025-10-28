@@ -15,11 +15,12 @@ PY_SRC     := $(shell find $(UTILS) -type f -name "*.py")
 
 # We need to use different commands to ensure the right order is outputed...
 RTL_SRC    := $(shell find $(SRC_DIR)packages -type f -name "*.sv")
-RTL_SRC    += $(shell find $(SRC_DIR)memory -type f -name "*.v")
 RTL_SRC    += $(shell find $(SRC_DIR)core -type f -name "*.sv")
 RTL_SRC    += $(shell find $(SRC_DIR)peripherals -type f -name "*.sv")
 RTL_SRC    += $(SRC_DIR)reset.sv
 RTL_SRC    += $(SRC_DIR)rv32.sv
+
+MEM_SRC    += $(shell find $(SRC_DIR)memory -type f -name "*.v")
 
 VERILATOR_CFG = verilatorcfg.vlt
 
@@ -67,6 +68,7 @@ $(BUILD_DIR)/V$(TOP): prepare $(RTL_SRC) $(CXX_TB)  $(TB_TOP)
 
 # List the files used for verilator.
 $(FILE_LIST) :
+	echo "$(MEM_SRC)" | tr ' ' '\n' >> $@
 	echo "$(RTL_SRC)" | tr ' ' '\n' >> $@
 
 # Clean
