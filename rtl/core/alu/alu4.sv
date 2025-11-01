@@ -153,7 +153,7 @@ module alu4 (
 
         end else begin
 
-            state <= next_state;
+            state   <= next_state;
             o_error <= csr_err;
 
             if (state == IDLE) begin
@@ -197,31 +197,31 @@ module alu4 (
 
             IDLE: begin
 
-                csr_wa  = 12'b0;
-                csr_ra  = 12'b0;
-                csr_we  = 1'b0;
-                csr_wd  = 32'b0;
+                csr_wa = 12'b0;
+                csr_ra = 12'b0;
+                csr_we = 1'b0;
+                csr_wd = 32'b0;
 
-                req     = 1'b0;
-                res     = 32'b0;
-                busy    = 1'b0;
-                o_rd    = 5'b0;
-                valid   = 1'b0;
+                req    = 1'b0;
+                res    = 32'b0;
+                busy   = 1'b0;
+                o_rd   = 5'b0;
+                valid  = 1'b0;
 
             end
 
             READ: begin
 
-                csr_wa  = 12'b0;
-                csr_ra  = address;
-                csr_we  = 1'b0;
-                csr_wd  = 32'b0;
+                csr_wa = 12'b0;
+                csr_ra = address;
+                csr_we = 1'b0;
+                csr_wd = 32'b0;
 
-                req     = 1'b0;
-                res     = 32'b0;
-                busy    = 1'b1;
-                o_rd    = 5'b0;
-                valid   = 1'b0;
+                req    = 1'b0;
+                res    = 32'b0;
+                busy   = 1'b1;
+                o_rd   = 5'b0;
+                valid  = 1'b0;
 
             end
 
@@ -242,11 +242,11 @@ module alu4 (
 
                 endcase
 
-                req     = 1'b0;
-                res     = readback;
-                busy    = 1'b1;
-                o_rd    = r_rd;
-                valid   = 1'b1;
+                req   = 1'b0;
+                res   = readback;
+                busy  = 1'b1;
+                o_rd  = r_rd;
+                valid = 1'b1;
 
             end
 
