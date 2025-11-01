@@ -10,25 +10,276 @@ int main(int argc, char **argv)
     Testbench<Vissuer> tb("Issuer");
     tb.reset();
 
+    unsigned int values[] = {0xAAAAAAAA, 0x55555555, 0xFFFFFFFF};
+
     // Set signals to ensure it'll work
     tb.dut->occupancy_exec = 1;
     tb.dut->flush_needed = 1;
-    tb.dut->reg_rd0 = 0xAAAAAAAA;
-    tb.dut->reg_rd1 = 0x55555555;
+    tb.dut->reg_rd0 = values[0];
+    tb.dut->reg_rd1 = values[1];
+    tb.dut->dec_imm = values[2];
     tb.dut->dec_rs1 = 0x1F;
     tb.dut->dec_rs2 = 0x1E;
     tb.dut->dec_rd = 0x1D;
     tb.dut->dec_address = 0x10001000;
 
-    tb.dut->dec_opcode = opcodes_t::i_ADD;
+    // Looping over each instructions :
+    for (auto op : EnumRange<opcodes_t>(opcodes_t::i_NOP, opcodes_t::i_CSRRCI))
+    {
+        tb.set_case_enum(op);
 
-    tb.run_for(1);
+        tb.dut->dec_opcode = op;
 
-    
+        tb.tick();
+        tb.tick();
 
-    tb.dut->dec_opcode = opcodes_t::i_MUL;
+        switch (op)
+        {
+        // Nothing
+        case opcodes_t::i_NOP:
+        case opcodes_t::i_FENCE:
+            break;
 
-tb.run_for(10);
+        // ALU 0 - immediates
+        case opcodes_t::i_LUI:
+            tb.check_equality((int)tb.dut->alu0_cmd, (int)alu_commands_t::c_ADD, "add");
+            goto alu0i_tests;
+        case opcodes_t::i_AUIPC:
+            tb.check_equality((int)tb.dut->alu0_cmd, (int)alu_commands_t::c_ADD, "add");
+            goto alu0i_tests;
+        case opcodes_t::i_ADDI:
+            tb.check_equality((int)tb.dut->alu0_cmd, (int)alu_commands_t::c_ADD, "add");
+            goto alu0i_tests;
+        case opcodes_t::i_XORI:
+            tb.check_equality((int)tb.dut->alu0_cmd, (int)alu_commands_t::c_XOR, "xor");
+            goto alu0i_tests;
+        case opcodes_t::i_ORI:
+            tb.check_equality((int)tb.dut->alu0_cmd, (int)alu_commands_t::c_OR, "or");
+            goto alu0i_tests;
+        case opcodes_t::i_ANDI:
+            tb.check_equality((int)tb.dut->alu0_cmd, (int)alu_commands_t::c_AND, "and");
+
+        alu0i_tests:
+            tb.check_equality((int)tb.dut->alu0_arg0, (int)values[0], "arg0");
+            tb.check_equality((int)tb.dut->alu0_arg1, (int)values[2], "arg1");
+            tb.check_equality((int)tb.dut->alu0_arg1, (int)0, "addr");
+            tb.check_equality((int)tb.dut->alu0_arg1, (int)0, "imm");
+            tb.check_equality((int)tb.dut->alu0_arg1, (int)0x1D, "rd");
+            break;
+
+        // ALU 0 - registers based
+        case opcodes_t::i_ADD:
+            tb.check_equality((int)tb.dut->alu0_cmd, (int)alu_commands_t::c_ADD, "add");
+            goto alu0r_tests;
+        case opcodes_t::i_SUB:
+            tb.check_equality((int)tb.dut->alu0_cmd, (int)alu_commands_t::c_SUB, "sub");
+            goto alu0r_tests;
+        case opcodes_t::i_OR:
+            tb.check_equality((int)tb.dut->alu0_cmd, (int)alu_commands_t::c_OR, "or");
+            goto alu0r_tests;
+        case opcodes_t::i_AND:
+            tb.check_equality((int)tb.dut->alu0_cmd, (int)alu_commands_t::c_AND, "and");
+            goto alu0r_tests;
+        case opcodes_t::i_XOR:
+            tb.check_equality((int)tb.dut->alu0_cmd, (int)alu_commands_t::c_XOR, "xor");
+
+        alu0r_tests:
+            tb.check_equality((int)tb.dut->alu0_arg0, (int)values[0], "arg0");
+            tb.check_equality((int)tb.dut->alu0_arg1, (int)values[1], "arg1");
+            tb.check_equality((int)tb.dut->alu0_arg1, (int)0, "addr");
+            tb.check_equality((int)tb.dut->alu0_arg1, (int)0, "imm");
+            tb.check_equality((int)tb.dut->alu0_arg1, (int)0x1D, "rd");
+            break;
+
+        // ALU 1 - immediates
+        case opcodes_t::i_SLTI:
+            tb.check_equality((int)tb.dut->alu1_cmd, (int)alu_commands_t::c_SLT, "slt");
+            goto alu1i_tests;
+        case opcodes_t::i_SLTIU:
+            tb.check_equality((int)tb.dut->alu1_cmd, (int)alu_commands_t::c_SLTU, "sltu");
+
+        alu1i_tests:
+            tb.check_equality((int)tb.dut->alu0_arg0, (int)values[0], "arg0");
+            tb.check_equality((int)tb.dut->alu0_arg1, (int)values[2], "arg1");
+            tb.check_equality((int)tb.dut->alu0_arg1, (int)0, "addr");
+            tb.check_equality((int)tb.dut->alu0_arg1, (int)0, "imm");
+            tb.check_equality((int)tb.dut->alu0_arg1, (int)0x1D, "rd");
+            break;
+
+        // ALU 1 - registers based
+        case opcodes_t::i_SLT:
+            tb.check_equality((int)tb.dut->alu1_cmd, (int)alu_commands_t::c_SLT, "slt");
+            goto alu1r_tests;
+        case opcodes_t::i_SLTU:
+            tb.check_equality((int)tb.dut->alu1_cmd, (int)alu_commands_t::c_SLTU, "sltu");
+            goto alu1r_tests;
+        case opcodes_t::i_BEQ:
+            tb.check_equality((int)tb.dut->alu1_cmd, (int)alu_commands_t::c_BEQ, "beq");
+            goto alu1r_tests;
+        case opcodes_t::i_BNE:
+            tb.check_equality((int)tb.dut->alu1_cmd, (int)alu_commands_t::c_BNE, "bne");
+            goto alu1r_tests;
+        case opcodes_t::i_BLT:
+            tb.check_equality((int)tb.dut->alu1_cmd, (int)alu_commands_t::c_BLT, "blt");
+            goto alu1r_tests;
+        case opcodes_t::i_BGE:
+            tb.check_equality((int)tb.dut->alu1_cmd, (int)alu_commands_t::c_BGE, "bge");
+            goto alu1r_tests;
+        case opcodes_t::i_BLTU:
+            tb.check_equality((int)tb.dut->alu1_cmd, (int)alu_commands_t::c_BLTU, "bltu");
+            goto alu1r_tests;
+        case opcodes_t::i_BGEU:
+            tb.check_equality((int)tb.dut->alu1_cmd, (int)alu_commands_t::c_BGEU, "bgeu");
+
+        alu1r_tests:
+            tb.check_equality((int)tb.dut->alu1_arg0, (int)values[0], "arg0");
+            tb.check_equality((int)tb.dut->alu1_arg1, (int)values[2], "arg1");
+            tb.check_equality((int)tb.dut->alu1_arg1, (int)0, "addr");
+            tb.check_equality((int)tb.dut->alu1_arg1, (int)0, "imm");
+            tb.check_equality((int)tb.dut->alu1_arg1, (int)0x1D, "rd");
+            break;
+
+        // ALU 2 & 3 - immediates
+        case opcodes_t::i_SLLI:
+            tb.check_equality((int)tb.dut->alu2_cmd, (int)alu_commands_t::c_SLL, "sll");
+            goto alu23i_tests;
+        case opcodes_t::i_SRAI:
+            tb.check_equality((int)tb.dut->alu2_cmd, (int)alu_commands_t::c_SRA, "sra");
+            goto alu23i_tests;
+        case opcodes_t::i_SRLI:
+            tb.check_equality((int)tb.dut->alu2_cmd, (int)alu_commands_t::c_SRL, "srl");
+
+        alu23i_tests:
+            tb.check_equality((int)tb.dut->alu2_arg0, (int)values[0], "arg0");
+            tb.check_equality((int)tb.dut->alu2_arg1, (int)values[2], "arg1");
+            tb.check_equality((int)tb.dut->alu2_arg1, (int)0, "addr");
+            tb.check_equality((int)tb.dut->alu2_arg1, (int)0, "imm");
+            tb.check_equality((int)tb.dut->alu2_arg1, (int)0x1D, "rd");
+            break;
+
+        // ALU 2 & 3 - registers based
+        case opcodes_t::i_SLL:
+            tb.check_equality((int)tb.dut->alu2_cmd, (int)alu_commands_t::c_SLL, "sll");
+            goto alu23r_tests;
+        case opcodes_t::i_SRL:
+            tb.check_equality((int)tb.dut->alu2_cmd, (int)alu_commands_t::c_SRL, "srl");
+            goto alu23r_tests;
+        case opcodes_t::i_SRA:
+            tb.check_equality((int)tb.dut->alu2_cmd, (int)alu_commands_t::c_SRA, "sra");
+            goto alu23r_tests;
+        case opcodes_t::i_MUL:
+            tb.check_equality((int)tb.dut->alu2_cmd, (int)alu_commands_t::c_MUL, "mul");
+            goto alu23r_tests;
+        case opcodes_t::i_MULH:
+            tb.check_equality((int)tb.dut->alu2_cmd, (int)alu_commands_t::c_MULH, "mulh");
+            goto alu23r_tests;
+        case opcodes_t::i_MULHU:
+            tb.check_equality((int)tb.dut->alu2_cmd, (int)alu_commands_t::c_MULHU, "mulhu");
+            goto alu23r_tests;
+        case opcodes_t::i_MULHSU:
+            tb.check_equality((int)tb.dut->alu2_cmd, (int)alu_commands_t::c_MULHSU, "mulhsu");
+            goto alu23r_tests;
+        case opcodes_t::i_DIV:
+            tb.check_equality((int)tb.dut->alu2_cmd, (int)alu_commands_t::c_DIV, "div");
+            goto alu23r_tests;
+        case opcodes_t::i_DIVU:
+            tb.check_equality((int)tb.dut->alu2_cmd, (int)alu_commands_t::c_DIVU, "divu");
+            goto alu23r_tests;
+        case opcodes_t::i_REM:
+            tb.check_equality((int)tb.dut->alu2_cmd, (int)alu_commands_t::c_REM, "rem");
+            goto alu23r_tests;
+        case opcodes_t::i_REMU:
+            tb.check_equality((int)tb.dut->alu2_cmd, (int)alu_commands_t::c_REMU, "remu");
+
+        alu23r_tests:
+            tb.check_equality((int)tb.dut->alu2_arg0, (int)values[0], "arg0");
+            tb.check_equality((int)tb.dut->alu2_arg1, (int)values[2], "arg1");
+            tb.check_equality((int)tb.dut->alu2_arg1, (int)0, "addr");
+            tb.check_equality((int)tb.dut->alu2_arg1, (int)0, "imm");
+            tb.check_equality((int)tb.dut->alu2_arg1, (int)0x1D, "rd");
+            break;
+
+        // ALU 4 - immediates
+        case opcodes_t::i_CSRRWI:
+            tb.check_equality((int)tb.dut->alu4_cmd, (int)alu_commands_t::c_CSRRW, "csrrw");
+            goto alu4i_tests;
+        case opcodes_t::i_CSRRSI:
+            tb.check_equality((int)tb.dut->alu4_cmd, (int)alu_commands_t::c_CSRRS, "csrrsi");
+            goto alu4i_tests;
+        case opcodes_t::i_CSRRCI:
+            tb.check_equality((int)tb.dut->alu4_cmd, (int)alu_commands_t::c_CSRRC, "csrrci");
+
+        alu4i_tests:
+            tb.check_equality((int)tb.dut->alu4_arg0, (int)values[0], "arg0");
+            tb.check_equality((int)tb.dut->alu4_arg1, (int)values[2], "arg1");
+            tb.check_equality((int)tb.dut->alu4_arg1, (int)0, "addr");
+            tb.check_equality((int)tb.dut->alu4_arg1, (int)0, "imm");
+            tb.check_equality((int)tb.dut->alu4_arg1, (int)0x1D, "rd");
+            break;
+
+        // ALU 4 - registers based
+        case opcodes_t::i_CSRRW:
+            tb.check_equality((int)tb.dut->alu4_cmd, (int)alu_commands_t::c_CSRRW, "csrrw");
+            goto alu4r_tests;
+        case opcodes_t::i_CSRRS:
+            tb.check_equality((int)tb.dut->alu4_cmd, (int)alu_commands_t::c_CSRRS, "csrrs");
+            goto alu4r_tests;
+        case opcodes_t::i_CSRRC:
+            tb.check_equality((int)tb.dut->alu4_cmd, (int)alu_commands_t::c_CSRRC, "csrrc");
+
+        alu4r_tests:
+            tb.check_equality((int)tb.dut->alu4_arg0, (int)values[0], "arg0");
+            tb.check_equality((int)tb.dut->alu4_arg1, (int)values[2], "arg1");
+            tb.check_equality((int)tb.dut->alu4_arg1, (int)0, "addr");
+            tb.check_equality((int)tb.dut->alu4_arg1, (int)0, "imm");
+            tb.check_equality((int)tb.dut->alu4_arg1, (int)0x1D, "rd");
+            break;
+
+        // ALU 5
+        case opcodes_t::i_LB:
+            tb.check_equality((int)tb.dut->alu5_cmd, (int)alu_commands_t::c_LB, "lb");
+            goto alu5r_tests;
+        case opcodes_t::i_LH:
+            tb.check_equality((int)tb.dut->alu5_cmd, (int)alu_commands_t::c_LH, "lh");
+            goto alu5r_tests;
+        case opcodes_t::i_LW:
+            tb.check_equality((int)tb.dut->alu5_cmd, (int)alu_commands_t::c_LW, "lw");
+            goto alu5r_tests;
+        case opcodes_t::i_LBU:
+            tb.check_equality((int)tb.dut->alu5_cmd, (int)alu_commands_t::c_LBU, "lbu");
+            goto alu5r_tests;
+        case opcodes_t::i_LHU:
+            tb.check_equality((int)tb.dut->alu5_cmd, (int)alu_commands_t::c_LHU, "lhu");
+            goto alu5r_tests;
+        case opcodes_t::i_SB:
+            tb.check_equality((int)tb.dut->alu5_cmd, (int)alu_commands_t::c_SB, "sb");
+            goto alu5r_tests;
+        case opcodes_t::i_SH:
+            tb.check_equality((int)tb.dut->alu5_cmd, (int)alu_commands_t::c_SH, "sh");
+            goto alu5r_tests;
+        case opcodes_t::i_SW:
+            tb.check_equality((int)tb.dut->alu5_cmd, (int)alu_commands_t::c_SW, "sw");
+
+        alu5r_tests:
+            tb.check_equality((int)tb.dut->alu5_arg0, (int)values[0], "arg0");
+            tb.check_equality((int)tb.dut->alu5_arg1, (int)values[2], "arg1");
+            tb.check_equality((int)tb.dut->alu5_arg1, (int)0, "addr");
+            tb.check_equality((int)tb.dut->alu5_arg1, (int)0, "imm");
+            tb.check_equality((int)tb.dut->alu5_arg1, (int)0x1D, "rd");
+            break;
+
+        default:
+            tb.check_equality(1, 2, "Unsupported OP !!");
+
+            // core_config_pkg::i_JAL,
+            // core_config_pkg::i_JALR : begin
+
+            // // Ucode :
+            // core_config_pkg::i_ECALL, core_config_pkg::i_EBREAK, core_config_pkg::i_MRET: begin
+        }
+    }
+
+    // Need to add tests when the ALU2 is already used !!
 
     return tb.get_return();
 }
