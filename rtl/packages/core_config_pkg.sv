@@ -43,6 +43,7 @@ package core_config_pkg;
     // -------------------------------------------------------------------------
     parameter int IF_LEN = 32;  // Instruction length
     parameter int IF_INC = 4;  // Offset between two memory addresses.
+    parameter int IF_LATENCY = 2; // Configure how many clock cycles are required from addr to data for the instruction ROM.
     parameter int IF_MAX_ADDR = 32'h1000_3FFF;  // Maximal address possible.
     parameter int IF_BASE_ADDR = 32'h1000_0000;  // Base address of IF stage.
     parameter int IF_BOOT_UCODE = IF_BASE_ADDR;
