@@ -26,6 +26,10 @@ module alu2 (
     input  logic                                                  rst_n,
     input  logic          [      (core_config_pkg::XLEN - 1) : 0] arg0,
     input  logic          [      (core_config_pkg::XLEN - 1) : 0] arg1,
+    /* verilator lint_off UNUSEDSIGNAL */
+    input  logic          [      (core_config_pkg::XLEN - 1) : 0] addr,
+    input  logic          [      (core_config_pkg::XLEN - 1) : 0] imm,
+    /* verilator lint_off UNUSEDSIGNAL */
     input  alu_commands_t                                         cmd,
     input  logic          [(core_config_pkg::REG_ADDR_W - 1) : 0] i_rd,
     output logic                                                  busy,

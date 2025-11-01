@@ -21,6 +21,8 @@ module alu4 (
     input  logic                                                  rst_n,
     input  logic          [      (core_config_pkg::XLEN - 1) : 0] arg0,
     /* verilator lint_off UNUSEDSIGNAL */
+    input  logic          [      (core_config_pkg::XLEN - 1) : 0] arg1,
+    input  logic          [      (core_config_pkg::XLEN - 1) : 0] addr,
     input  logic          [      (core_config_pkg::XLEN - 1) : 0] imm,
     /* verilator lint_on UNUSEDSIGNAL */
     input  alu_commands_t                                         cmd,
