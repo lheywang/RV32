@@ -154,6 +154,7 @@ module alu4 (
         end else begin
 
             state <= next_state;
+            o_error <= csr_err;
 
             if (state == IDLE) begin
 
@@ -206,7 +207,6 @@ module alu4 (
                 busy    = 1'b0;
                 o_rd    = 5'b0;
                 valid   = 1'b0;
-                o_error = 1'b0;
 
             end
 
@@ -222,7 +222,6 @@ module alu4 (
                 busy    = 1'b1;
                 o_rd    = 5'b0;
                 valid   = 1'b0;
-                o_error = 1'b0;
 
             end
 
@@ -248,7 +247,6 @@ module alu4 (
                 busy    = 1'b1;
                 o_rd    = r_rd;
                 valid   = 1'b1;
-                o_error = csr_err;
 
             end
 
