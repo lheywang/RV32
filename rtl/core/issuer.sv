@@ -211,13 +211,13 @@ module issuer (
             core_config_pkg::i_AUIPC,
             core_config_pkg::i_ADDI,
             core_config_pkg::i_XORI,
+            core_config_pkg::i_ORI, 
             core_config_pkg::i_ANDI :  begin
 
                 next_alu = ALU0;
                 arg1_imm = 1'b1;
 
             end
-            core_config_pkg::i_ORI, 
             core_config_pkg::i_ADD,
             core_config_pkg::i_SUB,
             core_config_pkg::i_OR,
@@ -396,39 +396,39 @@ module issuer (
             alu0_arg0 <= '0;
             alu0_arg1 <= '0;
             alu0_addr <= '0;
-            alu0_imm  <= '0;
-            alu0_cmd  <= core_config_pkg::c_NONE;
-            alu0_rd   <= '0;
+            alu0_imm <= '0;
+            alu0_cmd <= core_config_pkg::c_NONE;
+            alu0_rd <= '0;
             alu1_arg0 <= '0;
             alu1_arg1 <= '0;
             alu1_addr <= '0;
-            alu1_imm  <= '0;
-            alu1_cmd  <= core_config_pkg::c_NONE;
-            alu1_rd   <= '0;
+            alu1_imm <= '0;
+            alu1_cmd <= core_config_pkg::c_NONE;
+            alu1_rd <= '0;
             alu2_arg0 <= '0;
             alu2_arg1 <= '0;
             alu2_addr <= '0;
-            alu2_imm  <= '0;
-            alu2_cmd  <= core_config_pkg::c_NONE;
-            alu2_rd   <= '0;
+            alu2_imm <= '0;
+            alu2_cmd <= core_config_pkg::c_NONE;
+            alu2_rd <= '0;
             alu3_arg0 <= '0;
             alu3_arg1 <= '0;
             alu3_addr <= '0;
-            alu3_imm  <= '0;
-            alu3_cmd  <= core_config_pkg::c_NONE;
-            alu3_rd   <= '0;
+            alu3_imm <= '0;
+            alu3_cmd <= core_config_pkg::c_NONE;
+            alu3_rd <= '0;
             alu4_arg0 <= '0;
             alu4_arg1 <= '0;
             alu4_addr <= '0;
-            alu4_imm  <= '0;
-            alu4_cmd  <= core_config_pkg::c_NONE;
-            alu4_rd   <= '0;
+            alu4_imm <= '0;
+            alu4_cmd <= core_config_pkg::c_NONE;
+            alu4_rd <= '0;
             alu5_arg0 <= '0;
             alu5_arg1 <= '0;
             alu5_addr <= '0;
-            alu5_imm  <= '0;
-            alu5_cmd  <= core_config_pkg::c_NONE;
-            alu5_rd   <= '0;
+            alu5_imm <= '0;
+            alu5_cmd <= core_config_pkg::c_NONE;
+            alu5_rd <= '0;
 
             prog_enabled <= 1'b1;
 
@@ -438,39 +438,39 @@ module issuer (
             alu0_arg0 <= '0;
             alu0_arg1 <= '0;
             alu0_addr <= '0;
-            alu0_imm  <= '0;
-            alu0_cmd  <= core_config_pkg::c_NONE;
-            alu0_rd   <= '0;
+            alu0_imm <= '0;
+            alu0_cmd <= core_config_pkg::c_NONE;
+            alu0_rd <= '0;
             alu1_arg0 <= '0;
             alu1_arg1 <= '0;
             alu1_addr <= '0;
-            alu1_imm  <= '0;
-            alu1_cmd  <= core_config_pkg::c_NONE;
-            alu1_rd   <= '0;
+            alu1_imm <= '0;
+            alu1_cmd <= core_config_pkg::c_NONE;
+            alu1_rd <= '0;
             alu2_arg0 <= '0;
             alu2_arg1 <= '0;
             alu2_addr <= '0;
-            alu2_imm  <= '0;
-            alu2_cmd  <= core_config_pkg::c_NONE;
-            alu2_rd   <= '0;
+            alu2_imm <= '0;
+            alu2_cmd <= core_config_pkg::c_NONE;
+            alu2_rd <= '0;
             alu3_arg0 <= '0;
             alu3_arg1 <= '0;
             alu3_addr <= '0;
-            alu3_imm  <= '0;
-            alu3_cmd  <= core_config_pkg::c_NONE;
-            alu3_rd   <= '0;
+            alu3_imm <= '0;
+            alu3_cmd <= core_config_pkg::c_NONE;
+            alu3_rd <= '0;
             alu4_arg0 <= '0;
             alu4_arg1 <= '0;
             alu4_addr <= '0;
-            alu4_imm  <= '0;
-            alu4_cmd  <= core_config_pkg::c_NONE;
-            alu4_rd   <= '0;
+            alu4_imm <= '0;
+            alu4_cmd <= core_config_pkg::c_NONE;
+            alu4_rd <= '0;
             alu5_arg0 <= '0;
             alu5_arg1 <= '0;
             alu5_addr <= '0;
-            alu5_imm  <= '0;
-            alu5_cmd  <= core_config_pkg::c_NONE;
-            alu5_rd   <= '0;
+            alu5_imm <= '0;
+            alu5_cmd <= core_config_pkg::c_NONE;
+            alu5_rd <= '0;
 
             alu1_predict_in <= r_dec_branch_taken;
 
