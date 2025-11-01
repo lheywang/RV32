@@ -98,7 +98,8 @@ module issuer (
     input  logic flush_needed,
 
     // TRAP handling
-    input logic halt_pending
+    input logic halt_pending,
+    input logic commit_err
 );
     /*
      *  Storage types : 
@@ -629,7 +630,7 @@ module issuer (
     end
 
     assign dec_busy = ~prog_enabled;
-    assign halt_needed = |{alu0_error, alu1_error, alu2_error, alu3_error, alu4_error, alu5_error, halt_pending, dec_illegal};
+    assign halt_needed = |{alu0_error, alu1_error, alu2_error, alu3_error, alu4_error, alu5_error, halt_pending, dec_illegal, commit_err};
     assign dec_flush = flush_needed;
 
 endmodule
