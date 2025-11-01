@@ -13,21 +13,22 @@ int main(int argc, char **argv)
     // Set signals to ensure it'll work
     tb.dut->occupancy_exec = 1;
     tb.dut->flush_needed = 1;
-
     tb.dut->reg_rd0 = 0xAAAAAAAA;
     tb.dut->reg_rd1 = 0x55555555;
-
     tb.dut->dec_rs1 = 0x1F;
     tb.dut->dec_rs2 = 0x1E;
     tb.dut->dec_rd = 0x1D;
     tb.dut->dec_address = 0x10001000;
+
     tb.dut->dec_opcode = opcodes_t::i_ADD;
 
-    tb.run_for(10);
+    tb.run_for(1);
 
-        tb.dut->dec_opcode = opcodes_t::i_MUL;
+    
 
-        tb.run_for(10);
+    tb.dut->dec_opcode = opcodes_t::i_MUL;
+
+tb.run_for(10);
 
     return tb.get_return();
 }
