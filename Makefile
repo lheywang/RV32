@@ -17,7 +17,6 @@ PY_SRC     := $(shell find $(UTILS) -type f -name "*.py")
 RTL_SRC    := $(shell find $(SRC_DIR)packages -type f -name "*.sv")
 RTL_SRC    += $(shell find $(SRC_DIR)core -type f -name "*.sv")
 RTL_SRC    += $(shell find $(SRC_DIR)peripherals -type f -name "*.sv")
-RTL_SRC    += $(SRC_DIR)reset.sv
 RTL_SRC    += $(SRC_DIR)rv32.sv
 
 MEM_SRC    += $(shell find $(SRC_DIR)memory -type f -name "*.v")
