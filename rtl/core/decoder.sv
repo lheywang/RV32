@@ -34,7 +34,7 @@ module decoder (
     output logic     [      (XLEN - 1) : 0] o_address,
     output opcodes_t                        opcode,
     output logic                            illegal,
-    output logic decoded_cnt
+    output logic                            decoded_cnt
 );
 
     /*
@@ -385,7 +385,7 @@ module decoder (
     end
 
     assign illegal = r_decoder_illegal | dec_illegal2;
-    assign o_busy  = i_busy;
+    assign o_busy = i_busy;
     assign decoded_cnt = ~(illegal & o_busy);
 
 endmodule

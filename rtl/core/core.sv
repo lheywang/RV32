@@ -17,8 +17,8 @@ import core_config_pkg::opcodes_t;
 
 module core (
 
-    input logic clk,
-    input logic i_rst_n,
+    input  logic clk,
+    input  logic i_rst_n,
     output logic o_rst_n,
 
     // Program ROM IF
@@ -55,8 +55,8 @@ module core (
     /*
      *  BPU
      */
-    logic [(XLEN - 1) : 0] if_addr; // Used as output address.
-    logic bpu_branch_taken; // Show if the branch was predicted as taken or not.
+    logic [(XLEN - 1) : 0] if_addr;  // Used as output address.
+    logic bpu_branch_taken;  // Show if the branch was predicted as taken or not.
     logic [(XLEN - 1) : 0] bpu_write_addr;
     logic bpu_write;
     logic bpu_flush;
@@ -64,8 +64,8 @@ module core (
     /*
      *  Delay lines
      */
-    logic [(XLEN - 1) : 0] del_addr; // From if_addr to dec_i_addr;
-    logic del_branch_taken; // Show if the branch was predicted as taken or not.
+    logic [(XLEN - 1) : 0] del_addr;  // From if_addr to dec_i_addr;
+    logic del_branch_taken;  // Show if the branch was predicted as taken or not.
 
     /*
      *  Endianness corrections
@@ -102,14 +102,14 @@ module core (
      *  Instantiating modules for system wide 
      */
     clock clk_gen (
-        .clk (clk),
-        .rst_n (o_rst_n),
-        .clk_en (clk_en)
+        .clk(clk),
+        .rst_n(o_rst_n),
+        .clk_en(clk_en)
     );
 
     reset reset (
-        .clk (clk),
-        .rst_in (i_rst_n),
+        .clk(clk),
+        .rst_in(i_rst_n),
         .rst_out(o_rst_n)
     );
 
@@ -117,32 +117,32 @@ module core (
      *  Instantiating modules for the core
      */
     pcounter PC (
-        .clk (clk),
-        .clk_en (clk_en),
-        .rst_n (o_rst_n),
-        .enable (commit_enable),
-        .load (commit_write),
-        .load2 (bpu_write),
-        .loaded (commit_addr),
-        .loaded2 (bpu_write_addr),
-        .ovf (pc_ovf),
-        .address (pc_addr)
+        .clk(clk),
+        .clk_en(clk_en),
+        .rst_n(o_rst_n),
+        .enable(commit_enable),
+        .load(commit_write),
+        .load2(bpu_write),
+        .loaded(commit_addr),
+        .loaded2(bpu_write_addr),
+        .ovf(pc_ovf),
+        .address(pc_addr)
     );
 
     prediction BPU (
-        .clk (clk),
-        .rst_n (o_rst_n),
-        .predict_ok (alu_branch_taken),
-        .mispredict (alu_branch_not_taken),
-        .addr_in (pc_addr),
-        .addr_out (if_addr),
+        .clk(clk),
+        .rst_n(o_rst_n),
+        .predict_ok(alu_branch_taken),
+        .mispredict(alu_branch_not_taken),
+        .addr_in(pc_addr),
+        .addr_out(if_addr),
         .rom_flush(bpu_flush),
-        .PC_value (bpu_write_addr),
+        .PC_value(bpu_write_addr),
         .PC_write(bpu_write),
-        .actual_addr (dec_addr),
-        .actual_imm (dec_imm),
-        .actual_instr (dec_opcode),
-        .bpu_branch_taken (bpu_branch_taken)
+        .actual_addr(dec_addr),
+        .actual_imm(dec_imm),
+        .actual_instr(dec_opcode),
+        .bpu_branch_taken(bpu_branch_taken)
     );
 
 
@@ -154,21 +154,21 @@ module core (
     delay #(
         .WIDTH(XLEN)
     ) instr_delay (
-        .clk (clk),
-        .clk_en (clk_en),
-        .rst_n (o_rst_n),
-        .din (if_addr),
-        .dout (del_addr)
+        .clk(clk),
+        .clk_en(clk_en),
+        .rst_n(o_rst_n),
+        .din(if_addr),
+        .dout(del_addr)
     );
 
     delay #(
         .WIDTH(1)
     ) branch_delay (
-        .clk (clk),
-        .clk_en (clk_en),
-        .rst_n (o_rst_n),
-        .din (bpu_branch_taken),
-        .dout (del_branch_taken)
+        .clk(clk),
+        .clk_en(clk_en),
+        .rst_n(o_rst_n),
+        .din(bpu_branch_taken),
+        .dout(del_branch_taken)
     );
 
     /*
@@ -179,67 +179,67 @@ module core (
      */
     endianess if_endian (
         .in (instr),
-        .out (cor_instr)
+        .out(cor_instr)
     );
 
     /*
      *  Adding the decoder
      */
     decoder DEC (
-        .clk (clk),
-        .clk_en (clk_en),
-        .rst_n (o_rst_n),
-        .instruction (cor_instr),
-        .i_address (del_addr),
-        .i_busy (exec_busy),
-        .o_busy (dec_busy),
-        .rs1 (dec_rs1),
-        .rs2 (dec_rs2),
-        .rd (dec_rd),
-        .imm (dec_imm),
-        .o_address (dec_addr),
-        .opcode (dec_opcode),
-        .illegal (dec_illegal),
-        .decoded_cnt (dec_decoded)
+        .clk(clk),
+        .clk_en(clk_en),
+        .rst_n(o_rst_n),
+        .instruction(cor_instr),
+        .i_address(del_addr),
+        .i_busy(exec_busy),
+        .o_busy(dec_busy),
+        .rs1(dec_rs1),
+        .rs2(dec_rs2),
+        .rd(dec_rd),
+        .imm(dec_imm),
+        .o_address(dec_addr),
+        .opcode(dec_opcode),
+        .illegal(dec_illegal),
+        .decoded_cnt(dec_decoded)
     );
 
     /*
      *  Finally, adding the whole execution logic
      */
     assembly_alu ALUS (
-        .clk (clk),
-        .clk_en (clk_en),
+        .clk(clk),
+        .clk_en(clk_en),
         .rst_n(o_rst_n),
 
-        .rs1 (dec_rs1),
-        .rs2 (dec_rs2),
-        .rd (dec_rd),
-        .imm (dec_imm),
-        .address (dec_addr),
-        .opcode (dec_opcode),
-        .illegal (dec_illegal),
-        .busy (exec_busy),
-        .flush (exec_flush),
-        .branch_taken (del_branch_taken),
-        .count_decoded (dec_decoded),
+        .rs1(dec_rs1),
+        .rs2(dec_rs2),
+        .rd(dec_rd),
+        .imm(dec_imm),
+        .address(dec_addr),
+        .opcode(dec_opcode),
+        .illegal(dec_illegal),
+        .busy(exec_busy),
+        .flush(exec_flush),
+        .branch_taken(del_branch_taken),
+        .count_decoded(dec_decoded),
 
         .PC_ovf (pc_ovf),
-        .PC_en (commit_enable),
-        .PC_load (commit_write),
-        .PC_addr (commit_addr),
+        .PC_en  (commit_enable),
+        .PC_load(commit_write),
+        .PC_addr(commit_addr),
 
-        .mem_addr (mem_addr),
+        .mem_addr(mem_addr),
         .mem_byteen(mem_byteen),
-        .mem_we (mem_we),
-        .mem_req (mem_req),
-        .mem_wdata (cor_mem_wdata),
-        .mem_rdata (cor_mem_rdata),
-        .mem_err (mem_err),
+        .mem_we(mem_we),
+        .mem_req(mem_req),
+        .mem_wdata(cor_mem_wdata),
+        .mem_rdata(cor_mem_rdata),
+        .mem_err(mem_err),
 
-        .bpu_branch_taken (alu_branch_taken),
-        .bpu_branch_not_taken (alu_branch_not_taken),
+        .bpu_branch_taken(alu_branch_taken),
+        .bpu_branch_not_taken(alu_branch_not_taken),
 
-        .interrupt_vect (interrupt_vect)
+        .interrupt_vect(interrupt_vect)
     );
 
     /*
@@ -248,12 +248,12 @@ module core (
      */
     endianess mem_read_cor (
         .in (mem_rdata),
-        .out (cor_mem_rdata)
+        .out(cor_mem_rdata)
     );
 
     endianess mem_write_cor (
         .in (cor_mem_wdata),
-        .out (mem_wdata)
+        .out(mem_wdata)
     );
 
     /*

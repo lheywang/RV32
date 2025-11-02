@@ -30,7 +30,7 @@ module prediction (
     input  logic     [(core_config_pkg::XLEN - 1) : 0] actual_addr,
     input  logic     [(core_config_pkg::XLEN - 1) : 0] actual_imm,
     input  opcodes_t                                   actual_instr,
-    output logic bpu_branch_taken
+    output logic                                       bpu_branch_taken
 
 );
 
@@ -88,8 +88,8 @@ module prediction (
             // First, unconditionnal jumps (always taken)
             core_config_pkg::i_JAL, core_config_pkg::i_JALR: begin
 
-                next_addr      = $signed(actual_addr) + $signed(actual_imm);
-                updated_needed = 1'b1;
+                next_addr        = $signed(actual_addr) + $signed(actual_imm);
+                updated_needed   = 1'b1;
                 bpu_branch_taken = 1'b0;
 
             end
@@ -104,14 +104,14 @@ module prediction (
 
                 next_addr = $signed(actual_addr) + $signed(actual_imm);
                 updated_needed  = counter[core_config_pkg::BPU_BITS_NB - 1]; // Look for the MSB if needed
-                bpu_branch_taken = counter[core_config_pkg::BPU_BITS_NB - 1];
+                bpu_branch_taken = counter[core_config_pkg::BPU_BITS_NB-1];
 
             end
 
             default: begin
 
-                next_addr      = '0;
-                updated_needed = 1'b0;
+                next_addr        = '0;
+                updated_needed   = 1'b0;
                 bpu_branch_taken = 1'b0;
 
             end

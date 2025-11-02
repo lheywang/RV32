@@ -287,8 +287,8 @@ module assembly_alu (
         .flush_needed(int_flush),
 
         .halt_pending(halt_pend),
-        .commit_err  (commit_err),
-        .PC_ovf (PC_ovf)
+        .commit_err(commit_err),
+        .PC_ovf(PC_ovf)
     );
 
     /*
