@@ -34,7 +34,7 @@ FILE_LIST = $(BUILD_DIR)sources.f
 VERILATOR_FLAGS = -Wall \
 				  --trace \
 				  -j $(NPROC) \
-				  --cc -f $(FILE_LIST) $(VERILATOR_CFG) \
+				  --cc $(VERILATOR_CFG) -f $(FILE_LIST) \
 				  -O3 \
 				  --top-module $(TOP) \
 				  --exe $(TB_TOP) $(CCX_UTILS) \

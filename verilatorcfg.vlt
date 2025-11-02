@@ -3,3 +3,10 @@
 lint_off -file "rtl/memory/behavioral/altera_mf.v"
 lint_off -file "rtl/memory/rom/rom.v"
 lint_off -file "rtl/memory/ram/ram.v"
+
+lint_off -rule MULTIDRIVEN -file "rtl/memory/behavioral/altera_mf.v"
+lint_off -rule UNOPTFLAT -file "rtl/memory/behavioral/altera_mf.v"
+lint_off -rule MULTIDRIVEN -file "rtl/memory/rom/rom.v"
+lint_off -rule UNOPTFLAT -file "rtl/memory/rom/rom.v"
+lint_off -rule MULTIDRIVEN -file "rtl/memory/ram/ram.v"
+lint_off -rule UNOPTFLAT -file "rtl/memory/ram/ram.v"
