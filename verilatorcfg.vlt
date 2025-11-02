@@ -1,4 +1,5 @@
 `verilator_config
+
 lint_off -file "rtl/memory/behavioral/altera_mf.v"
-lint_off -rule PINCONNECTEMPTY -file "rtl/memory/rom/rom.v"
-lint_off -rule PINCONNECTEMPTY -file "rtl/memory/ram/ram.v"
+lint_off -file "rtl/memory/rom/rom.v"
+lint_off -file "rtl/memory/ram/ram.v"
