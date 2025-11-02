@@ -40,6 +40,7 @@ module assembly_alu (
     output logic PC_en,
     output logic PC_load,
     output logic [(XLEN - 1) : 0] PC_addr,
+    input logic PC_ovf,
 
     // memory interface
     output logic [      (XLEN - 1) : 0] mem_addr,
@@ -286,7 +287,8 @@ module assembly_alu (
         .flush_needed(int_flush),
 
         .halt_pending(halt_pend),
-        .commit_err  (commit_err)
+        .commit_err  (commit_err),
+        .PC_ovf (PC_ovf)
     );
 
     /*

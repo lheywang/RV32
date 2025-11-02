@@ -29,7 +29,8 @@ module prediction (
     output logic                                       PC_write,
     input  logic     [(core_config_pkg::XLEN - 1) : 0] actual_addr,
     input  logic     [(core_config_pkg::XLEN - 1) : 0] actual_imm,
-    input  opcodes_t                                   actual_instr
+    input  opcodes_t                                   actual_instr,
+    output logic bpu_branch_taken
 
 );
 
@@ -89,6 +90,7 @@ module prediction (
 
                 next_addr      = $signed(actual_addr) + $signed(actual_imm);
                 updated_needed = 1'b1;
+                bpu_branch_taken = 1'b0;
 
             end
 
@@ -102,6 +104,7 @@ module prediction (
 
                 next_addr = $signed(actual_addr) + $signed(actual_imm);
                 updated_needed  = counter[core_config_pkg::BPU_BITS_NB - 1]; // Look for the MSB if needed
+                bpu_branch_taken = counter[core_config_pkg::BPU_BITS_NB - 1];
 
             end
 
@@ -109,6 +112,7 @@ module prediction (
 
                 next_addr      = '0;
                 updated_needed = 1'b0;
+                bpu_branch_taken = 1'b0;
 
             end
 

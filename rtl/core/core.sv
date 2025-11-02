@@ -23,7 +23,7 @@ module core (
 
     // Program ROM IF
     input logic [(XLEN - 1) : 0] instr,
-    output logic [(XLEN - 1) : 0] addr,
+    output logic [(XLEN - 1) : 0] rom_addr,
     output logic flush,
     output logic enable,
     output logic rden,
@@ -80,7 +80,6 @@ module core (
     opcodes_t dec_opcode;
     logic dec_illegal;
     logic [(XLEN - 1) : 0] dec_imm;
-    logic dec_branch_taken;
     logic [(REG_ADDR_W - 1) : 0] dec_rs1;
     logic [(REG_ADDR_W - 1) : 0] dec_rs2;
     logic [(REG_ADDR_W - 1) : 0] dec_rd;
@@ -142,7 +141,8 @@ module core (
         .PC_write(bpu_write),
         .actual_addr (dec_addr),
         .actual_imm (dec_imm),
-        .actual_instr (dec_opcode)
+        .actual_instr (dec_opcode),
+        .bpu_branch_taken (bpu_branch_taken)
     );
 
 
@@ -167,7 +167,7 @@ module core (
         .clk (clk),
         .clk_en (clk_en),
         .rst_n (o_rst_n),
-        .din (1'b0),
+        .din (bpu_branch_taken),
         .dout (del_branch_taken)
     );
 
@@ -199,7 +199,8 @@ module core (
         .imm (dec_imm),
         .o_address (dec_addr),
         .opcode (dec_opcode),
-        .illegal (dec_illegal)
+        .illegal (dec_illegal),
+        .decoded_cnt (dec_decoded)
     );
 
     /*
@@ -217,11 +218,12 @@ module core (
         .address (dec_addr),
         .opcode (dec_opcode),
         .illegal (dec_illegal),
-        .busy (dec_busy),
+        .busy (exec_busy),
         .flush (exec_flush),
         .branch_taken (del_branch_taken),
         .count_decoded (dec_decoded),
 
+        .PC_ovf (pc_ovf),
         .PC_en (commit_enable),
         .PC_load (commit_write),
         .PC_addr (commit_addr),
@@ -253,5 +255,15 @@ module core (
         .in (cor_mem_wdata),
         .out (mem_wdata)
     );
+
+    /*
+     *  Statics IO of the module
+     */
+
+    assign rom_addr = if_addr;
+    assign flush = bpu_flush | exec_flush;
+    assign enable = ~dec_busy;
+    assign rden = 1'b1;
+
 
 endmodule
