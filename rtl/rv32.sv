@@ -16,7 +16,7 @@ module rv32 (
 
     // Standard IOs
     input logic clk,
-    input logic rst_in,
+    input logic rst_n,
 
     // Add here your peripherals outputs if needed :)
     input logic [(core_config_pkg::XLEN - 1) : 0] interrupt_vect
@@ -26,7 +26,7 @@ module rv32 (
     /*
      *  Internal global signals
      */
-    logic                    rst_n;
+    logic                    int_rst_n;
 
     /*
      *  ROM signals
@@ -49,7 +49,7 @@ module rv32 (
     logic                    mem_we;
     logic                    mem_req;
     logic [  (XLEN - 1) : 0] mem_wdata;
-    /* verilator lint_off MULTIDRIVEN */ // Theses signals are behind tri-state drivers, but verilator does not know that.
+    /* verilator lint_off MULTIDRIVEN */ // Thesesignals are behind tri-state drivers, but verilator does not know that.
     logic [  (XLEN - 1) : 0] mem_rdata;
     /* verilator lint_on MULTIDRIVEN */
     logic                    mem_err;
@@ -59,10 +59,10 @@ module rv32 (
        */
     core riscv (
         .clk(clk),
-        .i_rst_n(rst_in),
-        .o_rst_n(rst_n),
+        .i_rst_n(rst_n),
+        .o_rst_n(int_rst_n),
 
-        .instr(rom_instr),
+        .instr(rom_instr), s
         .rom_addr(rom_addr),
         .flush(rom_flush),
         .enable(rom_enable),
@@ -86,7 +86,7 @@ module rv32 (
      *  shall not differ too much from one to the other.
      */
     ram RAM0 (
-        .aclr(~rst_n),
+        .aclr(~int_rst_n),
         .byteena_a(mem_byteen),
         .clock(clk),
         .enable(1'b1),
