@@ -1,0 +1,7 @@
+# Config file for the branch preduction unit
+
+[bpu]
+
+# Changing this value will GREATLY change the branch prediction unit behavior
+# One of the "optimal" value is near 2.
+bpu_bits_nb = 2

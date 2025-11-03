@@ -1,0 +1,9 @@
+# Config file for the different includes files into the main one
+# We only need the key name to be present
+
+[includes]
+
+generated_opcodes.svh = 1
+generated_decoders.svh = 1
+generated_csr.svh = 1
+generated_commands.svh = 1

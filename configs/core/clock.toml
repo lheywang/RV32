@@ -1,0 +1,11 @@
+# Config file for the clocks and resets
+
+[clock]
+
+ref_clk_freq = 50_000_000
+core_clk_freq = 200_000_000
+core_clk_duty = 50
+
+[reset]
+
+rst_tick_cnt = 8

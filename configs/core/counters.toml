@@ -1,0 +1,6 @@
+# Config file for the performance counters
+
+[counters]
+
+perf_cnt_len = 64
+perf_cnt_inc = 1
