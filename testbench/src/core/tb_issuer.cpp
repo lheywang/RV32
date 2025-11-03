@@ -10,7 +10,8 @@ int main(int argc, char **argv)
     Testbench<Vissuer> tb("Issuer");
     tb.reset();
 
-    unsigned int values[] = {0xAAAAAAAA, 0x55555555, 0xFFFFFFFF};
+    unsigned int values[] = {0xAAAAAAAA, 0x55555555, 1};
+    unsigned int addr = 0x10001000;
 
     // Set signals to ensure it'll work
     tb.dut->occupancy_exec = 1;
@@ -21,7 +22,7 @@ int main(int argc, char **argv)
     tb.dut->dec_rs1 = 0x1F;
     tb.dut->dec_rs2 = 0x1E;
     tb.dut->dec_rd = 0x1D;
-    tb.dut->dec_address = 0x10001000;
+    tb.dut->dec_address = addr;
 
     // Looping over each instructions :
     for (auto op : EnumRange<opcodes_t>(opcodes_t::i_NOP, opcodes_t::i_CSRRCI))
@@ -36,9 +37,9 @@ int main(int argc, char **argv)
         switch (op)
         {
         // Nothing
-        case opcodes_t::i_NOP:
-        case opcodes_t::i_FENCE:
-            break;
+        // case opcodes_t::i_NOP:
+        // case opcodes_t::i_FENCE:
+        //     break;
 
         // ALU 0 - immediates
         case opcodes_t::i_LUI:
@@ -62,9 +63,9 @@ int main(int argc, char **argv)
         alu0i_tests:
             tb.check_equality((int)tb.dut->alu0_arg0, (int)values[0], "arg0");
             tb.check_equality((int)tb.dut->alu0_arg1, (int)values[2], "arg1");
-            tb.check_equality((int)tb.dut->alu0_arg1, (int)0, "addr");
-            tb.check_equality((int)tb.dut->alu0_arg1, (int)0, "imm");
-            tb.check_equality((int)tb.dut->alu0_arg1, (int)0x1D, "rd");
+            tb.check_equality((int)tb.dut->alu0_addr, (int)addr, "addr");
+            tb.check_equality((int)tb.dut->alu0_imm, (int)values[2], "imm");
+            tb.check_equality((int)tb.dut->alu0_rd, (int)0x1D, "rd");
             break;
 
         // ALU 0 - registers based
@@ -86,9 +87,9 @@ int main(int argc, char **argv)
         alu0r_tests:
             tb.check_equality((int)tb.dut->alu0_arg0, (int)values[0], "arg0");
             tb.check_equality((int)tb.dut->alu0_arg1, (int)values[1], "arg1");
-            tb.check_equality((int)tb.dut->alu0_arg1, (int)0, "addr");
-            tb.check_equality((int)tb.dut->alu0_arg1, (int)0, "imm");
-            tb.check_equality((int)tb.dut->alu0_arg1, (int)0x1D, "rd");
+            tb.check_equality((int)tb.dut->alu0_addr, (int)addr, "addr");
+            tb.check_equality((int)tb.dut->alu0_imm, (int)values[2], "imm");
+            tb.check_equality((int)tb.dut->alu0_rd, (int)0x1D, "rd");
             break;
 
         // ALU 1 - immediates
@@ -99,11 +100,11 @@ int main(int argc, char **argv)
             tb.check_equality((int)tb.dut->alu1_cmd, (int)alu_commands_t::c_SLTU, "sltu");
 
         alu1i_tests:
-            tb.check_equality((int)tb.dut->alu0_arg0, (int)values[0], "arg0");
-            tb.check_equality((int)tb.dut->alu0_arg1, (int)values[2], "arg1");
-            tb.check_equality((int)tb.dut->alu0_arg1, (int)0, "addr");
-            tb.check_equality((int)tb.dut->alu0_arg1, (int)0, "imm");
-            tb.check_equality((int)tb.dut->alu0_arg1, (int)0x1D, "rd");
+            tb.check_equality((int)tb.dut->alu1_arg0, (int)values[0], "arg0");
+            tb.check_equality((int)tb.dut->alu1_arg1, (int)values[2], "arg1");
+            tb.check_equality((int)tb.dut->alu1_addr, (int)addr, "addr");
+            tb.check_equality((int)tb.dut->alu1_imm, (int)values[2], "imm");
+            tb.check_equality((int)tb.dut->alu1_rd, (int)0x1D, "rd");
             break;
 
         // ALU 1 - registers based
@@ -133,10 +134,10 @@ int main(int argc, char **argv)
 
         alu1r_tests:
             tb.check_equality((int)tb.dut->alu1_arg0, (int)values[0], "arg0");
-            tb.check_equality((int)tb.dut->alu1_arg1, (int)values[2], "arg1");
-            tb.check_equality((int)tb.dut->alu1_arg1, (int)0, "addr");
-            tb.check_equality((int)tb.dut->alu1_arg1, (int)0, "imm");
-            tb.check_equality((int)tb.dut->alu1_arg1, (int)0x1D, "rd");
+            tb.check_equality((int)tb.dut->alu1_arg1, (int)values[1], "arg1");
+            tb.check_equality((int)tb.dut->alu1_addr, (int)addr, "addr");
+            tb.check_equality((int)tb.dut->alu1_imm, (int)values[2], "imm");
+            tb.check_equality((int)tb.dut->alu1_rd, (int)0x1D, "rd");
             break;
 
         // ALU 2 & 3 - immediates
@@ -152,9 +153,9 @@ int main(int argc, char **argv)
         alu23i_tests:
             tb.check_equality((int)tb.dut->alu2_arg0, (int)values[0], "arg0");
             tb.check_equality((int)tb.dut->alu2_arg1, (int)values[2], "arg1");
-            tb.check_equality((int)tb.dut->alu2_arg1, (int)0, "addr");
-            tb.check_equality((int)tb.dut->alu2_arg1, (int)0, "imm");
-            tb.check_equality((int)tb.dut->alu2_arg1, (int)0x1D, "rd");
+            tb.check_equality((int)tb.dut->alu2_addr, (int)addr, "addr");
+            tb.check_equality((int)tb.dut->alu2_imm, (int)values[2], "imm");
+            tb.check_equality((int)tb.dut->alu2_rd, (int)0x1D, "rd");
             break;
 
         // ALU 2 & 3 - registers based
@@ -193,10 +194,10 @@ int main(int argc, char **argv)
 
         alu23r_tests:
             tb.check_equality((int)tb.dut->alu2_arg0, (int)values[0], "arg0");
-            tb.check_equality((int)tb.dut->alu2_arg1, (int)values[2], "arg1");
-            tb.check_equality((int)tb.dut->alu2_arg1, (int)0, "addr");
-            tb.check_equality((int)tb.dut->alu2_arg1, (int)0, "imm");
-            tb.check_equality((int)tb.dut->alu2_arg1, (int)0x1D, "rd");
+            tb.check_equality((int)tb.dut->alu2_arg1, (int)values[1], "arg1");
+            tb.check_equality((int)tb.dut->alu2_addr, (int)addr, "addr");
+            tb.check_equality((int)tb.dut->alu2_imm, (int)values[2], "imm");
+            tb.check_equality((int)tb.dut->alu2_rd, (int)0x1D, "rd");
             break;
 
         // ALU 4 - immediates
@@ -212,9 +213,9 @@ int main(int argc, char **argv)
         alu4i_tests:
             tb.check_equality((int)tb.dut->alu4_arg0, (int)values[0], "arg0");
             tb.check_equality((int)tb.dut->alu4_arg1, (int)values[2], "arg1");
-            tb.check_equality((int)tb.dut->alu4_arg1, (int)0, "addr");
-            tb.check_equality((int)tb.dut->alu4_arg1, (int)0, "imm");
-            tb.check_equality((int)tb.dut->alu4_arg1, (int)0x1D, "rd");
+            tb.check_equality((int)tb.dut->alu4_addr, (int)addr, "addr");
+            tb.check_equality((int)tb.dut->alu4_imm, (int)values[2], "imm");
+            tb.check_equality((int)tb.dut->alu4_rd, (int)0x1D, "rd");
             break;
 
         // ALU 4 - registers based
@@ -229,10 +230,10 @@ int main(int argc, char **argv)
 
         alu4r_tests:
             tb.check_equality((int)tb.dut->alu4_arg0, (int)values[0], "arg0");
-            tb.check_equality((int)tb.dut->alu4_arg1, (int)values[2], "arg1");
-            tb.check_equality((int)tb.dut->alu4_arg1, (int)0, "addr");
-            tb.check_equality((int)tb.dut->alu4_arg1, (int)0, "imm");
-            tb.check_equality((int)tb.dut->alu4_arg1, (int)0x1D, "rd");
+            tb.check_equality((int)tb.dut->alu4_arg1, (int)values[1], "arg1");
+            tb.check_equality((int)tb.dut->alu4_addr, (int)addr, "addr");
+            tb.check_equality((int)tb.dut->alu4_imm, (int)values[2], "imm");
+            tb.check_equality((int)tb.dut->alu4_rd, (int)0x1D, "rd");
             break;
 
         // ALU 5
@@ -262,10 +263,10 @@ int main(int argc, char **argv)
 
         alu5r_tests:
             tb.check_equality((int)tb.dut->alu5_arg0, (int)values[0], "arg0");
-            tb.check_equality((int)tb.dut->alu5_arg1, (int)values[2], "arg1");
-            tb.check_equality((int)tb.dut->alu5_arg1, (int)0, "addr");
-            tb.check_equality((int)tb.dut->alu5_arg1, (int)0, "imm");
-            tb.check_equality((int)tb.dut->alu5_arg1, (int)0x1D, "rd");
+            tb.check_equality((int)tb.dut->alu5_arg1, (int)values[1], "arg1");
+            tb.check_equality((int)tb.dut->alu5_addr, (int)addr, "addr");
+            tb.check_equality((int)tb.dut->alu5_imm, (int)values[2], "imm");
+            tb.check_equality((int)tb.dut->alu5_rd, (int)0x1D, "rd");
             break;
 
         default:

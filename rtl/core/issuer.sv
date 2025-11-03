@@ -244,7 +244,7 @@ module issuer (
             core_config_pkg::i_BGE,
             core_config_pkg::i_BLTU,
             core_config_pkg::i_BGEU :
-            next_alu = ALU0;
+            next_alu = ALU1;
 
 
             /*
@@ -294,7 +294,7 @@ module issuer (
             core_config_pkg::i_SB,
             core_config_pkg::i_SH,
             core_config_pkg::i_SW :
-            next_alu = ALU4;
+            next_alu = ALU5;
 
             // Ucode :
             core_config_pkg::i_ECALL, core_config_pkg::i_EBREAK, core_config_pkg::i_MRET: begin
@@ -555,19 +555,6 @@ module issuer (
                     prog_enabled <= 1'b1;
 
                 end else begin
-
-                    alu2_arg0 <= '0;
-                    alu2_arg1 <= '0;
-                    alu2_addr <= '0;
-                    alu2_imm <= '0;
-                    alu2_cmd <= core_config_pkg::c_NONE;
-                    alu2_rd <= '0;
-                    alu3_arg0 <= '0;
-                    alu3_arg1 <= '0;
-                    alu3_addr <= '0;
-                    alu3_imm <= '0;
-                    alu3_cmd <= core_config_pkg::c_NONE;
-                    alu3_rd <= '0;
 
                     prog_enabled <= 1'b0;
 
