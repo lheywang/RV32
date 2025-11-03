@@ -171,8 +171,6 @@ def generate_systemverilog(enums, output_path):
     with open(output_path, "w") as f:
         f.write("\n".join(lines))
 
-    print(f"Generated SystemVerilog: {output_path}")
-
 
 def generate_cpp(enums, output_path):
     """Generate C++ header file."""
@@ -217,8 +215,6 @@ def generate_cpp(enums, output_path):
 
     with open(output_path, "w") as f:
         f.write("\n".join(lines))
-
-    print(f"Generated C++: {output_path}")
 
 
 def main():
@@ -277,7 +273,6 @@ Usage example:
 
         generate_systemverilog(enums, args.systemverilog)
         generate_cpp(enums, args.cpp)
-        print(f"✓ Successfully generated {len(enums)} enum(s)")
 
     except FileNotFoundError:
         print(f"Error: File not found: {args.definition_file}", file=sys.stderr)
