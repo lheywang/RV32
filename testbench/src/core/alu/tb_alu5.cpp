@@ -198,6 +198,7 @@ int main(int argc, char **argv)
     {
         tb.dut->cmd = 30;
 
+        tb.tick();
         tb.check_equality((unsigned int)tb.dut->o_error, (unsigned int)1, "Read-o_error");
 
         tb.clear();

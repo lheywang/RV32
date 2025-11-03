@@ -236,6 +236,7 @@ module alu5 (
         end else begin
 
             state <= next_state;
+            r_err   <= mem_err;
 
             if (state == IDLE) begin
 
@@ -250,8 +251,7 @@ module alu5 (
             end else if (state == WAIT) begin
 
                 r_data2 <= data2;
-                r_err   <= mem_err;
-
+                
             end
         end
     end
@@ -297,7 +297,7 @@ module alu5 (
                 res        = 32'b0;
                 o_rd       = 5'b0;
                 valid      = 1'b0;
-                o_error    = 1'b0;
+                o_error    = r_err;
                 req        = 1'b0;
                 busy       = 1'b0;
 
@@ -317,7 +317,7 @@ module alu5 (
                 res        = 32'b0;
                 o_rd       = 5'b0;
                 valid      = 1'b0;
-                o_error    = 1'b0;
+                o_error    = r_err;
                 req        = 1'b0;
                 busy       = 1'b1;
 
@@ -337,7 +337,7 @@ module alu5 (
                 res        = 32'b0;
                 o_rd       = r_rd;
                 valid      = 1'b0;
-                o_error    = 1'b0;
+                o_error    = r_err;
                 req        = 1'b0;
                 busy       = 1'b1;
 
