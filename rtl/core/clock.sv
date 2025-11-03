@@ -11,9 +11,9 @@
 
 `timescale 1ns / 1ps
 
-import core_config_pkg::REF_CLK_FREQ;
-import core_config_pkg::CORE_CLK_FREQ;
-import core_config_pkg::CORE_CLK_DUTY;
+import core_config_pkg::CLK_DIV_MAX;
+import core_config_pkg::CLK_DIV_THRES;
+import core_config_pkg::CLK_DIV_WIDTH;
 
 module clock (
     input  logic clk,
@@ -21,12 +21,8 @@ module clock (
     output logic clk_en
 );
 
-    // Defining parameters :
-    localparam int max = (REF_CLK_FREQ / CORE_CLK_FREQ) - 1;
-    localparam int thres = (max * CORE_CLK_DUTY) / 100 + 1;
-
     // Storages signals
-    logic [$clog2(max):0] cnt;
+    logic [CLK_DIV_WIDTH:0] cnt;
 
     always_ff @(posedge clk or negedge rst_n) begin
 
@@ -38,7 +34,7 @@ module clock (
         end else begin
 
             // Handle counter evolution
-            if (cnt >= logic'(max)) begin
+            if (cnt >= CLK_DIV_MAX[CLK_DIV_WIDTH:0]) begin
 
                 cnt <= 0;
 
@@ -49,7 +45,7 @@ module clock (
             end
 
             // Handle output state
-            if (cnt < logic'(thres)) begin
+            if (cnt < CLK_DIV_THRES[CLK_DIV_WIDTH:0]) begin
 
                 clk_en <= 1;
 

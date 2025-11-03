@@ -155,12 +155,12 @@ module shift (
                 next_shift_left = r_shift_left;
                 next_arithmetic = r_arithmetic;
 
-                step = (r_remaining > core_config_pkg::MAX_SHIFT_PER_CYCLE) ? 
-                        core_config_pkg::MAX_SHIFT_PER_CYCLE : 
+                step = (r_remaining > MAX_SHIFT_PER_CYCLE[SHIFT_SIZE : 0]) ? 
+                        MAX_SHIFT_PER_CYCLE [SHIFT_SIZE : 0] : 
                         r_remaining;
 
-                next_remaining  = (r_remaining > core_config_pkg::MAX_SHIFT_PER_CYCLE) ? 
-                        (r_remaining - core_config_pkg::MAX_SHIFT_PER_CYCLE) :
+                next_remaining  = (r_remaining > MAX_SHIFT_PER_CYCLE[SHIFT_SIZE : 0]) ? 
+                        (r_remaining - MAX_SHIFT_PER_CYCLE[SHIFT_SIZE : 0]) :
                         (0);
 
                 unique case ({
