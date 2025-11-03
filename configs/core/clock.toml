@@ -4,6 +4,7 @@
 
 ref_clk_freq = 50_000_000
 core_clk_freq = 200_000_000
+cycle_clk_freq = 100_000_000
 core_clk_duty = 50
 
 [reset]
