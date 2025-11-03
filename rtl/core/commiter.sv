@@ -25,6 +25,7 @@ module commiter (
     input  logic                                         alu0_valid,
     /* verilator lint_off UNUSEDSIGNAL */
     input  logic                                         alu0_req,
+    input  logic [      (core_config_pkg::XLEN - 1) : 0] alu0_jmp,
     /* verilator lint_on UNUSEDSIGNAL */
     input  logic [      (core_config_pkg::XLEN - 1) : 0] alu0_res,
     input  logic [(core_config_pkg::REG_ADDR_W - 1) : 0] alu0_rd,
@@ -33,12 +34,14 @@ module commiter (
     input  logic                                         alu1_valid,
     input  logic                                         alu1_req,
     input  logic [      (core_config_pkg::XLEN - 1) : 0] alu1_res,
+    input  logic [      (core_config_pkg::XLEN - 1) : 0] alu1_jmp,
     input  logic [(core_config_pkg::REG_ADDR_W - 1) : 0] alu1_rd,
     output logic                                         alu1_clear,
     input  logic                                         alu2_error,
     input  logic                                         alu2_valid,
     /* verilator lint_off UNUSEDSIGNAL */
     input  logic                                         alu2_req,
+    input  logic [      (core_config_pkg::XLEN - 1) : 0] alu2_jmp,
     /* verilator lint_on UNUSEDSIGNAL */
     input  logic [      (core_config_pkg::XLEN - 1) : 0] alu2_res,
     input  logic [(core_config_pkg::REG_ADDR_W - 1) : 0] alu2_rd,
@@ -47,6 +50,7 @@ module commiter (
     input  logic                                         alu3_valid,
     /* verilator lint_off UNUSEDSIGNAL */
     input  logic                                         alu3_req,
+    input  logic [      (core_config_pkg::XLEN - 1) : 0] alu3_jmp,
     /* verilator lint_on UNUSEDSIGNAL */
     input  logic [      (core_config_pkg::XLEN - 1) : 0] alu3_res,
     input  logic [(core_config_pkg::REG_ADDR_W - 1) : 0] alu3_rd,
@@ -55,6 +59,7 @@ module commiter (
     input  logic                                         alu4_valid,
     /* verilator lint_off UNUSEDSIGNAL */
     input  logic                                         alu4_req,
+    input  logic [      (core_config_pkg::XLEN - 1) : 0] alu4_jmp,
     /* verilator lint_on UNUSEDSIGNAL */
     input  logic [      (core_config_pkg::XLEN - 1) : 0] alu4_res,
     input  logic [(core_config_pkg::REG_ADDR_W - 1) : 0] alu4_rd,
@@ -63,6 +68,7 @@ module commiter (
     input  logic                                         alu5_valid,
     /* verilator lint_off UNUSEDSIGNAL */
     input  logic                                         alu5_req,
+    input  logic [      (core_config_pkg::XLEN - 1) : 0] alu5_jmp,
     /* verilator lint_on UNUSEDSIGNAL */
     input  logic [      (core_config_pkg::XLEN - 1) : 0] alu5_res,
     input  logic [(core_config_pkg::REG_ADDR_W - 1) : 0] alu5_rd,
@@ -138,7 +144,7 @@ module commiter (
                 reg_addr     = (alu1_req) ? '0 : alu1_rd;
                 reg_we       = (alu1_req) ? 1'b0 : 1'b1;
 
-                pc_value     = (alu1_req) ? alu1_res : '0;
+                pc_value     = (alu1_req) ? alu1_jmp : '0;
                 pc_we        = (alu1_req) ? 1'b1 : 1'b0;
                 issuer_flush = (alu1_req) ? 1'b1 : 1'b0;
 

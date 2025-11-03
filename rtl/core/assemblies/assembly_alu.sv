@@ -137,36 +137,42 @@ module assembly_alu (
     logic                                 alu0_valid;
     logic                                 alu0_req;
     logic          [      (XLEN - 1) : 0] alu0_res;
+    logic          [      (XLEN - 1) : 0] alu0_jmp;
     logic          [(REG_ADDR_W - 1) : 0] alu0_o_rd;
     logic                                 alu0_clear;
     logic                                 alu1_o_error;
     logic                                 alu1_valid;
     logic                                 alu1_req;
     logic          [      (XLEN - 1) : 0] alu1_res;
+    logic          [      (XLEN - 1) : 0] alu1_jmp;
     logic          [(REG_ADDR_W - 1) : 0] alu1_o_rd;
     logic                                 alu1_clear;
     logic                                 alu2_o_error;
     logic                                 alu2_valid;
     logic                                 alu2_req;
     logic          [      (XLEN - 1) : 0] alu2_res;
+    logic          [      (XLEN - 1) : 0] alu2_jmp;
     logic          [(REG_ADDR_W - 1) : 0] alu2_o_rd;
     logic                                 alu2_clear;
     logic                                 alu3_o_error;
     logic                                 alu3_valid;
     logic                                 alu3_req;
     logic          [      (XLEN - 1) : 0] alu3_res;
+    logic          [      (XLEN - 1) : 0] alu3_jmp;
     logic          [(REG_ADDR_W - 1) : 0] alu3_o_rd;
     logic                                 alu3_clear;
     logic                                 alu4_o_error;
     logic                                 alu4_valid;
     logic                                 alu4_req;
     logic          [      (XLEN - 1) : 0] alu4_res;
+    logic          [      (XLEN - 1) : 0] alu4_jmp;
     logic          [(REG_ADDR_W - 1) : 0] alu4_o_rd;
     logic                                 alu4_clear;
     logic                                 alu5_o_error;
     logic                                 alu5_valid;
     logic                                 alu5_req;
     logic          [      (XLEN - 1) : 0] alu5_res;
+    logic          [      (XLEN - 1) : 0] alu5_jmp;
     logic          [(REG_ADDR_W - 1) : 0] alu5_o_rd;
     logic                                 alu5_clear;
 
@@ -350,6 +356,7 @@ module assembly_alu (
         .busy(alu0_busy),
         .i_error(alu0_i_error),
         .res(alu0_res),
+        .jmp(alu0_jmp),
         .o_rd(alu0_o_rd),
         .valid(alu0_valid),
         .o_error(alu0_o_error),
@@ -372,6 +379,7 @@ module assembly_alu (
         .predict_ok(bpu_branch_taken),
         .mispredict(bpu_branch_not_taken),
         .res(alu1_res),
+        .jmp(alu1_jmp),
         .o_rd(alu1_o_rd),
         .valid(alu1_valid),
         .o_error(alu1_o_error),
@@ -391,6 +399,7 @@ module assembly_alu (
         .busy(alu2_busy),
         .i_error(alu2_i_error),
         .res(alu2_res),
+        .jmp(alu2_jmp),
         .o_rd(alu2_o_rd),
         .valid(alu2_valid),
         .o_error(alu2_o_error),
@@ -410,6 +419,7 @@ module assembly_alu (
         .busy(alu3_busy),
         .i_error(alu3_i_error),
         .res(alu3_res),
+        .jmp(alu3_jmp),
         .o_rd(alu3_o_rd),
         .valid(alu3_valid),
         .o_error(alu3_o_error),
@@ -429,6 +439,7 @@ module assembly_alu (
         .busy(alu4_busy),
         .i_error(alu4_i_error),
         .res(alu4_res),
+        .jmp(alu4_jmp),
         .o_rd(alu4_o_rd),
         .valid(alu4_valid),
         .o_error(alu4_o_error),
@@ -455,6 +466,7 @@ module assembly_alu (
         .busy(alu5_busy),
         .i_error(alu5_i_error),
         .res(alu5_res),
+        .jmp(alu5_jmp),
         .o_rd(alu5_o_rd),
         .valid(alu5_valid),
         .o_error(alu5_o_error),
@@ -483,6 +495,7 @@ module assembly_alu (
         .alu0_res(alu0_res),
         .alu0_rd(alu0_o_rd),
         .alu0_clear(alu0_clear),
+        .alu0_jmp(alu0_jmp),
 
         .alu1_error(alu1_o_error),
         .alu1_valid(alu1_valid),
@@ -490,6 +503,7 @@ module assembly_alu (
         .alu1_res(alu1_res),
         .alu1_rd(alu1_o_rd),
         .alu1_clear(alu1_clear),
+        .alu1_jmp(alu1_jmp),
 
         .alu2_error(alu2_o_error),
         .alu2_valid(alu2_valid),
@@ -497,6 +511,7 @@ module assembly_alu (
         .alu2_res(alu2_res),
         .alu2_rd(alu2_o_rd),
         .alu2_clear(alu2_clear),
+        .alu2_jmp(alu2_jmp),
 
         .alu3_error(alu3_o_error),
         .alu3_valid(alu3_valid),
@@ -504,6 +519,7 @@ module assembly_alu (
         .alu3_res(alu3_res),
         .alu3_rd(alu3_o_rd),
         .alu3_clear(alu3_clear),
+        .alu3_jmp(alu3_jmp),
 
         .alu4_error(alu4_o_error),
         .alu4_valid(alu4_valid),
@@ -511,6 +527,7 @@ module assembly_alu (
         .alu4_res(alu4_res),
         .alu4_rd(alu4_o_rd),
         .alu4_clear(alu4_clear),
+        .alu4_jmp(alu4_jmp),
 
         .alu5_error(alu5_o_error),
         .alu5_valid(alu5_valid),
@@ -518,6 +535,7 @@ module assembly_alu (
         .alu5_res(alu5_res),
         .alu5_rd(alu5_o_rd),
         .alu5_clear(alu5_clear),
+        .alu5_jmp(alu5_jmp),
 
         .reg_data(reg_data),
         .reg_addr(reg_addr),
