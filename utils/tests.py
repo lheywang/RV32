@@ -25,6 +25,7 @@ targets = [
     "alu5",
     "prediction",
     "commiter",
+    "issuer",
 ]
 log_dir = "logs"
 report_dir = os.path.join(log_dir, "reports")
