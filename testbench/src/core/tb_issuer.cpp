@@ -36,17 +36,28 @@ int main(int argc, char **argv)
 
         switch (op)
         {
-        // Nothing
-        // case opcodes_t::i_NOP:
-        // case opcodes_t::i_FENCE:
-        //     break;
+
+        case opcodes_t::i_NOP:
+            tb.check_equality((int)tb.dut->alu0_cmd, (int)alu_commands_t::c_ADD, "nop");
+            goto alu0_misc;
+        case opcodes_t::i_FENCE:
+            tb.check_equality((int)tb.dut->alu0_cmd, (int)alu_commands_t::c_ADD, "fence");
+            goto alu0_misc;
+
+        alu0_misc:
+            tb.check_equality((int)tb.dut->alu0_arg0, (int)values[0], "arg0");
+            tb.check_equality((int)tb.dut->alu0_arg1, (int)values[1], "arg1");
+            tb.check_equality((int)tb.dut->alu0_addr, (int)addr, "addr");
+            tb.check_equality((int)tb.dut->alu0_imm, (int)values[2], "imm");
+            tb.check_equality((int)tb.dut->alu0_rd, (int)0, "rd");
+            break;
 
         // ALU 0 - immediates
         case opcodes_t::i_LUI:
-            tb.check_equality((int)tb.dut->alu0_cmd, (int)alu_commands_t::c_ADD, "add");
+            tb.check_equality((int)tb.dut->alu0_cmd, (int)alu_commands_t::c_ADD, "lui");
             goto alu0i_tests;
         case opcodes_t::i_AUIPC:
-            tb.check_equality((int)tb.dut->alu0_cmd, (int)alu_commands_t::c_ADD, "add");
+            tb.check_equality((int)tb.dut->alu0_cmd, (int)alu_commands_t::c_ADD, "auipc");
             goto alu0i_tests;
         case opcodes_t::i_ADDI:
             tb.check_equality((int)tb.dut->alu0_cmd, (int)alu_commands_t::c_ADD, "add");
@@ -96,6 +107,12 @@ int main(int argc, char **argv)
         case opcodes_t::i_SLTI:
             tb.check_equality((int)tb.dut->alu1_cmd, (int)alu_commands_t::c_SLT, "slt");
             goto alu1i_tests;
+        case opcodes_t::i_JAL:
+            tb.check_equality((int)tb.dut->alu1_cmd, (int)alu_commands_t::c_JAL, "jal");
+            goto alu1i_tests;
+        case opcodes_t::i_JALR:
+            tb.check_equality((int)tb.dut->alu1_cmd, (int)alu_commands_t::c_JALR, "jalr");
+            goto alu1i_tests;
         case opcodes_t::i_SLTIU:
             tb.check_equality((int)tb.dut->alu1_cmd, (int)alu_commands_t::c_SLTU, "sltu");
 
@@ -128,6 +145,15 @@ int main(int argc, char **argv)
             goto alu1r_tests;
         case opcodes_t::i_BLTU:
             tb.check_equality((int)tb.dut->alu1_cmd, (int)alu_commands_t::c_BLTU, "bltu");
+            goto alu1r_tests;
+        case opcodes_t::i_MRET:
+            tb.check_equality((int)tb.dut->alu1_cmd, (int)alu_commands_t::c_MRET, "mret");
+            goto alu1r_tests;
+        case opcodes_t::i_ECALL:
+            tb.check_equality((int)tb.dut->alu1_cmd, (int)alu_commands_t::c_ECALL, "ecall");
+            goto alu1r_tests;
+        case opcodes_t::i_EBREAK:
+            tb.check_equality((int)tb.dut->alu1_cmd, (int)alu_commands_t::c_EBREAK, "ebreak");
             goto alu1r_tests;
         case opcodes_t::i_BGEU:
             tb.check_equality((int)tb.dut->alu1_cmd, (int)alu_commands_t::c_BGEU, "bgeu");

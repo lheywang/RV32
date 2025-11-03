@@ -199,10 +199,10 @@ module issuer (
         // Decide which ALU is the next : 
         unique case (r_dec_opcode)
 
-            core_config_pkg::i_NOP,
-            core_config_pkg::i_FENCE,
-            core_config_pkg::i_JAL,
-            core_config_pkg::i_JALR : begin
+            core_config_pkg::i_NOP, core_config_pkg::i_FENCE: begin
+
+                next_alu = ALU0;
+                next_alu_rd = 0; // This writeback will be ignored anyway, so not risk of executing unwanted op.
 
             end
 
@@ -220,6 +220,7 @@ module issuer (
                 arg1_imm = 1'b1;
 
             end
+
             core_config_pkg::i_ADD,
             core_config_pkg::i_SUB,
             core_config_pkg::i_OR,
@@ -230,12 +231,16 @@ module issuer (
             /*
              *  ALU 1
              */
-            core_config_pkg::i_SLTI, core_config_pkg::i_SLTIU: begin
+            core_config_pkg::i_SLTI, 
+            core_config_pkg::i_SLTIU,
+            core_config_pkg::i_JAL, 
+            core_config_pkg::i_JALR : begin
 
                 next_alu = ALU1;
                 arg1_imm = 1'b1;
 
             end
+
             core_config_pkg::i_SLT,
             core_config_pkg::i_SLTU,
             core_config_pkg::i_BEQ,
@@ -243,9 +248,14 @@ module issuer (
             core_config_pkg::i_BLT,
             core_config_pkg::i_BGE,
             core_config_pkg::i_BLTU,
-            core_config_pkg::i_BGEU :
-            next_alu = ALU1;
+            core_config_pkg::i_BGEU,
+            core_config_pkg::i_ECALL, 
+            core_config_pkg::i_EBREAK, 
+            core_config_pkg::i_MRET: begin
 
+                next_alu = ALU1;
+
+            end
 
             /*
              *  ALU 2 & 3 
@@ -280,6 +290,7 @@ module issuer (
                 arg1_imm = 1'b1;
 
             end
+
             core_config_pkg::i_CSRRW, core_config_pkg::i_CSRRS, core_config_pkg::i_CSRRC:
             next_alu = ALU4;
 
@@ -296,10 +307,6 @@ module issuer (
             core_config_pkg::i_SW :
             next_alu = ALU5;
 
-            // Ucode :
-            core_config_pkg::i_ECALL, core_config_pkg::i_EBREAK, core_config_pkg::i_MRET: begin
-
-            end
         endcase
 
         // Decide the next alu command : 
@@ -313,11 +320,8 @@ module issuer (
          */
         unique case (r_dec_opcode)
 
-            core_config_pkg::i_NOP,
-            core_config_pkg::i_FENCE,
-            core_config_pkg::i_JAL,
-            core_config_pkg::i_JALR :
-            next_alu_cmd = core_config_pkg::c_NONE;
+            // Theses instructions are treated as NOP.
+            core_config_pkg::i_NOP, core_config_pkg::i_FENCE: next_alu_cmd = core_config_pkg::c_ADD;
 
             /*
              *  ALU 0 
@@ -344,6 +348,11 @@ module issuer (
             core_config_pkg::i_BGE: next_alu_cmd = core_config_pkg::c_BGE;
             core_config_pkg::i_BLTU: next_alu_cmd = core_config_pkg::c_BLTU;
             core_config_pkg::i_BGEU: next_alu_cmd = core_config_pkg::c_BGEU;
+            core_config_pkg::i_JALR: next_alu_cmd = core_config_pkg::c_JALR;
+            core_config_pkg::i_JAL: next_alu_cmd = core_config_pkg::c_JAL;
+            core_config_pkg::i_ECALL: next_alu_cmd = core_config_pkg::c_ECALL;
+            core_config_pkg::i_EBREAK: next_alu_cmd = core_config_pkg::c_EBREAK;
+            core_config_pkg::i_MRET: next_alu_cmd = core_config_pkg::c_MRET;
 
             /*
              *  ALU 2 & 3
@@ -380,10 +389,6 @@ module issuer (
             core_config_pkg::i_SB:  next_alu_cmd = core_config_pkg::c_SB;
             core_config_pkg::i_SH:  next_alu_cmd = core_config_pkg::c_SH;
             core_config_pkg::i_SW:  next_alu_cmd = core_config_pkg::c_SW;
-
-            // Ucode :
-            core_config_pkg::i_ECALL, core_config_pkg::i_EBREAK, core_config_pkg::i_MRET:
-            next_alu_cmd = core_config_pkg::c_NONE;
 
         endcase
     end

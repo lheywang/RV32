@@ -16,6 +16,11 @@ c_BLT
 c_BGE
 c_BLTU
 c_BGEU
+c_JALR
+c_JAL
+c_ECALL
+c_EBREAK
+c_MRET
 c_SLL
 c_SRL
 c_SRA

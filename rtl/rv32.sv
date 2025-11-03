@@ -62,7 +62,7 @@ module rv32 (
         .i_rst_n(rst_n),
         .o_rst_n(int_rst_n),
 
-        .instr(rom_instr), s
+        .instr(rom_instr),
         .rom_addr(rom_addr),
         .flush(rom_flush),
         .enable(rom_enable),
