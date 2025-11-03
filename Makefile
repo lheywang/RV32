@@ -80,6 +80,7 @@ clean:
 	rm -rf logs/*.log
 	rm -rf documentation/html
 	rm -rf documentation/latex
+	rm -rf obj_dir/*
 
 tests:
 	@python utils/tests.py
