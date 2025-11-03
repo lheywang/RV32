@@ -17,7 +17,7 @@ even complex scripts that'll dynamically configure the core (even with a GUI ? )
 Since all of theses scripts are called after reading any TOML file, any defined key is 
 available by it's name on the passed dict.
 
-The script is ALWAYS defined as :
+The script always contain a function, defined as : 
 
 > def apply(config: dict) -> dict:
 >    config["mem_addr_w"] = config["xlen"]
@@ -27,6 +27,10 @@ The function shall always be named "apply", that's the one who's called.
 The function shall always accept a dict, and return a dict.
 The function could write / compute / ask the user for anything, until it remains an integer
 written to the dict.
+
+The script could be named as we want, and could even create multiple values ! In fact, we don't
+really care, they'll all be executed and dynamically loaded into the package.
+The decision to use them is took by the compiler rather than python.
 
 ## Outputs
 
