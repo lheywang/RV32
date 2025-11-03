@@ -2,6 +2,7 @@
 
 [csrs]
 csr_count = 23
+csr_addr_w = 12
 
 csr_wmask = [
     0x00007188, # MSTATUS

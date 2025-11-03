@@ -3,7 +3,7 @@
 
 [includes]
 
-generated_opcodes.svh = 1
-generated_decoders.svh = 1
-generated_csr.svh = 1
-generated_commands.svh = 1
+"generated_opcodes.svh" = 1
+"generated_decoders.svh" = 1
+"generated_csr.svh" = 1
+"generated_commands.svh" = 1
