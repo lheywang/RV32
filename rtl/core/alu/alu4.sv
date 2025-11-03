@@ -30,6 +30,9 @@ module alu4 (
     output logic                                                  busy,
     output logic                                                  i_error,
     output logic          [      (core_config_pkg::XLEN - 1) : 0] res,
+    /* verilator lint_off UNDRIVEN */
+    output logic          [      (core_config_pkg::XLEN - 1) : 0] jmp,
+    /* verilator lint_off UNDRIVEN */
     output logic          [(core_config_pkg::REG_ADDR_W - 1) : 0] o_rd,
     output logic                                                  valid,
     output logic                                                  o_error,
