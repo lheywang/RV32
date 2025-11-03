@@ -192,15 +192,11 @@ int main(int argc, char **argv)
     tb.dut->imm = 0;
     tb.dut->clear = 0;
 
-    tb.run_for(4);
-
     // Checking that the ALU does perform the feedback of errors
     tb.set_case("Error feedback (out)");
     for (int i = 27; i < 35; i++)
     {
         tb.dut->cmd = 30;
-
-        tb.run_for(6);
 
         tb.check_equality((unsigned int)tb.dut->o_error, (unsigned int)1, "Read-o_error");
 

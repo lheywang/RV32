@@ -45,6 +45,7 @@ int main(int argc, char **argv)
                              : 0),
                         "res");
                     tb.check_equality((unsigned int)tb.dut->req, (unsigned int)0, "req");
+                    tb.check_equality((unsigned int)tb.dut->jmp, (unsigned int)0, "jmp");
                     break;
 
                 case alu_commands_t::c_SLTU:
@@ -55,63 +56,70 @@ int main(int argc, char **argv)
                              : 0),
                         "res");
                     tb.check_equality((unsigned int)tb.dut->req, (unsigned int)0, "req");
+                    tb.check_equality((unsigned int)tb.dut->jmp, (unsigned int)0, "jmp");
                     break;
 
                 case alu_commands_t::c_BEQ:
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)16382, "req");
+                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)0, "res");
+                    tb.check_equality((unsigned int)tb.dut->jmp, (unsigned int)16382, "jmp");
                     tb.check_equality(
                         (int)tb.dut->req,
                         ((static_cast<int32_t>(inputs1[ii]) == static_cast<int32_t>(inputs2[iii]))
                              ? 1
                              : 0),
-                        "res");
+                        "req");
                     break;
 
                 case alu_commands_t::c_BNE:
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)16382, "req");
+                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)0, "res");
+                    tb.check_equality((unsigned int)tb.dut->jmp, (unsigned int)16382, "jmp");
                     tb.check_equality(
                         (int)tb.dut->req,
                         ((static_cast<int32_t>(inputs1[ii]) == static_cast<int32_t>(inputs2[iii]))
                              ? 0
                              : 1),
-                        "res");
+                        "req");
                     break;
 
                 case alu_commands_t::c_BLT:
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)16382, "req");
+                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)0, "res");
+                    tb.check_equality((unsigned int)tb.dut->jmp, (unsigned int)16382, "jmp");
                     tb.check_equality(
                         (int)tb.dut->req,
                         ((static_cast<int32_t>(inputs1[ii]) < static_cast<int32_t>(inputs2[iii]))
                              ? 1
                              : 0),
-                        "res");
+                        "req");
                     break;
                 case alu_commands_t::c_BGE:
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)16382, "req");
+                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)0, "res");
+                    tb.check_equality((unsigned int)tb.dut->jmp, (unsigned int)16382, "jmp");
                     tb.check_equality(
                         (int)tb.dut->req,
                         ((static_cast<int32_t>(inputs1[ii]) >= static_cast<int32_t>(inputs2[iii]))
                              ? 1
                              : 0),
-                        "res");
+                        "req");
                     break;
                 case alu_commands_t::c_BLTU:
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)16382, "req");
+                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)0, "res");
+                    tb.check_equality((unsigned int)tb.dut->jmp, (unsigned int)16382, "jmp");
                     tb.check_equality(
                         (int)tb.dut->req,
                         (static_cast<uint32_t>(inputs1[ii]) < static_cast<uint32_t>(inputs2[iii])
                              ? 1
                              : 0),
-                        "res");
+                        "req");
                     break;
                 case alu_commands_t::c_BGEU:
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)16382, "req");
+                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)0, "res");
+                    tb.check_equality((unsigned int)tb.dut->jmp, (unsigned int)16382, "jmp");
                     tb.check_equality(
                         (int)tb.dut->req,
                         (static_cast<uint32_t>(inputs1[ii]) >= static_cast<uint32_t>(inputs2[iii])
                              ? 1
                              : 0),
-                        "res");
+                        "req");
                     break;
 
                 default:

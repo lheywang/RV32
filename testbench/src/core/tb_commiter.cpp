@@ -260,10 +260,12 @@ int main(int argc, char **argv)
     tb.set_case("Checking jumps");
     tb.dut->alu1_req = 1;
     tb.dut->alu1_valid = 1;
-    tb.dut->alu1_res = 0xFFFFFFFF;
+    tb.dut->alu1_res = 0;
+    tb.dut->alu1_jmp = 0xFFFFFFFF;
 
     tb.tick();
 
+    tb.check_equality((unsigned)tb.dut->reg_data, (unsigned)0, "reg data");
     tb.check_equality((unsigned)tb.dut->pc_value, (unsigned)0xFFFFFFFF, "pc value");
     tb.check_equality((unsigned)tb.dut->pc_we, (unsigned)1, "pc we");
     tb.check_equality((unsigned)tb.dut->issuer_flush, (unsigned)1, "flush");
