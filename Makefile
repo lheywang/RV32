@@ -90,7 +90,7 @@ clean:
 	rm -rf obj_dir/*
 
 tests:
-	@python utils/tests.py
+	./utils/tests.py
 
 wave: run
 	@gtkwave $(SIMOUT)$(TOP).vcd
