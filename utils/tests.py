@@ -3,6 +3,7 @@ import os
 import subprocess
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
+import time 
 
 # === CONFIG ===
 targets = [
@@ -73,6 +74,7 @@ def run_target(target: str):
 
 def main():
 
+    start = time.time()
     print(f"🔧 Preparing the build files ...")
     subprocess.run(
         ["make", "prepare"],
@@ -115,12 +117,14 @@ def main():
         f.write(f"**Average success:** {avg_percent:.2f}%  \n")
         f.write(f"\n*Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*\n")
 
+    stop = time.time()
     print(f"\n📄 Summary written to: {summary_file}")
     print(f"📁 Reports directory: {report_dir}")
     print()
     print(f"Total passed: {total_pass}")
     print(f"Total failed: {total_fail}")
     print(f"Average success: {avg_percent:.2f}%")
+    print(f"Duration: {((stop - start) * 1000 if (stop - start) < 1 else (stop - start)):.3f} {"ms" if (stop - start) < 1 else "s"}")
 
 
 if __name__ == "__main__":
