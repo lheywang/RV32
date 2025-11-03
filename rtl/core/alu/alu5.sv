@@ -236,7 +236,7 @@ module alu5 (
         end else begin
 
             state <= next_state;
-            r_err   <= mem_err;
+            r_err <= mem_err;
 
             if (state == IDLE) begin
 
@@ -251,7 +251,7 @@ module alu5 (
             end else if (state == WAIT) begin
 
                 r_data2 <= data2;
-                
+
             end
         end
     end

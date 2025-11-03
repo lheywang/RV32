@@ -49,8 +49,8 @@ package core_config_pkg;
     parameter int IF_BOOT_UCODE = IF_BASE_ADDR;
     parameter int IF_TRAP_UCODE = 32'h1000_0100;  // Trap handler microcode address
     parameter int IF_MRET_UCODE = 32'h1000_0200;  // Mret trap handler
-    parameter int IF_ECALL_UCODE = 32'h1000_0200;  // Ecall trap handler
-    parameter int IF_EBREAK_UCODE = 32'h1000_0200;  // Ebreak trap handler
+    parameter int IF_ECALL_UCODE = 32'h1000_0300;  // Ecall trap handler
+    parameter int IF_EBREAK_UCODE = 32'h1000_0400;  // Ebreak trap handler
     parameter int IF_MAIN_CODE = 32'h1000_1000;  // Base for the main program.
 
     // -------------------------------------------------------------------------

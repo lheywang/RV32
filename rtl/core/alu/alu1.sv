@@ -172,18 +172,18 @@ module alu1 (
              */
             core_config_pkg::c_JAL: begin
                 // Calculation
-                tmp_jmp       = {1'b0, addr} + IF_INC;
+                tmp_jmp       = {1'b0, addr} + {1'b0, IF_INC};
                 tmp_res       = '0;
 
                 // Setting flags
                 act_needed    = 1'b0;  // always predicted
                 predict_value = 1'b0;
-                int_req       = 1'b0;
+                int_req       = 1'b1;
                 unknown_instr = 1'b0;
             end
             core_config_pkg::c_JALR: begin
                 // Calculation
-                tmp_jmp       = {1'b0, addr} + {1'b0, arg0} & ~1;
+                tmp_jmp       = ({1'b0, addr} + {1'b0, arg0}) & ~1;
                 tmp_res       = {1'b0, addr} + IF_INC;
 
                 // Setting flags
