@@ -297,12 +297,6 @@ int main(int argc, char **argv)
 
         default:
             tb.check_equality(1, 2, "Unsupported OP !!");
-
-            // core_config_pkg::i_JAL,
-            // core_config_pkg::i_JALR : begin
-
-            // // Ucode :
-            // core_config_pkg::i_ECALL, core_config_pkg::i_EBREAK, core_config_pkg::i_MRET: begin
         }
     }
 

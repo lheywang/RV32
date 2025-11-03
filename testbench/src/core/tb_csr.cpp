@@ -41,7 +41,7 @@ int main(int argc, char **argv)
         tb.tick();
 
         // Read some data (without calling tick but only eval to register them without clock)
-        tb.check_equality((unsigned int)tb.dut->rd, (unsigned int)readback[k], "CSR");
+        tb.check_equality((unsigned int)tb.dut->rd, CSR_WMASK[k], "CSR");
         tb.increment_cycles();
     }
 

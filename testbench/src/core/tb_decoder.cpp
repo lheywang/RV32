@@ -188,7 +188,7 @@ int main(int argc, char **argv)
     for (int i = 0; i < (sizeof(instructions) / sizeof(unsigned)); i++)
     {
         tb.dut->instruction = instructions[i];
-        tb.dut->i_address = 4 * i;
+        tb.dut->i_address = IF_INC * i;
 
         tb.tick();
         tb.tick();

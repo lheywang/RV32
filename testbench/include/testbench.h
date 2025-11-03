@@ -29,10 +29,7 @@
 #include "colors.h"
 
 // providing includes for auto generated
-#include "generated_commands.h"
-#include "generated_csr.h"
-#include "generated_decoders.h"
-#include "generated_opcodes.h"
+#include "generated.h"
 
 /*
  * ===========================================================================================

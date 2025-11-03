@@ -10,10 +10,26 @@ int main(int argc, char **argv)
     Testbench<Vdelay> tb("Delay");
 
     tb.dut->clk_en = 1;
-    tb.dut->enable = 1;
     tb.reset();
 
-    // To be done
+    unsigned int data[] = {
+        0x11111111, 0x22222222, 0x33333333, 0x44444444, 0x55555555, 0x66666666, 0x77777777,
+        0x88888888, 0x99999999, 0xAAAAAAAA, 0xBBBBBBBB, 0xCCCCCCCC, 0xDDDDDDDD, 0xEEEEEEEE,
+        0xFFFFFFFF
+    };
+
+    tb.dut->din = data[0];
+    tb.tick();
+    tb.dut->din = data[1];
+    tb.tick();
+
+    for (int i = 2; i < 15; i += 1)
+    {
+        tb.dut->din = data[i];
+        tb.check_equality(tb.dut->dout, data[i - 2], "dout");
+        tb.tick();
+        tb.increment_cycles();
+    }
 
     return tb.get_return();
 }
