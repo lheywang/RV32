@@ -15,7 +15,7 @@ UTILS 	   	= utils/
 TESTS       = tests/
 
 # --- Files definitions ---
-TESTER_SRC  = $(TB_DIR)tests/tester.cpp
+TESTER_SRC  = $(TB_DIR)src/tests/tester.cpp
 TESTER_TOP  = rv32
 
 
@@ -39,6 +39,7 @@ RTL_SRC    	+= $(shell find $(SRC_DIR)peripherals -type f -name "*.sv")
 RTL_SRC    	+= $(SRC_DIR)rv32.sv
 
 MEM_SRC    	+= $(shell find $(SRC_DIR)memory -type f -name "*.v")
+PLL_SRC    	+= $(shell find $(SRC_DIR)clocks -type f -name "*.v")
 
 VERILATOR_CFG = verilatorcfg.vlt
 
@@ -68,7 +69,7 @@ VERILATOR_FLAGS_RUN = -Wall \
 				      --cc $(VERILATOR_CFG) -f $(FILE_LIST) \
 				      -O3 \
 				      --top-module $(TESTER_TOP) \
-				      --exe $(TESTER_SRC) $(CCX_UTILS) \
+				      --exe $(abspath $(TESTER_SRC)) $(CCX_UTILS) \
 				      -Mdir $(BUILD_DIR) \
 				      -I$(BUILD_DIR) \
 				      -CFLAGS "-I$(TB_UTILS)"
@@ -107,15 +108,15 @@ all: run
 
 # Clean
 clean:
-	rm -rf $(BUILD_DIR)*
-	rm -rf $(SIMOUT)*.vcd
-	rm -rf logs/*.ans
-	rm -rf logs/reports/*.md
-	rm -rf logs/reports/*.stat
-	rm -rf logs/*.log
-	rm -rf documentation/html
-	rm -rf documentation/latex
-	rm -rf obj_dir/*
+	@rm -rf $(BUILD_DIR)*
+	@rm -rf $(SIMOUT)*.vcd
+	@rm -rf logs/*.ans
+	@rm -rf logs/reports/*.md
+	@rm -rf logs/reports/*.stat
+	@rm -rf logs/*.log
+	@rm -rf documentation/html
+	@rm -rf documentation/latex
+	@rm -rf obj_dir/*
 
 # Build and run simulation
 run: $(BUILD_DIR)/V$(TOP)
@@ -125,7 +126,7 @@ run: $(BUILD_DIR)/V$(TOP)
 # Compile generated C++ from Verilator
 $(BUILD_DIR)/V$(TOP): $(FILE_LIST) $(RTL_SRC) $(CXX_TB)  $(TB_TOP)
 	verilator $(VERILATOR_FLAGS)
-	make -C $(BUILD_DIR) -f V$(TESTER_TOP).mk V$(TESTER_TOP) -j$(NPROC) CXX="ccache g++"
+	@make -C $(BUILD_DIR) -f V$(TOP).mk V$(TOP) -j$(NPROC) CXX="ccache g++"
 
 wave: run
 	@gtkwave $(SIMOUT)$(TOP).vcd
@@ -141,15 +142,16 @@ prepare : $(BUILD_DIR) $(NEEDED_ENUMS) $(BUILD_DIR)generated.h
 
 # Prepare files for a program run
 test_case: $(FILE_LIST) $(TEST_BUILD) $(INIT_RAM) $(INIT_ROM)
+	verilator $(VERILATOR_FLAGS_RUN)
+	@make -C $(BUILD_DIR) -f V$(TESTER_TOP).mk V$(TESTER_TOP) -j$(NPROC) CXX="ccache g++"
 
 # Run the unit-tests
 tests:
-	./utils/tests.py
+	@./utils/tests.py
 
 # Run the simulation by hand
 run_case: test_case
-	verilator $(VERILATOR_FLAGS_RUN)
-	make -C $(BUILD_DIR) -f V$(TOP).mk V$(TOP) -j$(NPROC) CXX="ccache g++"
+	@$(BUILD_DIR)V$(TESTER_TOP)
 
 
 # =========================================================================================================
@@ -162,21 +164,21 @@ $(BUILD_DIR)generated.h $(BUILD_DIR)generated.sv : $(NEEDED_ENUMS) $(NEEDED_CONF
 # =========================================================================================================
 
 $(BUILD_DIR)core_config_pkg.svh :
-	./utils/conf2header.py configs/core/ --output $(BUILD_DIR)
+	@./utils/conf2header.py configs/core/ --output $(BUILD_DIR)
 $(BUILD_DIR)argb_config_pkg.svh :
-	./utils/conf2header.py configs/peripherals/argb/ --output $(BUILD_DIR)
+	@./utils/conf2header.py configs/peripherals/argb/ --output $(BUILD_DIR)
 $(BUILD_DIR)gpio_config_pkg.svh :
-	./utils/conf2header.py configs/peripherals/gpio/ --output $(BUILD_DIR)
+	@./utils/conf2header.py configs/peripherals/gpio/ --output $(BUILD_DIR)
 $(BUILD_DIR)interrupts_config_pkg.svh : 
-	./utils/conf2header.py configs/peripherals/interrupts/ --output $(BUILD_DIR)
+	@./utils/conf2header.py configs/peripherals/interrupts/ --output $(BUILD_DIR)
 $(BUILD_DIR)keys_config_pkg.svh :
-	./utils/conf2header.py configs/peripherals/keys/ --output $(BUILD_DIR)
+	@./utils/conf2header.py configs/peripherals/keys/ --output $(BUILD_DIR)
 $(BUILD_DIR)serial_config_pkg.svh : 
-	./utils/conf2header.py configs/peripherals/serial/ --output $(BUILD_DIR)
+	@./utils/conf2header.py configs/peripherals/serial/ --output $(BUILD_DIR)
 $(BUILD_DIR)timer_config_pkg.svh :
-	./utils/conf2header.py configs/peripherals/timer/ --output $(BUILD_DIR)
+	@./utils/conf2header.py configs/peripherals/timer/ --output $(BUILD_DIR)
 $(BUILD_DIR)ulpi_config_pkg.svh :
-	./utils/conf2header.py configs/peripherals/ulpi/ --output $(BUILD_DIR)
+	@./utils/conf2header.py configs/peripherals/ulpi/ --output $(BUILD_DIR)
 
 # =========================================================================================================
 # Enums creations
@@ -184,19 +186,19 @@ $(BUILD_DIR)ulpi_config_pkg.svh :
 
 # Opcodes
 $(BUILD_DIR)generated_opcodes.svh : $(CONFIG_DIR)def/opcodes.def
-	./utils/def2header.py -s $(BUILD_DIR)generated_opcodes.svh -c $(BUILD_DIR)generated_opcodes.h $< 
+	@./utils/def2header.py -s $(BUILD_DIR)generated_opcodes.svh -c $(BUILD_DIR)generated_opcodes.h $< 
 
 # Decoders
 $(BUILD_DIR)generated_decoders.svh : $(CONFIG_DIR)def/decoders.def
-	./utils/def2header.py -s $(BUILD_DIR)generated_decoders.svh -c $(BUILD_DIR)generated_decoders.h $<
+	@./utils/def2header.py -s $(BUILD_DIR)generated_decoders.svh -c $(BUILD_DIR)generated_decoders.h $<
 
 # CSRs
 $(BUILD_DIR)generated_csr.svh : $(CONFIG_DIR)def/csr.def
-	./utils/def2header.py -s $(BUILD_DIR)generated_csr.svh -c $(BUILD_DIR)generated_csr.h $<
+	@./utils/def2header.py -s $(BUILD_DIR)generated_csr.svh -c $(BUILD_DIR)generated_csr.h $<
 
 # Commands
 $(BUILD_DIR)generated_commands.svh : $(CONFIG_DIR)def/commands.def
-	./utils/def2header.py -s $(BUILD_DIR)generated_commands.svh -c $(BUILD_DIR)generated_commands.h $<
+	@./utils/def2header.py -s $(BUILD_DIR)generated_commands.svh -c $(BUILD_DIR)generated_commands.h $<
 
 # =========================================================================================================
 # Folders
@@ -208,9 +210,10 @@ $(BUILD_DIR) :
 
 # List the files used for verilator.
 $(FILE_LIST) : prepare
-	echo "$(MEM_SRC)" | tr ' ' '\n' >> $@
-	echo "$(shell find $(BUILD_DIR) -type f -name "*.sv")" | tr ' ' '\n' >> $@
-	echo "$(RTL_SRC)" | tr ' ' '\n' >> $@
+	@echo "$(MEM_SRC)" | tr ' ' '\n' > $@
+	@echo "$(PLL_SRC)" | tr ' ' '\n' >> $@
+	@echo "$(shell find $(BUILD_DIR) -type f -name "*.sv")" | tr ' ' '\n' >> $@
+	@echo "$(RTL_SRC)" | tr ' ' '\n' >> $@
 
 # =========================================================================================================
 # Tests folders
