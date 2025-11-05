@@ -1,5 +1,9 @@
 # .gitignore
 
+# Python files
+__pycache__/
+*.pyc
+
 # Then, removes some specifics patterns
 # Compiled files
 *.o
@@ -11,6 +15,7 @@
 
 # Assembles / compilations outputs
 *.elf
+*.txt
 *.hex
 *.bin
 *.o

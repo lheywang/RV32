@@ -10,24 +10,10 @@ int main(int argc, char **argv)
     Testbench<Vendianess> tb("Endianess");
 
     // Reset sequence
-    unsigned int to_rev[8] = {
-        0xdeadbeef,
-        0xaabbccdd,
-        0xeeff1122,
-        0x33445566,
-        0x778899aa,
-        0xcafecafe,
-        0xa5a5a5a5,
-        0xaaaabbbb};
-    unsigned int reversed[8] = {
-        0xefbeadde,
-        0xddccbbaa,
-        0x2211ffee,
-        0x66554433,
-        0xaa998877,
-        0xfecafeca,
-        0xa5a5a5a5,
-        0xbbbbaaaa};
+    unsigned int to_rev[8] = {0xdeadbeef, 0xaabbccdd, 0xeeff1122, 0x33445566,
+                              0x778899aa, 0xcafecafe, 0xa5a5a5a5, 0xaaaabbbb};
+    unsigned int reversed[8] = {0xefbeadde, 0xddccbbaa, 0x2211ffee, 0x66554433,
+                                0xaa998877, 0xfecafeca, 0xa5a5a5a5, 0xbbbbaaaa};
 
     for (int k = 0; k < 8; k++)
     {

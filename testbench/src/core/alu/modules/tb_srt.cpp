@@ -3,8 +3,11 @@
 
 #include "testbench.h"
 
-unsigned int input1[20] = {10, 100, 1000, 0xFFFFFFFF, 0, 8, 2, 17, 29, 33, 59, 87, 453610452, 452135, 125245454, 47, 123, 789, 456, 20};
-unsigned int input2[20] = {3, 5, 7, 9, 22, 0xFFFFFFFF, 21, 37, 49, 11345678, 0xAAAAAAAA, 0x55555555, 456, 123, 789, 741, 852, 963, 0, 123};
+unsigned int input1[20] = {10, 100, 1000,      0xFFFFFFFF, 0,         8,  2,   17,  29,  33,
+                           59, 87,  453610452, 452135,     125245454, 47, 123, 789, 456, 20};
+unsigned int input2[20] = {3,   5,   7,        9,          22,         0xFFFFFFFF, 21,
+                           37,  49,  11345678, 0xAAAAAAAA, 0x55555555, 456,        123,
+                           789, 741, 852,      963,        0,          123};
 
 // Main
 int main(int argc, char **argv)
@@ -50,25 +53,37 @@ int main(int argc, char **argv)
                 {
                     tb.check_equality(count, 2, "Cycle count");
 
-                    tb.check_equality((unsigned int)tb.dut->div_by_zero, (unsigned int)1, "Div By Zero");
-                    tb.check_equality((unsigned int)tb.dut->quotient, (unsigned int)0xFFFFFFFF, "Result (NULL)");
-                    tb.check_equality((unsigned int)tb.dut->remainder, (unsigned int)0, "Result (U % U)");
+                    tb.check_equality((unsigned int)tb.dut->div_by_zero, (unsigned int)1,
+                                      "Div By Zero");
+                    tb.check_equality((unsigned int)tb.dut->quotient, (unsigned int)0xFFFFFFFF,
+                                      "Result (NULL)");
+                    tb.check_equality((unsigned int)tb.dut->remainder, (unsigned int)0,
+                                      "Result (U % U)");
                 }
                 else
                 {
                     tb.check_equality(count, 69, "Cycle count");
 
-                    tb.check_equality((unsigned int)tb.dut->div_by_zero, (unsigned int)0, "Div By Zero");
+                    tb.check_equality((unsigned int)tb.dut->div_by_zero, (unsigned int)0,
+                                      "Div By Zero");
 
                     switch (op)
                     {
                     case 0:
-                        tb.check_equality((unsigned int)tb.dut->quotient, (unsigned int)input1[i] / (unsigned int)input2[ii], "Result (U / U)");
-                        tb.check_equality((unsigned int)tb.dut->remainder, (unsigned int)input1[i] % (unsigned int)input2[ii], "Result (U % U)");
+                        tb.check_equality((unsigned int)tb.dut->quotient,
+                                          (unsigned int)input1[i] / (unsigned int)input2[ii],
+                                          "Result (U / U)");
+                        tb.check_equality((unsigned int)tb.dut->remainder,
+                                          (unsigned int)input1[i] % (unsigned int)input2[ii],
+                                          "Result (U % U)");
                         break;
                     case 1:
-                        tb.check_equality((signed int)tb.dut->quotient, (signed int)input1[i] / (signed int)input2[ii], "Result (S / S)");
-                        tb.check_equality((signed int)tb.dut->remainder, (signed int)input1[i] % (signed int)input2[ii], "Result (S % S)");
+                        tb.check_equality((signed int)tb.dut->quotient,
+                                          (signed int)input1[i] / (signed int)input2[ii],
+                                          "Result (S / S)");
+                        tb.check_equality((signed int)tb.dut->remainder,
+                                          (signed int)input1[i] % (signed int)input2[ii],
+                                          "Result (S % S)");
                         break;
                     }
                 }

@@ -39,12 +39,11 @@ int main(int argc, char **argv)
     tb.dut->i_rd = 0x1F;
     tb.dut->arg0 = 0x1000F0F0;
 
-    int cycle = 0;
-
     // Performing writes
-    for (int i = 27; i < 30; i++)
+    for (auto op : EnumRange<alu_commands_t>(alu_commands_t::c_SB, alu_commands_t::c_SW))
     {
-        tb.dut->cmd = i;
+        tb.set_case_enum("Write", op);
+        tb.dut->cmd = op;
 
         // Iterate over some data
         for (int ii = 0; ii < 10; ii++)
@@ -62,52 +61,33 @@ int main(int argc, char **argv)
                 tb.tick();
                 tb.tick();
 
-                tb.check_equality((unsigned int)tb.dut->mem_addr, (unsigned int)target_addr, "Write-memaddr");
+                tb.check_equality((unsigned int)tb.dut->mem_addr, (unsigned int)target_addr,
+                                  "Write-memaddr");
                 tb.check_equality((unsigned int)tb.dut->mem_we, (unsigned int)1, "Write-we");
                 tb.check_equality((unsigned int)tb.dut->mem_req, (unsigned int)1, "Write-req");
                 tb.check_equality((unsigned int)tb.dut->busy, (unsigned int)1, "Write-busy");
 
-                switch (i)
+                switch (op)
                 {
-                case 27: // SB
-                    switch (iii)
-                    {
-                    case 0:
-                        tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)(writedata[ii] & 0x000000FF), "Write-wdata");
-                        break;
-
-                    case 1:
-                        tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)(writedata[ii] & 0x000000FF) << 8, "Write-wdata");
-                        break;
-
-                    case 2:
-                        tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)(writedata[ii] & 0x000000FF) << 16, "Write-wdata");
-                        break;
-
-                    case 3:
-                        tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)(writedata[ii] & 0x000000FF) << 24, "Write-wdata");
-                        ;
-                        break;
-                    }
+                case alu_commands_t::c_SB:
+                    tb.check_equality((unsigned int)tb.dut->mem_wdata,
+                                      (unsigned int)(writedata[ii] & 0x000000FF) << (iii * 8),
+                                      "Write-wdata");
                     break;
 
-                case 28: // SH
-                    switch (iii)
-                    {
-                    case 0:
-                    case 1:
-                        tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)writedata[ii] & 0x0000FFFF, "Write-wdata");
-                        break;
-
-                    case 2:
-                    case 3:
-                        tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)(writedata[ii] & 0x0000FFFF) << 16, "Write-wdata");
-                        break;
-                    }
+                case alu_commands_t::c_SH:
+                    tb.check_equality((unsigned int)tb.dut->mem_wdata,
+                                      (unsigned int)(writedata[ii] & 0x0000FFFF)
+                                          << ((iii >> 1) * 16),
+                                      "Write-wdata");
                     break;
 
-                case 29: // SW
-                    tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)writedata[ii], "Write-wdata");
+                case alu_commands_t::c_SW:
+                    tb.check_equality((unsigned int)tb.dut->mem_wdata, (unsigned int)writedata[ii],
+                                      "Write-wdata");
+                    break;
+
+                default:
                     break;
                 }
 
@@ -130,9 +110,10 @@ int main(int argc, char **argv)
     tb.dut->arg0 = 0x1000F0F0;
 
     // Performing reads
-    for (int i = 30; i < 35; i++)
+    for (auto op : EnumRange<alu_commands_t>(alu_commands_t::c_LB, alu_commands_t::c_LHU))
     {
-        tb.dut->cmd = i;
+        tb.dut->cmd = op;
+        tb.set_case_enum("Read", op);
 
         // Iterate over some data
         for (int ii = 0; ii < 10; ii++)
@@ -153,7 +134,8 @@ int main(int argc, char **argv)
                 tb.tick();
                 tb.tick();
 
-                tb.check_equality((unsigned int)tb.dut->mem_addr, (unsigned int)target_addr, "Read-memaddr");
+                tb.check_equality((unsigned int)tb.dut->mem_addr, (unsigned int)target_addr,
+                                  "Read-memaddr");
                 tb.check_equality((unsigned int)tb.dut->mem_we, (unsigned int)0, "Read-we");
                 tb.check_equality((unsigned int)tb.dut->mem_req, (unsigned int)1, "Read-req");
                 tb.check_equality((unsigned int)tb.dut->busy, (unsigned int)1, "Read-busy");
@@ -161,89 +143,47 @@ int main(int argc, char **argv)
                 tb.tick();
                 tb.dut->clear = 1;
 
-                switch (i)
+                switch (op)
                 {
-                case 30: // LB
-                    switch (iii)
-                    {
-                    case 0:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)sext8((writedata[ii] >> 0) & 0x000000FF), "Read-res");
-                        break;
-
-                    case 1:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)sext8((writedata[ii] >> 8) & 0x000000FF), "Read-res");
-                        break;
-
-                    case 2:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)sext8((writedata[ii] >> 16) & 0x000000FF), "Read-res");
-                        break;
-
-                    case 3:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)sext8((writedata[ii] >> 24) & 0x000000FF), "Read-res");
-                        break;
-                    }
+                case alu_commands_t::c_LB:
+                    tb.check_equality(
+                        (unsigned int)tb.dut->res,
+                        (unsigned int)sext8((writedata[ii] >> (iii * 8)) & 0x000000FF), "Read-res");
                     break;
 
-                case 31: // LH
-                    switch (iii)
-                    {
-                    case 0:
-                    case 1:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)sext16((writedata[ii] >> 0) & 0x0000FFFF), "Read-res");
-                        break;
-
-                    case 2:
-                    case 3:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)sext16((writedata[ii] >> 16) & 0x0000FFFF), "Read-res");
-                        break;
-                    }
+                case alu_commands_t::c_LH:
+                    tb.check_equality(
+                        (unsigned int)tb.dut->res,
+                        (unsigned int)sext16((writedata[ii] >> ((iii >> 1) * 16)) & 0x0000FFFF),
+                        "Read-res");
                     break;
 
-                case 32: // LW
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)writedata[ii], "Read-res");
+                case alu_commands_t::c_LW:
+                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)writedata[ii],
+                                      "Read-res");
                     break;
 
-                case 33: // LBU
-                    switch (iii)
-                    {
-                    case 0:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(writedata[ii] >> 0) & 0x000000FF, "Read-res");
-                        break;
-
-                    case 1:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(writedata[ii] >> 8) & 0x000000FF, "Read-res");
-                        break;
-
-                    case 2:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(writedata[ii] >> 16) & 0x000000FF, "Read-res");
-                        break;
-
-                    case 3:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(writedata[ii] >> 24) & 0x000000FF, "Read-res");
-                        break;
-                    }
+                case alu_commands_t::c_LBU:
+                    tb.check_equality((unsigned int)tb.dut->res,
+                                      (unsigned int)(writedata[ii] >> (iii * 8) & 0x000000FF),
+                                      "Read-res");
                     break;
 
-                case 34: // LHU
-                    switch (iii)
-                    {
-                    case 0:
-                    case 1:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)writedata[ii] & 0x0000FFFF, "Read-res");
-                        break;
+                case alu_commands_t::c_LHU:
+                    tb.check_equality(
+                        (unsigned int)tb.dut->res,
+                        (unsigned int)(writedata[ii] >> ((iii >> 1) * 16) & 0x0000FFFF),
+                        "Read-res");
+                    break;
 
-                    case 2:
-                    case 3:
-                        tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(writedata[ii] >> 16) & 0x0000FFFF, "Read-res");
-                        break;
-                    }
+                default:
                     break;
                 }
 
                 tb.check_equality((unsigned int)tb.dut->valid, (unsigned int)1, "Read-valid");
                 tb.tick();
 
-                cycle += 1;
+                tb.increment_cycles();
             }
         }
     }
@@ -252,56 +192,36 @@ int main(int argc, char **argv)
     tb.dut->imm = 0;
     tb.dut->clear = 0;
 
-    tb.tick();
-    tb.tick();
-    tb.tick();
-    tb.tick();
-
     // Checking that the ALU does perform the feedback of errors
+    tb.set_case("Error feedback (out)");
     for (int i = 27; i < 35; i++)
     {
         tb.dut->cmd = 30;
 
         tb.tick();
-        tb.tick();
-        tb.tick();
-        tb.tick();
-        tb.tick();
-        tb.tick();
-
         tb.check_equality((unsigned int)tb.dut->o_error, (unsigned int)1, "Read-o_error");
 
-        tb.tick();
-        tb.dut->clear = 1;
-        tb.tick();
-        tb.dut->clear = 0;
-
-        cycle += 1;
+        tb.clear();
+        tb.increment_cycles();
     }
 
     tb.dut->mem_err = 0;
     tb.dut->clear = 0;
 
     // Checking that the ALU does perform the feedback of errors
-    for (int i = 10; i < 14; i++)
+    tb.set_case("Error feedback (in)");
+    for (int i = 0; i < 4; i++)
     {
         tb.dut->cmd = 0;
 
         tb.dut->mem_err = 0;
         tb.dut->imm = 0;
 
-        tb.tick();
-        tb.tick();
-        tb.tick();
-        tb.tick();
+        tb.run_for(6);
 
         tb.check_equality((unsigned int)tb.dut->i_error, (unsigned int)1, "Read-i_error");
 
-        tb.tick();
-        tb.dut->clear = 1;
-        tb.tick();
-        tb.dut->clear = 0;
-
+        tb.clear();
         tb.increment_cycles();
     }
 

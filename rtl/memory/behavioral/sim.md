@@ -4,11 +4,16 @@ Since simulations models from Altera / Intel aren't open-sourced, they won't be 
 For a working simulation, you'll need them anyway, just copy them from their directory into this one.
 
 ## Where to find them ?
+
 Typically, theses files come with Modelsim / Quartus installation, mine where :
 
-C:\intelFPGA\18.1\modelsim_ase\altera\vhdl\src\altera_mf\altera_mf.vhd
+C:\intelFPGA\18.1\\...\\altera_mf.v
+
+Copy this file into this folder, and everything shall be fine !
+Verilator is configured to ignore warnings from these file.
 
 ## I don't have theses files ?
+
 Then, you can install the tools. You don't need a full license to get them, the free license (which I use)
 is more than enough !
 

@@ -3,6 +3,7 @@ import os
 import subprocess
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
+import time 
 
 # === CONFIG ===
 targets = [
@@ -21,7 +22,11 @@ targets = [
     "alu0",
     "alu1",
     "alu2",
+    "alu4",
     "alu5",
+    "prediction",
+    "commiter",
+    "issuer",
 ]
 log_dir = "logs"
 report_dir = os.path.join(log_dir, "reports")
@@ -68,14 +73,28 @@ def run_target(target: str):
 
 
 def main():
+
+    start = time.time()
+    print(f"🔧 Preparing the build files ...")
+    subprocess.run(
+        ["make", "prepare"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
     print(f"🔧 Running Verilator builds in parallel ({os.cpu_count()} threads)...\n")
 
     results = []
     with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
         for res in executor.map(run_target, targets):
             target, status, passed, failed, percent = res
-            emoji = "✅" if status == "PASS" else "❌"
-            print(f"{emoji} {target:10s} → {status:4s} ({percent:.2f}%)")
+            emoji = "✅" if status == "PASS" and passed != 0 else "❌"
+            msg = (
+                " : No tests detected, perhaps check for build errors ?"
+                if passed == 0 and failed == 0
+                else ""
+            )
+            print(f"{emoji} {target:10s} → {status:4s} ({percent:.2f}%){msg}")
             results.append(res)
 
     # === Generate global summary ===
@@ -88,7 +107,7 @@ def main():
         f.write("| Module | Status | Passed | Failed | Success (%) |\n")
         f.write("| ------- | ------- | ------- | ------- | ------------ |\n")
         for target, status, passed, failed, percent in results:
-            emoji = "✅" if status == "PASS" else "❌"
+            emoji = "✅" if status == "PASS" and passed != 0 else "❌"
             f.write(
                 f"| [{target}](./{target}.md) | {emoji} {status} | {passed} | {failed} | {percent:.2f} |\n"
             )
@@ -98,8 +117,14 @@ def main():
         f.write(f"**Average success:** {avg_percent:.2f}%  \n")
         f.write(f"\n*Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*\n")
 
+    stop = time.time()
     print(f"\n📄 Summary written to: {summary_file}")
     print(f"📁 Reports directory: {report_dir}")
+    print()
+    print(f"Total passed: {total_pass}")
+    print(f"Total failed: {total_fail}")
+    print(f"Average success: {avg_percent:.2f}%")
+    print(f"Duration: {((stop - start) * 1000 if (stop - start) < 1 else (stop - start)):.3f} {"ms" if (stop - start) < 1 else "s"}")
 
 
 if __name__ == "__main__":

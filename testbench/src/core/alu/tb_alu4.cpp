@@ -4,25 +4,17 @@
 #include "testbench.h"
 
 unsigned short int addresses[] = {
-    0x300, 0x304, 0x305,
-    0x340, 0x341, 0x342,
-    0x343, 0x344, 0xB00,
-    0xB02, 0xB03, 0xB04,
-    0xB05, 0xB80, 0xB82,
-    0xB83, 0xB84, 0xB85,
-    0xF10, 0xF11, 0xF12,
-    0xF13, 0xF14 // Written addresses of CSR registers.
+    0x300, 0x304, 0x305, 0x340, 0x341, 0x342, 0x343, 0x344, 0xB00, 0xB02, 0xB03, 0xB04,
+    0xB05, 0xB80, 0xB82, 0xB83, 0xB84, 0xB85, 0xF10, 0xF11, 0xF12, 0xF13, 0xF14 // Written addresses
+                                                                                // of CSR registers.
 };
 
-unsigned int readback[] = {
-    0x00007188, 0xFFFF0888, 0xFFFFFF01,
-    0xFFFFFFFF, 0xFFFFFFFE, 0x8000001F,
-    0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000 // Values that shall be read
+unsigned int readback[] =
+    {
+        0x00007188, 0xFFFF0888, 0xFFFFFF01, 0xFFFFFFFF, 0xFFFFFFFE, 0x8000001F,
+        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 // Values that shall be read
 };
 
 // Main
@@ -38,26 +30,11 @@ int main(int argc, char **argv)
     tb.dut->clear = 0;
     tb.dut->csr_err = 0;
 
-    for (int op = 0; op < 3; op += 1)
+    for (auto op : EnumRange<alu_commands_t>(alu_commands_t::c_CSRRW, alu_commands_t::c_CSRRC))
     {
         // Setting up the command
-        switch (op)
-        {
-        case 0 : 
-            tb.dut->cmd = alu_commands_t::c_CSRRW;
-            tb.set_case("CSRRW");
-            break;
-
-        case 1:
-            tb.dut->cmd = alu_commands_t::c_CSRRS;
-            tb.set_case("CSRRS");
-            break; 
-
-        case 2: 
-            tb.dut->cmd = alu_commands_t::c_CSRRC;
-            tb.set_case("CSRRC");
-            break;
-        }
+        tb.dut->cmd = op;
+        tb.set_case_enum(op);
 
         // Setting up the address
         for (int addr = 0; addr < 23; addr += 1)
@@ -66,15 +43,16 @@ int main(int argc, char **argv)
             tb.dut->csr_rd = readback[addr];
 
             tb.tick();
-            // tb.tick();
 
-            tb.check_equality((unsigned int)tb.dut->csr_ra, (unsigned int)addresses[addr], "CSR_RA");
+            tb.check_equality((unsigned int)tb.dut->csr_ra, (unsigned int)addresses[addr],
+                              "CSR_RA");
             tb.check_equality((unsigned int)tb.dut->csr_wa, (unsigned int)0, "CSR_WA");
 
             tb.tick();
 
             tb.check_equality((unsigned int)tb.dut->csr_ra, (unsigned int)0, "CSR_RA");
-            tb.check_equality((unsigned int)tb.dut->csr_wa, (unsigned int)addresses[addr], "CSR_WA");
+            tb.check_equality((unsigned int)tb.dut->csr_wa, (unsigned int)addresses[addr],
+                              "CSR_WA");
 
             tb.check_equality((unsigned int)tb.dut->res, (unsigned int)readback[addr], "CSR_RD");
             tb.check_equality((unsigned int)tb.dut->o_error, (unsigned int)0, "CSR_ERR");
@@ -82,21 +60,22 @@ int main(int argc, char **argv)
 
             switch (op)
             {
-            case 0 : 
-            case 1:
+            case alu_commands_t::c_CSRRW:
+            case alu_commands_t::c_CSRRS:
                 tb.check_equality((unsigned int)tb.dut->csr_wd, (unsigned int)0xFFFFFFFF, "CSR_WD");
-                break; 
+                break;
 
-            case 2: 
+            case alu_commands_t::c_CSRRC:
                 tb.check_equality((unsigned int)tb.dut->csr_wd, (unsigned int)0x00000000, "CSR_WD");
+                break;
+            default:
                 break;
             }
 
             tb.dut->clear = 1;
             tb.tick();
             tb.dut->clear = 0;
-            
-        } 
+        }
     }
 
     return tb.get_return();

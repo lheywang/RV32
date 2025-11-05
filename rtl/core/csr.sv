@@ -1,30 +1,41 @@
+/*
+ *  File :      rtl/core/csr.sv
+ *
+ *  Author :    l.heywang <leonard.heywang@proton.me>
+ *  Date :      25/10.2025
+ *  
+ *  Brief :     This file define the CSR register array, or, at least 
+ *              emulate it. In fact, there's only 8 registers that are 
+ *              stored, even if 23 of them are available !
+ *              That's because some of them aren't writtable at all, so
+ *              we return 0, some are just "interfaces" to some 
+ */
+
 `timescale 1ns / 1ps
 
 import core_config_pkg::XLEN;
 
 module csr (
-    input   logic                                               clk,
+    input logic clk,
 
-    input   logic                                               we,
-    input   logic   [(core_config_pkg::CSR_ADDR_W - 1) : 0]     wa,
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]           wd,
-
-    input   logic   [(core_config_pkg::CSR_ADDR_W - 1) : 0]     ra,
-    output  logic   [(core_config_pkg::XLEN - 1) : 0]           rd,
-    output  logic                                               err,
-
-    // Specials inputs
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]           cycleL,
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]           cycleH,
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]           instructionsL,
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]           instructionsH,
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]           flushsL,
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]           flushsH,
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]           waitsL,
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]           waitsH,
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]           decodedL,
-    input   logic   [(core_config_pkg::XLEN - 1) : 0]           decodedH
-    
+    input  logic                                         we,
+    input  logic [(core_config_pkg::CSR_ADDR_W - 1) : 0] wa,
+    input  logic [      (core_config_pkg::XLEN - 1) : 0] wd,
+    input  logic [(core_config_pkg::CSR_ADDR_W - 1) : 0] ra,
+    output logic [      (core_config_pkg::XLEN - 1) : 0] rd,
+    output logic                                         err,
+    input  logic [      (core_config_pkg::XLEN - 1) : 0] cycleL,
+    input  logic [      (core_config_pkg::XLEN - 1) : 0] cycleH,
+    input  logic [      (core_config_pkg::XLEN - 1) : 0] instructionsL,
+    input  logic [      (core_config_pkg::XLEN - 1) : 0] instructionsH,
+    input  logic [      (core_config_pkg::XLEN - 1) : 0] flushsL,
+    input  logic [      (core_config_pkg::XLEN - 1) : 0] flushsH,
+    input  logic [      (core_config_pkg::XLEN - 1) : 0] waitsL,
+    input  logic [      (core_config_pkg::XLEN - 1) : 0] waitsH,
+    input  logic [      (core_config_pkg::XLEN - 1) : 0] decodedL,
+    input  logic [      (core_config_pkg::XLEN - 1) : 0] decodedH,
+    input  logic [      (core_config_pkg::XLEN - 1) : 0] interrupt_vect,
+    output logic                                         int_pend
 );
 
     /*
@@ -75,7 +86,7 @@ module csr (
     /* 
      *  Storage types
      */
-    logic [(core_config_pkg::XLEN - 1) : 0] csrs [(core_config_pkg::r_MVENDORID - 1) : 0];
+    logic [(core_config_pkg::XLEN - 1) : 0] csrs[(core_config_pkg::r_MVENDORID - 1) : 0];
     core_config_pkg::csr_t wid;
     core_config_pkg::csr_t rid;
     core_config_pkg::csr_t r_wid;
@@ -97,13 +108,13 @@ module csr (
         end else begin
             err = 0;
         end
-        
+
     end
 
     /*
      *  Sync logic, perform  read and writes (2 per cpu cycles !).
      */
-    always_ff @( posedge clk ) begin
+    always_ff @(posedge clk) begin
 
         // Assigning input values to the counters
 
@@ -123,44 +134,49 @@ module csr (
         if (write_state) begin
 
             csrs[r_wid[2 : 0]] <= update_bits( // Theses registers are all located within the three LSB, thus this expression is correct.
-                    r_readback, 
-                    core_config_pkg::CSR_WMASK[r_wid], 
-                    r_wd
-                ); 
+                r_readback, core_config_pkg::CSR_WMASK[r_wid], r_wd
+            );
             write_state <= 1'b0;
         end
-          
+
         if (rid != core_config_pkg::r_NONE) begin
 
             unique case (rid)
+                // Theses registers are all located within the three LSB, thus this expression is correct.
                 core_config_pkg::r_MSTATUS,
                 core_config_pkg::r_MIE,
                 core_config_pkg::r_MTVEC,
                 core_config_pkg::r_MSCRATCH,
                 core_config_pkg::r_MEPC,
                 core_config_pkg::r_MCAUSE,
-                core_config_pkg::r_MTVAL,
-                core_config_pkg::r_MIP :    rd <= csrs[rid[2 : 0]]; // Theses registers are all located within the three LSB, thus this expression is correct.
+                core_config_pkg::r_MTVAL :
+                rd <= csrs[rid[2 : 0]];
 
-                core_config_pkg::r_CYCLE :  rd <= cycleL;
-                core_config_pkg::r_CYCLEH : rd <= cycleH;
-                core_config_pkg::r_INSTR :  rd <= instructionsL;
-                core_config_pkg::r_INSTRH : rd <= instructionsH;
-                core_config_pkg::r_FLUSH :  rd <= flushsL;
-                core_config_pkg::r_FLUSHH : rd <= flushsH;
-                core_config_pkg::r_WAIT :   rd <= waitsL;
-                core_config_pkg::r_WAITH :  rd <= waitsH;
-                core_config_pkg::r_DECOD :  rd <= decodedL;
-                core_config_pkg::r_DECODH : rd <= decodedH;
+                // The MIP register is build on the fly when needed.
+                core_config_pkg::r_MIP: rd <= interrupt_vect & csrs[core_config_pkg::r_MIE[2:0]];
+
+                core_config_pkg::r_CYCLE:  rd <= cycleL;
+                core_config_pkg::r_CYCLEH: rd <= cycleH;
+                core_config_pkg::r_INSTR:  rd <= instructionsL;
+                core_config_pkg::r_INSTRH: rd <= instructionsH;
+                core_config_pkg::r_FLUSH:  rd <= flushsL;
+                core_config_pkg::r_FLUSHH: rd <= flushsH;
+                core_config_pkg::r_WAIT:   rd <= waitsL;
+                core_config_pkg::r_WAITH:  rd <= waitsH;
+                core_config_pkg::r_DECOD:  rd <= decodedL;
+                core_config_pkg::r_DECODH: rd <= decodedH;
 
                 core_config_pkg::r_MVENDORID,
                 core_config_pkg::r_MARCHID,
                 core_config_pkg::r_MIMPID,
                 core_config_pkg::r_MHARTID,
-                core_config_pkg::r_MISA :   rd <= 32'h0; // Default value on simple impl.
-                core_config_pkg::r_NONE :   rd <= 32'h0;
+                core_config_pkg::r_MISA :
+                rd <= 32'h0;  // Default value on simple impl.
+                core_config_pkg::r_NONE: rd <= 32'h0;
             endcase
-        end  
-     end
+        end
+    end
+
+    assign int_pend = |(interrupt_vect & csrs[core_config_pkg::r_MIE[2:0]]);
 
 endmodule

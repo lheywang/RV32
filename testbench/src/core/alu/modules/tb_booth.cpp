@@ -65,29 +65,22 @@ int main(int argc, char **argv)
                 {
                 case 0:
                     result = ((uint64_t)input1[i] * (uint64_t)input2[ii]);
-                    tb.check_equality((uint32_t)((tb.dut->Z)),
-                                      (uint32_t)(result),
+                    tb.check_equality((uint32_t)((tb.dut->Z)), (uint32_t)(result),
                                       "Result (U * U)");
                     break;
                 case 1:
                     result = ((uint64_t)input1[i] * (int64_t)input2[ii]);
-                    std::cout << std::hex << "0x" << result << " = 0x" << tb.dut->Z << " | " << (uint64_t)input1[i] << " * " << (int64_t)input2[ii] << std::dec << std::endl;
-                    tb.check_equality((uint32_t)((tb.dut->Z)),
-                                      (uint32_t)(result),
+                    tb.check_equality((uint32_t)((tb.dut->Z)), (uint32_t)(result),
                                       "Result (U * S)");
                     break;
                 case 2:
                     result = ((int64_t)input1[i] * (uint64_t)input2[ii]);
-                    std::cout << std::hex << "0x" << result << " = 0x" << tb.dut->Z << " | " << (int64_t)input1[i] << " * " << (uint64_t)input2[ii] << std::dec << std::endl;
-                    tb.check_equality((uint32_t)((tb.dut->Z)),
-                                      (uint32_t)(result),
+                    tb.check_equality((uint32_t)((tb.dut->Z)), (uint32_t)(result),
                                       "Result (S * U)");
                     break;
                 case 3:
                     result = ((int64_t)input1[i] * (int64_t)input2[ii]);
-                    std::cout << std::hex << "0x" << result << " = 0x" << tb.dut->Z << " | " << (int64_t)input1[i] << " * " << (int64_t)input2[ii] << std::dec << std::endl;
-                    tb.check_equality((uint32_t)((tb.dut->Z)),
-                                      (uint32_t)(result),
+                    tb.check_equality((uint32_t)((tb.dut->Z)), (uint32_t)(result),
                                       "Result (S * S)");
                     break;
                 }

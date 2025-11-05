@@ -1,0 +1,48 @@
+# Config file for the instructions and memory
+
+[instructions]
+
+# Memory address is 32 bits wide
+if_len = 32
+
+# Memory address are incremented by four each clicks.
+if_inc = 4
+
+# Memory take two cycles to return the value
+if_latency = 2
+
+[memory]
+
+# ROM limits
+if_base_addr = 0x1000_0000
+if_max_addr = 0x1000_3FFF
+
+# Special microcode addresses
+if_trap_ucode = 0x1000_0100
+if_mret_ucode = 0x1000_0200
+if_ecall_ucode = 0x1000_0300
+if_ebreak_ucode = 0x1000_0400
+if_main_code = 0x1000_1000
+
+[opcodes]
+
+# Defines the way the instrction is parsed.
+# Theses values set the limits of each fields.
+
+opcode_msb = 6
+opcode_lsb = 0
+
+rd_msb = 11
+rd_lsb = 7
+
+funct3_msb = 14
+funct3_lsb = 12
+
+rs1_msb = 19
+rs1_lsb = 15
+
+rs2_msb = 24
+rs2_lsb = 20
+
+funct7_msb = 31
+funct7_lsb = 25

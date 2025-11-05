@@ -31,9 +31,7 @@ def bin_to_mif(bin_file, mif_file, width=32, depth=None, byte_swap=False):
             f.write(f"    {i:04X} : {word_hex};\n")
 
         if nwords < depth:
-            f.write(
-                f"    [{nwords:04X}..{depth-1:04X}] : " + "0" * (width // 4) + ";\n"
-            )
+            f.write(f"    [{nwords:04X}..{depth-1:04X}] : " + "0" * (width // 4) + ";\n")
 
         f.write("END;\n")
         return
@@ -45,9 +43,7 @@ def main():
     )
     parser.add_argument("input", help="Input .bin file")
     parser.add_argument("output", help="Output .mif file")
-    parser.add_argument(
-        "--width", type=int, default=32, help="Word width in bits (default: 32)"
-    )
+    parser.add_argument("--width", type=int, default=32, help="Word width in bits (default: 32)")
     parser.add_argument(
         "--depth", type=int, default=None, help="Memory depth in words (default: auto)"
     )

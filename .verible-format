@@ -1,0 +1,8 @@
+# Verible Verilog Formatter configuration (only supported flags)
+# Reference: https://chipsalliance.github.io/verible/verilog_format.html
+
+--indentation_spaces=4
+--wrap_spaces=4
+--column_limit=100
+--over_column_limit_penalty=200
+--max_search_states=100000

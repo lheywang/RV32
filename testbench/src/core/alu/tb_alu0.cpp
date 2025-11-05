@@ -16,10 +16,12 @@ int main(int argc, char **argv)
     int cycle = 0;
 
     // Formal calculation test
-    for (int i = 0; i < 5; i++)
+    for (auto op : EnumRange<alu_commands_t>(alu_commands_t::c_ADD, alu_commands_t::c_XOR))
     {
-        tb.dut->cmd = i;
+        tb.dut->cmd = op;
         tb.dut->i_rd = 0x1F;
+
+        tb.set_case_enum(op);
 
         for (int ii = 0; ii < 5; ii++)
         {
@@ -30,40 +32,49 @@ int main(int argc, char **argv)
                 tb.tick();
                 tb.tick();
 
-                tb.check_equality((unsigned int)tb.dut->busy, (unsigned int)1, "Busy");
-                tb.check_equality((unsigned int)tb.dut->valid, (unsigned int)1, "Busy");
-                tb.check_equality((unsigned int)tb.dut->o_rd, (unsigned int)0x1F, "Busy");
+                tb.check_equality((unsigned int)tb.dut->busy, (unsigned int)1, "busy");
+                tb.check_equality((unsigned int)tb.dut->valid, (unsigned int)1, "valid");
+                tb.check_equality((unsigned int)tb.dut->o_rd, (unsigned int)0x1F, "o_rd");
 
-                switch (i)
+                switch (op)
                 {
-                case 0: // ADD
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(inputs1[ii] + inputs2[iii]), "Add");
+                case alu_commands_t::c_ADD:
+                    tb.check_equality((unsigned int)tb.dut->res,
+                                      (unsigned int)(inputs1[ii] + inputs2[iii]), "res");
                     break;
 
-                case 1: // SUB
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(inputs1[ii] - inputs2[iii]), "Sub");
+                case alu_commands_t::c_SUB:
+                    tb.check_equality((unsigned int)tb.dut->res,
+                                      (unsigned int)(inputs1[ii] - inputs2[iii]), "res");
                     break;
 
-                case 2: // AND
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(inputs1[ii] & inputs2[iii]), "And");
+                case alu_commands_t::c_AND:
+                    tb.check_equality((unsigned int)tb.dut->res,
+                                      (unsigned int)(inputs1[ii] & inputs2[iii]), "res");
                     break;
 
-                case 3: // OR
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(inputs1[ii] | inputs2[iii]), "Or");
+                case alu_commands_t::c_OR:
+                    tb.check_equality((unsigned int)tb.dut->res,
+                                      (unsigned int)(inputs1[ii] | inputs2[iii]), "res");
                     break;
 
-                case 4: // XOR
-                    tb.check_equality((unsigned int)tb.dut->res, (unsigned int)(inputs1[ii] ^ inputs2[iii]), "Xor");
+                case alu_commands_t::c_XOR:
+                    tb.check_equality((unsigned int)tb.dut->res,
+                                      (unsigned int)(inputs1[ii] ^ inputs2[iii]), "res");
+                    break;
+
+                default:
                     break;
                 }
 
-                tb.dut->clear = 1;
+                tb.clear();
                 tb.increment_cycles();
             }
         }
     }
 
     // Overflow test
+    tb.set_case("Overflow");
     tb.dut->cmd = 0;
     tb.dut->i_rd = 0x1F;
     tb.dut->arg0 = 0xFFFFFFFF;
