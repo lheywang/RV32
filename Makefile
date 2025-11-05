@@ -123,7 +123,7 @@ run: $(BUILD_DIR)/V$(TOP)
 	@$(BUILD_DIR)V$(TOP)
 
 # Compile generated C++ from Verilator
-$(BUILD_DIR)/V$(TOP): prepare $(RTL_SRC) $(CXX_TB)  $(TB_TOP)
+$(BUILD_DIR)/V$(TOP): $(FILE_LIST) $(RTL_SRC) $(CXX_TB)  $(TB_TOP)
 	verilator $(VERILATOR_FLAGS)
 	make -C $(BUILD_DIR) -f V$(TESTER_TOP).mk V$(TESTER_TOP) -j$(NPROC) CXX="ccache g++"
 
