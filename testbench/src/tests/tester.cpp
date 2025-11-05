@@ -7,7 +7,7 @@
 int main(int argc, char **argv)
 {
     Verilated::commandArgs(argc, argv);
-    Testbench<Vrv32> tb("Issuer");
+    Testbench<Vrv32> tb("Run_case");
     tb.reset();
 
     tb.run_for(1000);
