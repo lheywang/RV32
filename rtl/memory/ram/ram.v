@@ -103,7 +103,7 @@ module ram (
         altsyncram_component.clock_enable_input_a = "NORMAL",
         altsyncram_component.clock_enable_input_b = "NORMAL",
         altsyncram_component.clock_enable_output_b = "NORMAL",
-        altsyncram_component.init_file = "mem.mif",
+        altsyncram_component.init_file = "build/ram.mif",
         altsyncram_component.intended_device_family = "MAX 10",
         altsyncram_component.lpm_type = "altsyncram",
         altsyncram_component.numwords_a = 24576,
