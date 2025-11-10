@@ -4,10 +4,10 @@
 # --- User passed parameters ---
 TOP        	?= pcounter
 TEST        ?= test1
+BUILD_DIR  	?= build/
 
 # --- Folders definitions ---
 SRC_DIR    	= rtl/
-BUILD_DIR  	= build/
 CONFIG_DIR 	= configs/
 TB_DIR 	   	= testbench/
 SIMOUT     	= simout/
@@ -124,7 +124,7 @@ run: $(BUILD_DIR)/V$(TOP)
 	@$(BUILD_DIR)V$(TOP)
 
 # Compile generated C++ from Verilator
-$(BUILD_DIR)/V$(TOP): $(FILE_LIST) $(RTL_SRC) $(CXX_TB)  $(TB_TOP)
+$(BUILD_DIR)/V$(TOP): $(FILE_LIST) $(RTL_SRC) $(CXX_TB) $(TB_TOP) $(BUILD_DIR)generated.h $(BUILD_DIR)generated.sv
 	verilator $(VERILATOR_FLAGS)
 	@make -C $(BUILD_DIR) -f V$(TOP).mk V$(TOP) -j$(NPROC) CXX="ccache g++"
 
@@ -137,16 +137,13 @@ format:
 	@clang-format -i --style=file $(TB_SRC)
 	@black --line-length 100 $(PY_SRC)
 
-# Prepare files for any simulations
-prepare : $(BUILD_DIR) $(NEEDED_ENUMS) $(BUILD_DIR)generated.h
-
 # Prepare files for a program run
 test_case: $(FILE_LIST) $(TEST_BUILD) $(INIT_RAM) $(INIT_ROM)
 	verilator $(VERILATOR_FLAGS_RUN)
 	@make -C $(BUILD_DIR) -f V$(TESTER_TOP).mk V$(TESTER_TOP) -j$(NPROC) CXX="ccache g++"
 
 # Run the unit-tests
-tests:
+tests: $(BUILD_DIR)generated.h $(BUILD_DIR)generated.sv
 	@./utils/tests.py
 
 # Run the simulation by hand
@@ -206,13 +203,13 @@ $(BUILD_DIR)generated_commands.svh : $(CONFIG_DIR)def/commands.def
 
 # Build dir
 $(BUILD_DIR) : 
-	@mkdir $(BUILD_DIR)
+	@mkdir -p $(BUILD_DIR)
 
 # List the files used for verilator.
-$(FILE_LIST) : prepare
+$(FILE_LIST) :
 	@echo "$(MEM_SRC)" | tr ' ' '\n' > $@
 	@echo "$(PLL_SRC)" | tr ' ' '\n' >> $@
-	@echo "$(shell find $(BUILD_DIR) -type f -name "*.sv")" | tr ' ' '\n' >> $@
+	@echo "$(BUILD_DIR)generated.sv "> $@
 	@echo "$(RTL_SRC)" | tr ' ' '\n' >> $@
 
 # =========================================================================================================

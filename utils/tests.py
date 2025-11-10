@@ -3,7 +3,9 @@ import os
 import subprocess
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
-import time 
+import time
+import random 
+from pathlib import Path
 
 # === CONFIG ===
 targets = [
@@ -41,9 +43,12 @@ def run_target(target: str):
     report_file = os.path.join(report_dir, f"{target}.md")
     stat_file = os.path.join(report_dir, f"{target}.stat")
 
+    build_folder = f"build/{random.randint(1, 2**32):0x}/"
+    Path(build_folder).mkdir(parents=True, exist_ok=True)
+
     # Run Verilator build
     with open(log_file, "w") as f:
-        subprocess.run(["make", f"TOP={target}"], stdout=f, stderr=subprocess.STDOUT)
+        subprocess.run(["make", f"TOP={target}", f"BUILD_DIR={build_folder}"], stdout=f, stderr=subprocess.STDOUT)
 
     # Generate the Markdown report
     subprocess.run(
@@ -75,13 +80,6 @@ def run_target(target: str):
 def main():
 
     start = time.time()
-    print(f"🔧 Preparing the build files ...")
-    subprocess.run(
-        ["make", "prepare"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
-
     print(f"🔧 Running Verilator builds in parallel ({os.cpu_count()} threads)...\n")
 
     results = []
