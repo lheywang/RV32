@@ -237,10 +237,10 @@ module alu1 (
                 tmp_jmp       = 33'b0;
 
                 // Setting flags
-                act_needed    = 1'b1;  // always jumped
+                act_needed    = 1'b0;
                 predict_value = 1'b0;
-                int_req       = 1'b1;
-                unknown_instr = 1'b0;
+                int_req       = 1'b0;
+                unknown_instr = 1'b1;
             end
 
         endcase
@@ -264,7 +264,8 @@ module alu1 (
             valid     <= 1'b0;
             end_of_op <= 1'b0;
 
-        end else if (clear && end_of_op) begin
+        end 
+        else if (clear && end_of_op) begin
 
             busy       <= 1'b0;
             res        <= 32'b0;
@@ -278,12 +279,13 @@ module alu1 (
             predict_ok <= 1'b0;
             mispredict <= 1'b0;
 
-        end else begin
+        end 
+        else if (!unknown_instr) begin
 
             busy       <= int_req;
             res        <= tmp_res[(core_config_pkg::XLEN-1) : 0];
             jmp        <= tmp_jmp[(core_config_pkg::XLEN-1) : 0];
-            i_error    <= unknown_instr;
+            i_error    <= 1'b0;
             o_error    <= tmp_res[(core_config_pkg::XLEN)] | tmp_jmp[(core_config_pkg::XLEN)];
             req        <= act_needed;
             o_rd       <= i_rd;
@@ -291,6 +293,21 @@ module alu1 (
             end_of_op  <= 1'b1;
             predict_ok <= ~(act_needed ^ predict_value);
             mispredict <= act_needed ^ predict_value;
+
+        end 
+        else begin
+
+            busy       <= 1'b0;
+            res        <= 32'b0;
+            jmp        <= 32'b0;
+            i_error    <= 1'b1; // Set to 1
+            o_error    <= 1'b0;
+            req        <= 1'b0;
+            o_rd       <= 5'b0;
+            valid      <= 1'b0;
+            end_of_op  <= 1'b0;
+            predict_ok <= 1'b0;
+            mispredict <= 1'b0;
 
         end
     end

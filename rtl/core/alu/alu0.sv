@@ -120,7 +120,8 @@ module alu0 (
             valid     <= 1'b0;
             end_of_op <= 1'b0;
 
-        end else if (clear && end_of_op) begin
+        end 
+        else if (clear && end_of_op) begin
 
             busy      <= 1'b0;
             res       <= 32'b0;
@@ -131,16 +132,29 @@ module alu0 (
             valid     <= 1'b0;
             end_of_op <= 1'b0;
 
-        end else begin
+        end 
+        else if (!unknown_instr) begin
 
             busy      <= int_req;
             res       <= tmp_res[(core_config_pkg::XLEN-1) : 0];
-            i_error   <= unknown_instr;
+            i_error   <= 1'b0;
             o_error   <= tmp_res[(core_config_pkg::XLEN)];
             req       <= 1'b0;
             o_rd      <= i_rd;
             valid     <= 1'b1;
             end_of_op <= 1'b1;
+
+        end 
+        else begin
+
+            busy      <= 1'b0;
+            res       <= 32'b0;
+            i_error   <= 1'b1;
+            o_error   <= 1'b0;
+            req       <= 1'b0;
+            o_rd      <= 5'b0;
+            valid     <= 1'b0;
+            end_of_op <= 1'b0;
 
         end
     end

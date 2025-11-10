@@ -104,7 +104,7 @@ module rv32 (
     assign mem_err = 1'b0;
 
     rom ROM0 (
-        .aclr(rom_flush),
+        .aclr(1'b1 | rom_flush),
         .address_a(rom_addr[17:2]),
         .address_b(mem_addr[17:2]),
         .clock(clk),
@@ -113,7 +113,6 @@ module rv32 (
         .rden_b(mem_req),
         .q_a(rom_instr),
         .q_b(mem_rdata)
-
     );
 
 endmodule

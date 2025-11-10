@@ -623,7 +623,7 @@ module issuer (
     end
 
     assign dec_busy = ~prog_enabled;
-    assign halt_needed = |{alu0_error, alu1_error, alu2_error, alu3_error, alu4_error, alu5_error, halt_pending, dec_illegal, commit_err, PC_ovf};
+    assign halt_needed = |{alu0_error, alu1_error, alu2_error, alu3_error, alu4_error, alu5_error, halt_pending, dec_illegal, commit_err, PC_ovf} & 1'b0;
     assign dec_flush = flush_needed;
 
 endmodule
