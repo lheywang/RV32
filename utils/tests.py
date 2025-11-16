@@ -4,7 +4,7 @@ import subprocess
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 import time
-import random 
+import random
 from pathlib import Path
 
 # === CONFIG ===
@@ -29,6 +29,7 @@ targets = [
     "prediction",
     "commiter",
     "issuer",
+    "mem_manager",
 ]
 log_dir = "logs"
 report_dir = os.path.join(log_dir, "reports")
@@ -48,7 +49,11 @@ def run_target(target: str):
 
     # Run Verilator build
     with open(log_file, "w") as f:
-        subprocess.run(["make", f"TOP={target}", f"BUILD_DIR={build_folder}"], stdout=f, stderr=subprocess.STDOUT)
+        subprocess.run(
+            ["make", f"TOP={target}", f"BUILD_DIR={build_folder}"],
+            stdout=f,
+            stderr=subprocess.STDOUT,
+        )
 
     # Generate the Markdown report
     subprocess.run(
@@ -122,7 +127,9 @@ def main():
     print(f"Total passed: {total_pass}")
     print(f"Total failed: {total_fail}")
     print(f"Average success: {avg_percent:.2f}%")
-    print(f"Duration: {((stop - start) * 1000 if (stop - start) < 1 else (stop - start)):.3f} {"ms" if (stop - start) < 1 else "s"}")
+    print(
+        f"Duration: {((stop - start) * 1000 if (stop - start) < 1 else (stop - start)):.3f} {"ms" if (stop - start) < 1 else "s"}"
+    )
 
 
 if __name__ == "__main__":
