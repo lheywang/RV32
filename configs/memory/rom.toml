@@ -1,0 +1,7 @@
+# Config file for the different memory spaces for the onchip ROM
+
+[rom]
+
+rom_base = 0x1000_0000
+rom_length = "48K"
+

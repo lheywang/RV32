@@ -1,0 +1,30 @@
+# Config file for the different memory spaces for the peripherals
+
+[peripherals]
+
+peripheral_length = "4k" # Each peripherals get a block of 4kB of memory space, to be used as they need.
+
+gpio0_base = 0x4000_0000
+gpio1_base = 0x4000_1000
+gpio2_base = 0x4000_2000
+gpio3_base = 0x4000_3000
+
+serial0_base = 0x4001_0000
+serial1_base = 0x4001_1000
+serial2_base = 0x4001_2000
+serial3_base = 0x4001_3000
+serial4_base = 0x4001_4000
+serial5_base = 0x4001_5000
+
+keyboard0_base = 0x4000_2000
+
+argb0_base = 0x4003_0000
+
+timer0_base = 0x4004_0000
+timer1_base = 0x4004_1000
+timer2_base = 0x4004_2000
+timer3_base = 0x4004_3000
+timer4_base = 0x4004_4000
+timer5_base = 0x4004_5000
+
+int0_base = 0x4F00_0000

@@ -1,0 +1,9 @@
+# Config file for the different memory spaces for the onchip RAM
+
+[ram]
+
+ram_base = 0x2000_0000
+ram_length = "24K"
+
+ext_ram_base = 0x8000_0000
+ext_ram_length = "256M"
