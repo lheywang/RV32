@@ -264,8 +264,7 @@ module alu1 (
             valid     <= 1'b0;
             end_of_op <= 1'b0;
 
-        end 
-        else if (clear && end_of_op) begin
+        end else if (clear && end_of_op) begin
 
             busy       <= 1'b0;
             res        <= 32'b0;
@@ -279,8 +278,7 @@ module alu1 (
             predict_ok <= 1'b0;
             mispredict <= 1'b0;
 
-        end 
-        else if (!unknown_instr) begin
+        end else if (!unknown_instr) begin
 
             busy       <= int_req;
             res        <= tmp_res[(core_config_pkg::XLEN-1) : 0];
@@ -294,13 +292,12 @@ module alu1 (
             predict_ok <= ~(act_needed ^ predict_value);
             mispredict <= act_needed ^ predict_value;
 
-        end 
-        else begin
+        end else begin
 
             busy       <= 1'b0;
             res        <= 32'b0;
             jmp        <= 32'b0;
-            i_error    <= 1'b1; // Set to 1
+            i_error    <= 1'b1;  // Set to 1
             o_error    <= 1'b0;
             req        <= 1'b0;
             o_rd       <= 5'b0;

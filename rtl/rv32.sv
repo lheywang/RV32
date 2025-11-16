@@ -86,7 +86,7 @@ module rv32 (
      *  shall not differ too much from one to the other.
      */
     ram RAM0 (
-        .aclr(~int_rst_n),
+        .aclr(int_rst_n),
         .byteena_a(mem_byteen),
         .clock(clk),
         .enable(1'b1),
