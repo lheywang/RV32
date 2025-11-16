@@ -32,10 +32,12 @@ TB_UTILS  	 = $(abspath $(TB_DIR)/include )
 TB_TOP 	   	:= $(shell find $(abspath $(TB_DIR)src) -type f -iname "tb_$(TOP).cpp" | head -n 1)
 TB_SRC     	:= $(shell find $(TB_DIR)src -type f -name "*.cpp")
 PY_SRC     	:= $(shell find $(UTILS) -type f -name "*.py")
+PY_SRC     	:= $(shell find $(CONFIG_DIR) -type f -name "*.py")
 
 # We need to use different commands to ensure the right order is outputed...
 RTL_SRC    	 = $(shell find $(SRC_DIR)core -type f -name "*.sv")
 RTL_SRC    	+= $(shell find $(SRC_DIR)peripherals -type f -name "*.sv")
+RTL_SRC    	+= $(shell find $(SRC_DIR)memory/assemblies -type f -name "*.sv")
 RTL_SRC    	+= $(SRC_DIR)rv32.sv
 
 MEM_SRC    	+= $(SRC_DIR)memory/rom/rom.v \
@@ -86,7 +88,8 @@ NEEDED_CONFIS = $(BUILD_DIR)core_config_pkg.svh \
 				$(BUILD_DIR)keys_config_pkg.svh \
 				$(BUILD_DIR)serial_config_pkg.svh \
 				$(BUILD_DIR)timer_config_pkg.svh \
-				$(BUILD_DIR)ulpi_config_pkg.svh
+				$(BUILD_DIR)ulpi_config_pkg.svh \
+				$(BUILD_DIR)memory_config_pkg.svh
 
 NEEDED_ENUMS  = $(BUILD_DIR)generated_opcodes.svh \
 				$(BUILD_DIR)generated_decoders.svh \
@@ -127,8 +130,10 @@ run: $(BUILD_DIR)/V$(TOP)
 	@echo "Running simulation..."
 	@$(BUILD_DIR)V$(TOP)
 
+prepare: $(FILE_LIST) $(RTL_SRC) $(CXX_TB) $(TB_TOP) $(BUILD_DIR)generated.h $(BUILD_DIR)generated.sv
+
 # Compile generated C++ from Verilator
-$(BUILD_DIR)/V$(TOP): $(FILE_LIST) $(RTL_SRC) $(CXX_TB) $(TB_TOP) $(BUILD_DIR)generated.h $(BUILD_DIR)generated.sv
+$(BUILD_DIR)/V$(TOP): prepare
 	verilator $(VERILATOR_FLAGS)
 	@make -C $(BUILD_DIR) -f V$(TOP).mk V$(TOP) -j$(NPROC) CXX="ccache g++"
 
@@ -179,6 +184,8 @@ $(BUILD_DIR)timer_config_pkg.svh :
 	@./utils/conf2header.py configs/peripherals/timer/ --output $(BUILD_DIR)
 $(BUILD_DIR)ulpi_config_pkg.svh :
 	@./utils/conf2header.py configs/peripherals/ulpi/ --output $(BUILD_DIR)
+$(BUILD_DIR)memory_config_pkg.svh :
+	@./utils/conf2header.py configs/memory/ --output $(BUILD_DIR)
 
 # =========================================================================================================
 # Enums creations
