@@ -3,7 +3,7 @@ USE IEEE.std_logic_1164.ALL;
 USE IEEE.numeric_std.ALL;
 USE work.common.ALL;
 
-ENTITY endianess IS
+ENTITY endianess_vhd IS
     GENERIC (
         --! @brief Configure the data width in the core.
         XLEN : INTEGER := 32
@@ -16,7 +16,7 @@ ENTITY endianess IS
     );
 END ENTITY;
 
-ARCHITECTURE rtl OF endianess IS
+ARCHITECTURE rtl OF endianess_vhd IS
 
 BEGIN
 

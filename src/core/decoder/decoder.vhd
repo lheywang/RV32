@@ -8,7 +8,7 @@ USE IEEE.std_logic_1164.ALL;
 USE IEEE.numeric_std.ALL;
 USE work.common.ALL;
 
-ENTITY decoder IS
+ENTITY decoder_vhd IS
     GENERIC (
         --! @brief Configure the data width in the core. DOES NOT configure the instruction lenght, which is fixed to 32 bits.
         XLEN : INTEGER := 32
@@ -54,7 +54,7 @@ ENTITY decoder IS
     );
 END ENTITY;
 
-ARCHITECTURE behavioral OF decoder IS
+ARCHITECTURE behavioral OF decoder_vhd IS
 
     --------------------------------------------------------------------------------------------------------
     -- Types definitions

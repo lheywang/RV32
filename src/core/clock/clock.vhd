@@ -2,7 +2,7 @@ LIBRARY IEEE;
 USE IEEE.std_logic_1164.ALL;
 USE IEEE.numeric_std.ALL;
 
-ENTITY clock IS
+ENTITY clock_vhd IS
     GENERIC (
         --! @brief Input frequency of the module. This value is needed to deduce the counter limits.
         INPUT_FREQ : INTEGER := 200_000_000;
@@ -23,7 +23,7 @@ ENTITY clock IS
     );
 END ENTITY;
 
-ARCHITECTURE behavioral OF clock IS
+ARCHITECTURE behavioral OF clock_vhd IS
 
     --! @brief constant that will be used as the upper limit of the counter.
     CONSTANT maxval : INTEGER := (INPUT_FREQ / OUTPUT_FREQ) - 1;

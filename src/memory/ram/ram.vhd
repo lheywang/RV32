@@ -40,7 +40,7 @@ USE ieee.std_logic_1164.all;
 LIBRARY altera_mf;
 USE altera_mf.altera_mf_components.all;
 
-ENTITY ram IS
+ENTITY ram_vhd IS
 	PORT
 	(
 		aclr		: IN STD_LOGIC  := '0';
@@ -54,7 +54,7 @@ ENTITY ram IS
 END ram;
 
 
-ARCHITECTURE SYN OF ram IS
+ARCHITECTURE SYN OF ram_vhd IS
 
 	SIGNAL sub_wire0	: STD_LOGIC_VECTOR (31 DOWNTO 0);
 

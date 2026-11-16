@@ -7,7 +7,7 @@ LIBRARY IEEE;
 USE IEEE.std_logic_1164.ALL;
 USE IEEE.numeric_std.ALL;
 
-ENTITY pcounter IS
+ENTITY pcounter_vhd IS
     GENERIC (
         --! @brief Configure the data width in the core.
         XLEN : INTEGER := 32;
@@ -51,7 +51,7 @@ ENTITY pcounter IS
     );
 END ENTITY;
 
-ARCHITECTURE behavioral OF pcounter IS
+ARCHITECTURE behavioral OF pcounter_vhd IS
 
     --! @brief Internal counter for the address value, as an unsigned of XLEN bits.
     SIGNAL internal_address : unsigned((XLEN - 1) DOWNTO 0);

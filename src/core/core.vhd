@@ -9,7 +9,7 @@ USE IEEE.numeric_std.ALL;
 USE work.common.ALL;
 USE work.records.ALL;
 
-ENTITY core IS
+ENTITY core_vhd IS
     GENERIC (
         --! @brief Configure the data width in the core. DOES NOT configure the instruction lenght, which is fixed to 32 bits.
         XLEN : INTEGER := 32;
@@ -83,7 +83,7 @@ ENTITY core IS
     );
 END ENTITY;
 
-ARCHITECTURE behavioral OF core IS
+ARCHITECTURE behavioral OF core_vhd IS
 
     -- Since most signals are between a component and the core controller, they're sorted as this logic.
     --------------------------------------------------------------------------------------------------------

@@ -36,7 +36,7 @@ USE ieee.std_logic_1164.ALL;
 LIBRARY altera_mf;
 USE altera_mf.altera_mf_components.ALL;
 
-ENTITY rom IS
+ENTITY rom_vhd IS
     PORT (
         aclr : IN STD_LOGIC := '0';
         address_a : IN STD_LOGIC_VECTOR (13 DOWNTO 0);
@@ -47,7 +47,7 @@ ENTITY rom IS
         q_b : OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
     );
 END rom;
-ARCHITECTURE SYN OF rom IS
+ARCHITECTURE SYN OF rom_vhd IS
 
     SIGNAL sub_wire0_bv : BIT_VECTOR (31 DOWNTO 0);
     SIGNAL sub_wire0 : STD_LOGIC_VECTOR (31 DOWNTO 0);
